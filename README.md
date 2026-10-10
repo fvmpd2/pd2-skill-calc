@@ -1,4 +1,4 @@
-# PD2 Damage Calculator — martial arts edition
+# PD2 Damage Calculator — ember edition
 
 Extract this ZIP and open `index.html` in a modern browser. No installation or server is required. For GitHub Pages, replace the existing calculator files in your repository and publish the repository root. No original game files are needed at runtime.
 
@@ -66,7 +66,7 @@ Automated tests passed. Browser visual verification was unavailable: local hosti
 
 If your repository contains only this calculator, replace its existing files with all eight files from this ZIP in the same repository folder. Keep index.html, style.css, skills.js, calc.js and main.js together. Upload the extracted files, not the ZIP itself. Preserve unrelated projects, .git, .github and any custom domain CNAME file.
 
-This build displays “Martial arts · v4” beneath the title and uses versioned style/script links to request fresh assets. An empty skill list with the old blue theme suggests mismatched or cached files. Wait for GitHub Pages deployment to finish, then use Command+Shift+R on Mac or Ctrl+Shift+R on Windows.
+This build displays “Built with AI” beneath the title and uses versioned style/script links to request fresh assets. The visible version badge is removed. An empty skill list with the old blue theme suggests mismatched or cached files. Wait for GitHub Pages deployment to finish, then use Command+Shift+R on Mac or Ctrl+Shift+R on Windows.
 
 ## Martial arts / in-game names (v4)
 
@@ -80,4 +80,10 @@ The uploaded source data is authoritative for this build. Current wiki descripti
 
 Internal names are mapped to player-visible names throughout the selector and synergy controls: Royal Strike → Phoenix Strike, Poison Dagger → Poison Strike, Fire Trauma → Fire Blast, Shock Field → Shock Web, Wake of Fire Sentry → Wake of Fire, Inferno Sentry → Wake of Inferno, Plague Poppy → Poison Creeper, Summon Fenris → Summon Dire Wolf, Eruption → Fissure, Enchant → Enchant Fire, and golem spacing. Original internal names/IDs and raw formulas remain available in the generated data for auditing. Name references: PD2 wiki All Assassin, Necromancer, Druid and Sorceress Skills pages.
 
-The page includes: “Built with AI. Found an issue? Tag fvm on the PD2 Discord.” It recommends https://hiimpd2.com/planner and https://hiimpd2.com/damage-calc for more detailed information.
+The title has a small “Built with AI” credit. The bottom notice says “Found an issue? Tag fvm on the PD2 Discord.” It recommends https://hiimpd2.com/planner and https://hiimpd2.com/damage-calc for more detailed information.
+
+## Ember layout update (v5)
+
+Classes sort alphabetically. The version badge and explanatory subtitle are removed; only “Built with AI” sits beneath the title. Routine supported-component messages and the long technical footer are removed. Calculation errors and immunity messages still appear when relevant. Model limitations remain documented in this README.
+
+Poison results use four small two-line cards; charge poison summaries are condensed. Modifier fields align at the bottom of each grid row, with elemental/physical resistance and pierce occupying matching columns. The palette now uses near-black panels, ember-red borders and orange firelit headings. Issue-reporting and Hiim resource links remain at the bottom. Automated regression tests passed; browser visual verification remains unavailable in this environment.

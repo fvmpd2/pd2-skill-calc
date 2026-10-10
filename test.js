@@ -23,7 +23,7 @@ vm.runInContext(fs.readFileSync(__dirname+'/main.js','utf8'),c);
 assert.equal(elements.skill.children.some(x=>x.text.includes('unsupported')),false);
 for(const s of c.catalog.filter(s=>s.formula)){elements.skill.value=s.id;vm.runInContext('changeSkill()',c);assert(!/error/i.test(elements.status.textContent),s.name);if(s.charges){assert.equal(elements.chargeResults.children.length,3,s.name);}else{assert.equal(elements.damageRows.children.length,1,s.name);}assert.equal(elements.scalingGrid.querySelectorAll('input').length,s.formula.kind==='weapon'?0:12,s.name);}
 for(const className of new Set(c.catalog.map(s=>s.className))){elements.class.value=className;elements.class.listeners.change();assert(elements.skill.children.every(option=>c.catalog.find(s=>s.id===option.value).formula));}
-elements.skill.value=c.catalog.find(s=>s.name==='Poison Nova').id;elements.skill.listeners.change();assert.equal(elements.poisonResults.children.length,5);
+elements.skill.value=c.catalog.find(s=>s.name==='Poison Nova').id;elements.skill.listeners.change();assert.equal(elements.poisonResults.children.length,4);
 const original=vm.runInContext('skillFormula().min[0]',c);const synergy=vm.runInContext('JSON.stringify(skillFormula().synergy)',c);
 elements.scalingGrid.querySelectorAll('input')[0].value='1';elements.apply.listeners.click();assert.equal(vm.runInContext('skillFormula().min[0]',c),1);assert.equal(vm.runInContext('JSON.stringify(skillFormula().synergy)',c),synergy);
 elements.scalingGrid.querySelectorAll('input')[0].value='';elements.apply.listeners.click();assert(elements.feedback.textContent.includes('valid'));
@@ -46,3 +46,6 @@ console.log('Passed: all six martial arts skills, three stages, mixed fire/physi
 for(const [internal,name] of [['Royal Strike','Phoenix Strike'],['Poison Dagger','Poison Strike'],['Fire Trauma','Fire Blast'],['Shock Field','Shock Web'],['Eruption','Fissure'],['AmpDmg','Amplify Damage'],['Vines','Solar Creeper']])assert.equal(c.catalog.find(s=>s.internalName===internal).name,name);
 const page=fs.readFileSync(__dirname+'/index.html','utf8');assert(page.includes('Built with AI'));assert(page.includes('fvm'));assert(page.includes('https://hiimpd2.com/planner'));assert(page.includes('https://hiimpd2.com/damage-calc'));
 console.log('Passed: in-game name aliases and site notice/resource links.');
+
+assert.equal(elements.status.textContent,'');assert(!page.includes('Supported component'));assert(!page.includes('class="footer"'));assert(page.includes('class="ai-credit"'));assert(!page.includes('build-label'));assert.deepEqual(Array.from(elements.class.children.map(c=>c.text)),Array.from(elements.class.children.map(c=>c.text)).sort((a,b)=>a.localeCompare(b)));
+console.log('Passed: alphabetical classes, compact poison cards, clean header/footer and removed routine status.');
