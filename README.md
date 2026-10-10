@@ -1,4 +1,4 @@
-# PD2 Damage Calculator — skill audit edition (v10)
+# PD2 Damage Calculator — skill audit edition (v11)
 
 Extract the ZIP and open `index.html`, or replace the calculator files in your GitHub Pages repository. Keep `index.html`, `style.css`, `skills.js`, `calc.js` and `main.js` together. Upload extracted files, not the ZIP. The original game text files are not required by the website.
 
@@ -66,24 +66,26 @@ Run `node test.js`. Tests cover every available component at eleven level bounda
 
 This is automated formula/UI-logic verification, **not a live in-game comparison or visual browser check**. Some server/tooltip discrepancies and equipment/conversion models remain unresolved; see the audit. No blanket claim that all skill components are fully modeled is made.
 
-The website retains the fiery dark theme, alphabetical classes, “Built with AI” and the fvm/Hiim resource notice together beneath the title. Versioned asset links request fresh v10 files. Wait for GitHub Pages deployment to complete and hard-refresh if the old version remains visible. Preserve unrelated files, `.git`, `.github` and any custom-domain `CNAME` when replacing calculator files.
+The website retains the fiery dark theme, alphabetical classes, “Built with AI” and the fvm/Hiim resource notice together beneath the title. Versioned asset links request fresh v11 files. Wait for GitHub Pages deployment to complete and hard-refresh if the old version remains visible. Preserve unrelated files, `.git`, `.github` and any custom-domain `CNAME` when replacing calculator files.
 
-## Teleport comparison (v10)
+## Teleport comparison (v11)
 
 Every selectable Sorceress skill has a **Teleport (slvl)** dropdown in Skill levels (1–100). Select your effective level including +skills. The calculated penalty appears beside it; level 1 is selected initially. The supplied Skills row and [Teleport skill table](https://wiki.projectdiablo2.cn/wiki/All_Sorceress_Skills#Teleport) give a one-second debuff, starting at 50% at level 1, decreasing by one percentage point per effective level to zero at level 51.
 
 The additional output below the main damage shows each component with the penalty, before and after resistance, using damage × (1 − penalty/100), with penalty = max(0, 51 − effective Teleport level). It preserves all existing synergies, bonuses and resistance inputs. Multi-component and continuous damage retain the units of their main output. This is a comparison while the debuff applies; the calculator does not simulate cast timing, persistent spell snapshotting or the lifetime of Hydra/ground effects. Main damage remains unchanged. Checks cover all selectable Sorceress skills, component output, 0–100% boundaries, changing the input and hiding the controls for other classes.
 
-## Saving and sharing (v10)
+## Saving and sharing (v11)
 
 The address updates automatically as you change calculator inputs. Click **Copy build link** to save or share the current setup, or bookmark the page. Opening the link restores skill selection, levels, synergies, resistance/bonus inputs, summon/weapon inputs, Teleport level, selected scaling component and applied custom scaling. Unapplied scaling edits are not included. If clipboard access is unavailable, a selectable link box appears.
 
 Build data is embedded in the URL fragment (`#build=...`); no account or database is needed. Custom scaling can make links longer. Links restore inputs against the site's current game data, so future season updates may change results. Unsupported/invalid skill links show a helpful message; malformed scaling is ignored. Tested with saved/restored spell, martial arts, poison and summon builds, custom scaling and invalid links.
 
-## Results layout (v10)
+## Results layout (v11)
 
-Every damage type uses the same modifier slots: Skill damage, Enemy res, −Enemy res % on the first row; Breaking pierce and poison length reduction on the second. Physical skill damage is disabled because that modifier does not apply. Normal and Teleport results sit together per component, with before/after resistance columns. Synergy and bonus details are in a collapsed Calculation breakdown.
+Every damage type uses the same modifier slots: Skill damage, −Enemy res %, Enemy res on the first row; Breaking pierce on the left and poison length reduction on the right of the second row. Physical skill damage is disabled because that modifier does not apply. Normal and Teleport results sit together per component, with before/after resistance columns. Synergy and bonus details are in a collapsed Calculation breakdown.
 
-**Truncate numbers** defaults on and truncates displayed damage toward zero to whole numbers. Uncheck it to display the computed JavaScript numeric precision (up to 20 decimal places). The underlying calculation is unchanged; duration and percentage labels keep their own units/precision. The preference is saved in build links.
+**Truncate numbers** defaults on and truncates displayed damage toward zero to whole numbers. Uncheck it to display the computed JavaScript numeric precision (a maximum of 3 decimal places). The underlying calculation is unchanged; duration and percentage labels keep their own units/precision. The preference is saved in build links.
 
 Typography uses a shared scale: 12px controls/table text, 11px helper text, 13px component headings, 15px panel headings and a 22px page title.
+
+The Reset button beside Copy build link keeps the selected class/skill and display preference. It resets main/Teleport levels to 1, synergies and modifiers to zero, weapon inputs to zero, and clears applied scaling edits for the selected skill. Mastery resets to zero except Skeleton Mage’s required minimum of 1; Dark Pact curse count resets to 1. Other extra inputs reset to zero. The saved link updates to the reset setup.

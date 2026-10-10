@@ -7,7 +7,7 @@ const selectedComponent=()=>{if(!active?.charges)return null;const [stage,index]
 const skillFormula=()=>active&&(overrides[editorKey()]||selectedComponent()?.formula||active.formula);
 const guessedType=s=>Object.entries(types).find(([_,re])=>re.test(s.name))?.[0]||'physical';
 const n=id=>Number($(id).value)||0;
-$('teleportLevel').replaceChildren(...Array.from({length:100},(_,i)=>new Option(String(i+1),String(i+1))));const fmt=v=>$('truncateNumbers').checked?Math.trunc(v).toLocaleString():v.toLocaleString(undefined,{maximumFractionDigits:20});const range=(a,b)=>`${fmt(a)} – ${fmt(b)}`;
+$('teleportLevel').replaceChildren(...Array.from({length:100},(_,i)=>new Option(String(i+1),String(i+1))));const fmt=v=>$('truncateNumbers').checked?Math.trunc(v).toLocaleString():v.toLocaleString(undefined,{maximumFractionDigits:3});const range=(a,b)=>`${fmt(a)} – ${fmt(b)}`;
 $('class').replaceChildren(...classes.map(c=>new Option(c,c)));
 function refreshSkillList(){const matching=supportedSkills.filter(s=>s.className===$('class').value);$('skill').replaceChildren(...matching.map(s=>new Option(s.name,s.id)));active=matching[0]||null;changeSkill();}
 function changeSkill(){active=supportedSkills.find(s=>s.id===$('skill').value)||active;if(!active)return;$('feedback').textContent='';$('levelLabel').firstChild.textContent=`${active.name} (slvl)`;setupExtras();setupCharges();$('skillInfo').textContent=active.info||'';$('skillInfo').hidden=!active.info;$('damageType').value=skillFormula()?.damageType||guessedType(active);$('damageType').disabled=true;$('normalModifierType').textContent=$('damageType').value[0].toUpperCase()+$('damageType').value.slice(1);$('pct').disabled=$('damageType').value==='physical';renderScaling();renderSynergies();compute();}
@@ -138,6 +138,17 @@ function restoreBuild(hash){
   renderScaling();compute();return true;
  }catch(e){$('linkFeedback').textContent='This build link could not be loaded. Choose a skill to start again.';return false;}finally{restoringBuild=false;}
 }
+$('resetBuild').addEventListener('click',()=>{
+ const id=active.id;
+ for(const key of Object.keys(overrides))if(key===id||key.startsWith(id+':'))delete overrides[key];
+ savedSynergies[id]={};
+ for(const sy of synergyList())savedSynergies[id][sy.name]=0;
+ for(const field of buildFields)$(field).value=['level','teleportLevel'].includes(field)?'1':'0';
+ changeSkill();
+ for(const e of $('extraFields').querySelectorAll('input'))e.value=e.dataset.extra==='curseCount'||(e.dataset.extra==='masteryLevel'&&active.charges?.some(stage=>stage.components.some(c=>c.formula.model==='skeleton-mage')))?'1':'0';
+ $('linkFallback').hidden=true;$('linkFeedback').textContent='Inputs reset. Class and skill kept.';
+ renderScaling();compute();
+});
 $('copyBuild').addEventListener('click',async()=>{
  try{const url=buildUrl();await navigator.clipboard.writeText(url);$('linkFeedback').textContent='Build link copied. Save it as a bookmark or share it.';}
  catch(e){$('linkFallback').value=buildUrl();$('linkFallback').hidden=false;$('linkFallback').select();$('linkFeedback').textContent='Copy the link from the box below.';}
