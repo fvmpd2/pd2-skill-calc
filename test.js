@@ -15,13 +15,18 @@ assert.equal(c.calc(poison,{skillLevel:1,enemyResistancePct:100,enemyResistanceR
 assert.equal(c.calc(null,{skillLevel:1}),null);
 for(const s of c.catalog)if(s.formula)for(const skillLevel of [1,8,9,16,17,22,23,28,29,50,100]){const v=c.calc(s.formula,{skillLevel});assert(Number.isFinite(v.min)&&Number.isFinite(v.max),s.name);}
 // Exercise UI event handling without a browser, including unsupported and editable formulas.
-class Element{constructor(){this.value='';this.children=[];this.listeners={};this.firstChild={textContent:''};this.dataset={};this.textContent='';}replaceChildren(...xs){this.children=xs;if(xs[0]?.value!==undefined)this.value=xs[0].value;}append(x){this.children.push(x);}addEventListener(name,fn){this.listeners[name]=fn;}querySelectorAll(){return this.children.flatMap(x=>x.children);}get selectedOptions(){return [{text:this.value}];}}
-const ids=['class','skill','levelLabel','damageType','formulaEditor','synergies','level','pct','pierce','enemyRes','enemyPlr','plrField','poisonResults','status','damageRows','comparison','apply','feedback','example','reset'];
+class Element{constructor(){this.value='';this.children=[];this.listeners={};this.firstChild={textContent:''};this.dataset={};this.textContent='';}replaceChildren(...xs){this.children=xs;if(xs[0]?.value!==undefined)this.value=xs[0].value;}append(x){this.children.push(x);}addEventListener(name,fn){this.listeners[name]=fn;}querySelectorAll(selector){const all=this.children.flatMap(x=>[x,...x.querySelectorAll(selector)]);return all.filter(x=>selector==='input'&&x.type==='number');}get selectedOptions(){return [{text:this.value}];}}
+const ids=['class','skill','levelLabel','damageType','scalingGrid','scalingNote','synergies','level','pct','pierce','enemyRes','enemyPlr','plrField','poisonResults','status','damageRows','comparison','apply','feedback','reset'];
 const elements=Object.fromEntries(ids.map(id=>[id,new Element()]));elements.level.value='1';
 c.document={getElementById:id=>elements[id],createElement:()=>new Element()};c.Option=function(text,value){return {text,value};};
 vm.runInContext(fs.readFileSync(__dirname+'/main.js','utf8'),c);
-for(const s of c.catalog){elements.skill.value=s.id;vm.runInContext('changeSkill()',c);assert(!elements.status.textContent.includes('Formula error'),s.name);assert.equal(elements.damageRows.children.length,s.formula?1:0,s.name);}
-elements.formulaEditor.value=JSON.stringify(flat);elements.apply.listeners.click();assert.equal(elements.damageRows.children.length,1);
-elements.formulaEditor.value='broken';elements.apply.listeners.click();assert(elements.feedback.textContent.length>0);
-elements.reset.listeners.click();
-console.log('Passed: 96 components across 11 levels; resistance, poison, scaling, and all 231 UI selections.');
+assert.equal(elements.skill.children.some(x=>x.text.includes('unsupported')),false);
+for(const s of c.catalog.filter(s=>s.formula)){elements.skill.value=s.id;vm.runInContext('changeSkill()',c);assert(!elements.status.textContent.includes('Formula error'),s.name);assert.equal(elements.damageRows.children.length,1,s.name);assert.equal(elements.scalingGrid.querySelectorAll('input').length,12,s.name);}
+for(const className of new Set(c.catalog.map(s=>s.className))){elements.class.value=className;elements.class.listeners.change();assert(elements.skill.children.every(option=>c.catalog.find(s=>s.id===option.value).formula));}
+elements.skill.value=c.catalog.find(s=>s.name==='Poison Nova').id;elements.skill.listeners.change();assert.equal(elements.poisonResults.children.length,5);
+const original=vm.runInContext('skillFormula().min[0]',c);const synergy=vm.runInContext('JSON.stringify(skillFormula().synergy)',c);
+elements.scalingGrid.querySelectorAll('input')[0].value='1';elements.apply.listeners.click();assert.equal(vm.runInContext('skillFormula().min[0]',c),1);assert.equal(vm.runInContext('JSON.stringify(skillFormula().synergy)',c),synergy);
+elements.scalingGrid.querySelectorAll('input')[0].value='';elements.apply.listeners.click();assert(elements.feedback.textContent.includes('valid'));
+elements.scalingGrid.querySelectorAll('input')[0].value='99999999';elements.apply.listeners.click();assert(elements.feedback.textContent.includes('Min must'));
+elements.reset.listeners.click();assert.equal(vm.runInContext('skillFormula().min[0]',c),original);
+console.log('Passed: damage engine, all 96 supported selections, class filtering, 12 tier inputs, poison cards, Apply/Reset and validation.');
