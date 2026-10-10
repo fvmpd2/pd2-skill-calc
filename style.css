@@ -35,3 +35,26 @@ button{background:linear-gradient(#ad3d18,#6c1c0d);border-color:#e17636;color:#f
 #teleportField{margin-bottom:10px}#teleportField select{max-width:150px}.teleport-penalty{margin-left:8px;color:#ffb464;font-size:11px;font-weight:400}#teleportResults{border-top:1px solid var(--border);margin-top:10px;padding-top:6px}#teleportResults h3{font-size:13px;color:#ffb464;margin:4px 0}
 
 .build-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px}.build-actions button{font-size:11px;padding:5px 9px}.build-actions span{font-size:11px}.build-actions input{width:100%;font-size:11px}
+
+/* Consistent modifier slots for every component type. */
+#normalModifiers .fields,.charge-modifier .fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:end}
+#normalModifiers .fields>[data-modifier="bonus"],.charge-modifier .fields>[data-modifier="bonus"]{grid-column:1;grid-row:1}
+#normalModifiers .fields>[data-modifier="res"],.charge-modifier .fields>[data-modifier="res"]{grid-column:2;grid-row:1}
+#normalModifiers .fields>[data-modifier="pierce"],.charge-modifier .fields>[data-modifier="pierce"]{grid-column:3;grid-row:1}
+#normalBreaking,.charge-modifier .fields>.breaking-box{grid-column:1;grid-row:2;margin:0}
+#normalModifiers .fields>[data-modifier="plr"],.charge-modifier .fields>[data-modifier="plr"]{grid-column:2;grid-row:2}
+.charge-modifier .fields,#normalModifiers .fields{grid-template-rows:auto auto;min-height:110px}.fields label{font-size:11px}.fields input:disabled{opacity:.4}.breaking-box{font-size:11px}.damage-type-label{font-size:11px}
+.results h2{display:flex;justify-content:space-between;align-items:center}.truncate-control{display:flex;align-items:center;gap:5px;font:11px system-ui;color:var(--muted)}.truncate-control input{width:13px;height:13px;padding:0;margin:0;accent-color:#e68b40}
+.normal-row td:last-child,.teleport-row td:last-child{color:#ffd08c;font-weight:700}.teleport-row{background:#2c1a1055}.teleport-row td{color:#c8ab90}.damage-breakdown{border-top:1px solid var(--border);margin:8px 0 0!important}.damage-breakdown summary{font:12px system-ui;padding:8px 0}.damage-breakdown table{table-layout:auto}.damage-breakdown th,.damage-breakdown td{font-size:11px;white-space:nowrap}.damage-breakdown th:first-child,.damage-breakdown td:first-child{width:auto}#normalResistance{font-size:11px;margin:6px 0}.charge-stage td[colspan="3"]{font-size:11px;color:var(--muted)}
+@media(max-width:420px){#normalModifiers .fields,.charge-modifier .fields{gap:5px}.fields label,.breaking-box{font-size:10px}.fields input{padding:6px 5px}}
+
+/* Shared typography scale: consistent controls/results, clear heading hierarchy. */
+:root{--font-body:12px;--font-helper:11px;--font-section:15px;--font-subheading:13px}
+body{font-size:var(--font-body)}h1{font-size:22px}.panel h2{font-size:var(--font-section)}
+label,.fields label,.breaking-box,.scaling-tier label,.build-actions button,button,input,select{font-size:var(--font-body)}
+th,td,.charge-stage th,.charge-stage td,.damage-breakdown th,.damage-breakdown td,.compare{font-size:var(--font-body)}
+.modifier-type,.charge-modifier h3,.charge-stage h3,.scaling-tier h3{font-size:var(--font-subheading);font-weight:650;color:var(--orange);margin:0 0 7px}
+#normalModifiers .fields{margin-top:0}.charge-modifier .fields label,.fields label{min-height:48px;justify-content:space-between}.breaking-box{justify-content:space-between;min-height:48px}
+.muted,.skill-info,.charge-stage p,.charge-stage .muted,.ai-credit,.teleport-penalty,.truncate-control,.build-actions span,.poison-card span,.scaling-tier p,#normalResistance,.charge-stage td[colspan="3"]{font-size:var(--font-helper)}
+.poison-card strong{font-size:var(--font-body)}summary,.damage-breakdown summary{font-size:var(--font-body)}
+@media(max-width:420px){.fields label,.breaking-box{font-size:var(--font-body)}}
