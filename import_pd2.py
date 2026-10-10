@@ -5,6 +5,7 @@ Damage depends on in-game engine details; conservative direct-damage import only
 """
 import csv,json,re,sys
 CLASS={'ama':'Amazon','ass':'Assassin','bar':'Barbarian','dru':'Druid','nec':'Necromancer','pal':'Paladin','sor':'Sorceress'}
+DISPLAY_NAMES={'Royal Strike':'Phoenix Strike','Poison Dagger':'Poison Strike','Fire Trauma':'Fire Blast','Shock Field':'Shock Web','Wake of Fire Sentry':'Wake of Fire','Inferno Sentry':'Wake of Inferno','FireGolem':'Fire Golem','ClayGolem':'Clay Golem','BloodGolem':'Blood Golem','IronGolem':'Iron Golem','Plague Poppy':'Poison Creeper','Summon Fenris':'Summon Dire Wolf','Eruption':'Fissure','Enchant':'Enchant Fire','AmpDmg':'Amplify Damage','LowRes':'Lower Resist','CurMas':'Curse Mastery','Shape Shifting':'Lycanthropy','Wearbear':'Werebear','Cycle of Life':'Carrion Vine','Vines':'Solar Creeper','Wake Of Fire Sentry':'Wake of Fire','Lightning bolt':'Lightning Bolt'}
 TYPE={'mag':'magic','fire':'fire','cold':'cold','ltng':'lightning','pois':'poison','phys':'physical'}
 def load(path):
  with open(path,encoding='utf-8-sig',newline='') as f:return list(csv.DictReader(f,delimiter='\t'))
@@ -38,6 +39,43 @@ def extract_synergies(expr,r):
   if abs(evaluate(dict.fromkeys(terms,1))-sum(s['pctPerHardPoint']*100 for s in out))>0.0001:return [],False
   return out,True
  except Exception:return [],False
+
+def charge_data(r, missiles):
+ name=r['skill']
+ if name not in ['Fists of Fire','Claws of Thunder','Blades of Ice','Royal Strike','Cobra Strike','Tiger Strike']:return None
+ def component(label,source=None,physical=False,rate=False):
+  row=r if source is None else missiles[source.lower()]
+  keys=['MinDam','MinLevDam'] if source is None else ['MinDamage','MinLevDam']
+  if physical:
+   mn=vals(row,[keys[0]]+[keys[1]+str(i) for i in range(1,6)])
+   mx=vals(row,['MaxDam' if source is None else 'MaxDamage']+['MaxLevDam'+str(i) for i in range(1,6)])
+   typ='physical';expr=row.get('DmgSymPerCalc','')
+  else:
+   mn=vals(row,['EMin']+['EMinLev'+str(i) if source is None else 'MinELev'+str(i) for i in range(1,6)])
+   mx=vals(row,['EMax' if source is None else 'Emax']+['EMaxLev'+str(i) if source is None else 'MaxELev'+str(i) for i in range(1,6)])
+   typ=TYPE[row['EType']];expr=row.get('EDmgSymPerCalc','')
+  if not all(x is not None for x in mn+mx):raise ValueError('Incomplete charge damage: '+label)
+  synergy,ok=extract_synergies(expr,row)
+  if not ok:raise ValueError('Unsupported charge synergy: '+expr)
+  factor=2**(numeric(row.get('HitShift','')) or 0)/256
+  if rate:factor*=25
+  f={'kind':'flat','damageType':typ,'min':[v*factor for v in mn],'max':[v*factor for v in mx],'synergy':synergy,'source':'skill' if source is None else 'missile:'+source,'rawSynergy':expr}
+  if typ=='poison':
+   length=numeric(row.get('ELen',''))
+   if not length:raise ValueError('Missing charge poison duration')
+   f['min']=[v*length for v in f['min']];f['max']=[v*length for v in f['max']];f['poisonDurationSec']=length/25
+  return {'label':label,'formula':f,'unit':'per second' if rate else 'per hit'}
+ def stage(label,components,note=''):return {'label':label,'components':components,'note':note}
+ if name=='Fists of Fire':return [
+  stage('Charge 1 · Explosion',[component('Fire explosion'),component('Ground fire', 'fistsoffirefirewall',rate=True)],'Explosion damage and ground-fire damage per second are separate.'),
+  stage('Charge 2 · Fire nova',[component('Fire nova','fistsoffirenova')]),
+  stage('Charge 3 · Meteors',[component('Meteor impact · Fire','fofmeteor'),component('Meteor impact · Physical','fofmeteor',physical=True),component('Ground fire','fistsoffirefirewall',rate=True)],'Impact values are per meteor. Three meteors are released; they may hit different targets. Ground fire is shown per second, separately.')]
+ if name=='Claws of Thunder':return [stage('Charge 1 · Lightning hit',[component('Lightning hit')]),stage('Charge 2 · Nova',[component('Lightning nova','clawsofthundernova')]),stage('Charge 3 · Charged bolts',[component('Charged bolt','clawsofthunderbolt'),component('Lightning strike','cotthunderstorm')],'Each bolt and its triggered lightning strike roll damage independently. Values are per bolt/strike, not all projectiles.')]
+ if name=='Blades of Ice':return [stage('Charge 1 · Cold hit',[component('Cold hit')]),stage('Charge 2 · Ice waves',[component('Ice wave','boiwavetrail')],'Damage per wave hit.'),stage('Charge 3 · Ice bolts',[component('Ice bolt','boichaosice')],'Damage per bolt; not multiplied by projectile count.')]
+ if name=='Royal Strike':return [stage('Charge 1 · Meteor',[component('Meteor impact','royalstrikemeteor'),component('Ground fire','royalstrikemeteorfire',rate=True)],'Fire-only meteor impact; ground fire is separate damage per second.'),stage('Charge 2 · Chain lightning',[component('Chain lightning','royalstrikechainlightning')],'Damage per target hit.'),stage('Charge 3 · Ice bolts',[component('Ice bolt','royalstrikechaosice')],'Damage per bolt.')]
+ def weapon(label,base,increment,multiplier=1):return {'label':label,'unit':'per hit','formula':{'kind':'weapon','damageType':'physical','enhancedBase':base,'enhancedPerLevel':increment,'chargeMultiplier':multiplier,'min':[0]*6,'max':[0]*6,'synergy':[]}}
+ if name=='Tiger Strike':return [stage('Charge '+str(i)+' · Physical hit',[weapon('Physical hit',float(r['Param1']),float(r['Param2']),i)],'Uses your weapon damage and other off-weapon enhanced damage inputs.') for i in range(1,4)]
+ if name=='Cobra Strike':return [stage('Charge 1 · Poison bolts',[component('Poison bolt','cobrastrikepoisonbolt')],'Poison per bolt. Added Venom/gear poison is not included.'),stage('Charge 2 · Physical hit',[weapon('Physical hit',float(r['Param6'])+float(r['Param7']),float(r['Param7']))],'Life/mana leech bonus: '+r['Param1']+'% + '+r['Param2']+'% per additional skill level. Leech recovery and added gear damage are not calculated.'),stage('Charge 3 · Poison cloud',[component('Poison cloud','cobrastrikepoisoncloud')],'One poison application; added Venom/gear poison and repeated cloud applications are not included.')]
 
 def make_data(skill_path,missile_path,desc_path=None,calc_path=None):
  rows=load(skill_path); missiles=load(missile_path)
@@ -97,9 +135,19 @@ def make_data(skill_path,missile_path,desc_path=None,calc_path=None):
      else:reason='Data-derived direct damage component; special multipliers and hits not modeled.'
      stats['missile' if origin.startswith('missile') else 'direct']+=1
   if not formula:stats['review']+=1
+  charges=charge_data(r,missile_by_name)
+  if charges and formula is None:formula=charges[0]['components'][0]['formula']
   desc=descs.get(r.get('skilldesc',''),{})
   display={k:v for k,v in desc.items() if v and (k.startswith(('ddam','p1dm','p2dm','p3dm','descmissile')) or k=='descdam')}
-  out.append({'descriptionDamage':display,'missileCalcCodes':{k:v for k,v in codes.items() if any(k in str(x) for x in display.values())},'id':klass.lower()+'-'+re.sub('[^a-z0-9]+','-',name.lower()).strip('-'),'gameId':int(eid),'name':name,'className':klass,'formula':formula,'notes':reason})
+  out.append({'charges':charges,'descriptionDamage':display,'missileCalcCodes':{k:v for k,v in codes.items() if any(k in str(x) for x in display.values())},'id':klass.lower()+'-'+re.sub('[^a-z0-9]+','-',name.lower()).strip('-'),'gameId':int(eid),'name':DISPLAY_NAMES.get(name,name),'internalName':name,'className':klass,'formula':formula,'notes':reason})
+ for entry in out:
+  formulas=([entry['formula']] if entry['formula'] else [])+[c['formula'] for stage in entry.get('charges') or [] for c in stage['components']]
+  for f in formulas:
+   for sy in f.get('synergy',[]):
+    sy['name']=DISPLAY_NAMES.get(sy['name'],sy['name'])
+ stats['chargeSkills']=sum(bool(s.get('charges')) for s in out)
+ stats['supported']=sum(s['formula'] is not None for s in out)
+ stats['review']=len(out)-stats['supported']
  return out,stats
 if __name__=='__main__':
  data,stats=make_data(*sys.argv[1:5]);print('// Generated from uploaded PD2 text files. Review special skill mechanics; do not assume exact displayed DPS.');print('const skills = '+json.dumps(data,ensure_ascii=False,separators=(',',':'))+';');print('// Import summary: '+json.dumps(stats))

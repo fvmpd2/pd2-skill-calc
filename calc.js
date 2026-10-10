@@ -34,3 +34,16 @@ function calculate(formula, {skillLevel, synergyPoints={}, skillDamagePct=0, ene
     min,max,avg:(min+max)/2, dpsMin:isPoison?min/durationSec:null,dpsMax:isPoison?max/durationSec:null,
     dpsAvg:isPoison?(min+max)/2/durationSec:null};
 }
+
+/** A supplied weapon range includes weapon-local damage bonuses, before off-weapon ED. */
+function calculateChargeComponent(component,options={}){
+ const f=component.formula;
+ if(f.kind!=='weapon')return calculate(f,{...options,damageType:f.damageType,skillDamagePct:f.damageType==='physical'?0:options.skillDamagePct});
+ const level=options.skillLevel;
+ const enhancedPct=(f.enhancedBase+(level-1)*f.enhancedPerLevel)*f.chargeMultiplier;
+ const multiplier=1+(enhancedPct+Number(options.otherEnhancedDamagePct||0))/100;
+ const lo=Number(options.weaponMin||0),hi=Number(options.weaponMax||0);
+ if(lo<0||hi<lo||!Number.isFinite(lo+hi))throw Error('Weapon Min/Max must be valid and Min must not exceed Max.');
+ const result=calculate({kind:'flat',damageType:'physical',min:[lo*multiplier,0,0,0,0,0],max:[hi*multiplier,0,0,0,0,0],synergy:[]},{...options,damageType:'physical',skillDamagePct:0});
+ return {...result,enhancedPct};
+}
