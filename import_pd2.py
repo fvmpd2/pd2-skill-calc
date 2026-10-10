@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Convert PD2 tab-separated Skills/Missiles into a browsable calculator catalogue.
-Run: python3 import_pd2.py 'Skills(2).txt' 'Missiles(2).txt' > skills.js
+Run: python3 import_pd2.py Skills.txt Missiles.txt Skilldesc.txt MissCalc.txt > skills.js
 Damage depends on in-game engine details; conservative direct-damage import only.
 """
 import csv,json,re,sys
@@ -14,6 +14,8 @@ def numeric(x):
 def vals(r,keys):return [numeric(r.get(k,'')) for k in keys]
 def extract_synergies(expr,r):
  if not expr:return [],True
+ for param in re.findall(r'\bpar([1-8])\b',expr):
+  if numeric(r.get('Param'+param,'')) is None:return [],False
  # Validates that expression is ONLY sum of one or more skill('<name>'.blvl) terms multiplied by parN or literal.
  terms=re.findall(r"skill\('([^']+)'\.blvl\)",expr)
  if not terms:return [],False
@@ -37,8 +39,10 @@ def extract_synergies(expr,r):
   return out,True
  except Exception:return [],False
 
-def make_data(skill_path,missile_path):
+def make_data(skill_path,missile_path,desc_path=None,calc_path=None):
  rows=load(skill_path); missiles=load(missile_path)
+ descs={r["skilldesc"]:r for r in load(desc_path)} if desc_path else {}
+ codes={r["code"]:r.get("*desc", "") for r in load(calc_path)} if calc_path else {}
  missile_by_name={r['Missile'].lower():r for r in missiles if r.get('Missile')}
  out=[]; stats={'direct':0,'missile':0,'review':0}
  for r in rows:
@@ -52,6 +56,10 @@ def make_data(skill_path,missile_path):
    vmin=vals(r,['EMin']+['EMinLev'+str(i) for i in range(1,6)])
    vmax=vals(r,['EMax']+['EMaxLev'+str(i) for i in range(1,6)])
    if all(x is not None for x in vmin+vmax):opts.append((stype,vmin,vmax,r.get('EDmgSymPerCalc',''),'skill'))
+  if not opts and not (numeric(r.get('SrcDam','')) or 0):
+   mn=vals(r,['MinDam']+['MinLevDam'+str(i) for i in range(1,6)])
+   mx=vals(r,['MaxDam']+['MaxLevDam'+str(i) for i in range(1,6)])
+   if all(v is not None for v in mn+mx) and any(mn+mx):opts.append(('physical',mn,mx,r.get('DmgSymPerCalc',''),'skill'))
   # A skill may contain no elemental data but fire damage is on an associated missile. Cautious fallback.
   if not opts:
    names=[r.get(x,'') for x in ['srvmissile','srvmissilea','srvmissileb','srvmissilec']]
@@ -67,16 +75,21 @@ def make_data(skill_path,missile_path):
    typ,mn,mx,syn,origin=opts[0]
    sy,ok=extract_synergies(syn,r if origin=='skill' else missile_by_name[origin.split(':',1)[1].lower()])
    if ok:
+    source_row=r if origin=='skill' else missile_by_name[origin.split(':',1)[1].lower()]
+    shift=numeric(source_row.get('HitShift','')) or 0
+    mn=[v*2**shift/256 for v in mn];mx=[v*2**shift/256 for v in mx]
     # Skills can contain additional damage components (phys + element); or require weapon scaling.
     complexity=bool(numeric(r.get('SrcDam','')) and numeric(r.get('SrcDam',''))>0)
     formula={'kind':'flat','damageType':typ,'min':mn,'max':mx,'synergy':sy,'source':origin,'rawSynergy':syn}
     if typ=='poison':
      length=numeric(r.get('ELen','')) if origin=='skill' else numeric(missile_by_name[origin.split(':',1)[1].lower()].get('ELen',''))
      if length and length>0:
-      # Poison fields contain damage-per-frame in 256ths; convert to total over poison length (frames).
-      formula['min']=[round(v*length/256,6) for v in mn];formula['max']=[round(v*length/256,6) for v in mx]
+      # Poison rate was converted using HitShift above; multiply by length in frames.
+      formula['min']=[round(v*length,6) for v in mn];formula['max']=[round(v*length,6) for v in mx]
       formula['poisonDurationSec']=length/25
-      formula['conversionNote']='Poison damage rate × base duration; provisional; verify PD2 poison tick/length mechanics.'
+      formula['poisonLengthSteps']=[length]+[(numeric(source_row.get('ELevLen'+str(i),'')) or 0) for i in range(1,4)]
+      
+      formula['conversionNote']='Poison damage rate × base duration; HitShift-adjusted rate × length in frames.'
      else:formula=None;reason='Poison length unavailable; review required.'
     if formula:
      if complexity:reason='Skill may also use weapon-based damage; listed component only.'
@@ -84,7 +97,9 @@ def make_data(skill_path,missile_path):
      else:reason='Data-derived direct damage component; special multipliers and hits not modeled.'
      stats['missile' if origin.startswith('missile') else 'direct']+=1
   if not formula:stats['review']+=1
-  out.append({'id':klass.lower()+'-'+re.sub('[^a-z0-9]+','-',name.lower()).strip('-'),'gameId':int(eid),'name':name,'className':klass,'formula':formula,'notes':reason})
+  desc=descs.get(r.get('skilldesc',''),{})
+  display={k:v for k,v in desc.items() if v and (k.startswith(('ddam','p1dm','p2dm','p3dm','descmissile')) or k=='descdam')}
+  out.append({'descriptionDamage':display,'missileCalcCodes':{k:v for k,v in codes.items() if any(k in str(x) for x in display.values())},'id':klass.lower()+'-'+re.sub('[^a-z0-9]+','-',name.lower()).strip('-'),'gameId':int(eid),'name':name,'className':klass,'formula':formula,'notes':reason})
  return out,stats
 if __name__=='__main__':
- data,stats=make_data(*sys.argv[1:3]);print('// Generated from uploaded PD2 text files. Review special skill mechanics; do not assume exact displayed DPS.');print('const skills = '+json.dumps(data,ensure_ascii=False,separators=(',',':'))+';');print('// Import summary: '+json.dumps(stats))
+ data,stats=make_data(*sys.argv[1:5]);print('// Generated from uploaded PD2 text files. Review special skill mechanics; do not assume exact displayed DPS.');print('const skills = '+json.dumps(data,ensure_ascii=False,separators=(',',':'))+';');print('// Import summary: '+json.dumps(stats))

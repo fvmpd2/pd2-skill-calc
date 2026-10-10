@@ -13,18 +13,24 @@ function calculate(formula, {skillLevel, synergyPoints={}, skillDamagePct=0, ene
   const baseMin=scaledValue(formula.min,level), baseMax=scaledValue(formula.max,level);
   const synergyPct=(formula.synergy||[]).reduce((sum,s)=>sum+(Number(synergyPoints[s.name]||0)*s.pctPerHardPoint*100),0);
   const isPoison=(damageType||formula.damageType)==='poison';
-  const pierce=Number(enemyResistanceReductionPct);
-  const effectiveResistancePct=clamp(Number(enemyResistancePct)-pierce,-100,100);
-  const mult=(1+synergyPct/100)*(1+Number(skillDamagePct)/100)*(1-effectiveResistancePct/100);
-  // D2-derived provisional poison mechanic: -enemy poison resistance also reduces target PLR;
-  // this is not a complete PD2 immunity/penetration implementation.
-  const baseDurationSec=isPoison?Number(formula.poisonDurationSec ?? 2):null;
-  if(isPoison && (!Number.isFinite(baseDurationSec)||baseDurationSec<=0)) throw Error('Poison formula needs a positive poisonDurationSec');
-  const effectivePlrPct=isPoison?clamp(Number(enemyPlrPct)-pierce,-100,75):null;
+  const pierce=Math.max(0,Number(enemyResistanceReductionPct));
+  // Input resistance is the target's resistance before this attack's pierce.
+  // Gear pierce cannot break immunity. Below zero only the added negative portion is halved.
+  const resistance=Number(enemyResistancePct), immune=resistance>=100;
+  const positivePortion=Math.min(pierce,Math.max(0,resistance));
+  const effectiveResistancePct=immune?resistance:clamp(Math.trunc(resistance-positivePortion-(pierce-positivePortion)/2),-100,99);
+  const mult=(1+synergyPct/100)*(1+Number(skillDamagePct)/100)*Math.max(0,1-effectiveResistancePct/100);
+  const length=formula.poisonLengthSteps;
+  const baseDurationSec=isPoison?(length ? (length[0]+Math.min(level-1,7)*length[1]+Math.max(0,Math.min(level-8,8))*length[2]+Math.max(0,level-16)*length[3])/25 : Number(formula.poisonDurationSec ?? 2)):null;
+  if(isPoison && (!Number.isFinite(baseDurationSec)||baseDurationSec<=0)) throw Error('Poison formula needs a positive duration');
+  // Requested PD2 length model: poison pierce affects PLR at half effectiveness.
+  const effectivePlrPct=isPoison?clamp(Number(enemyPlrPct)-(immune?0:pierce/2),-100,75):null;
+  const beforeDurationSec=isPoison?baseDurationSec*(1-clamp(Number(enemyPlrPct),-100,75)/100):null;
   const durationSec=isPoison?baseDurationSec*(1-effectivePlrPct/100):null;
-  const durationMultiplier=isPoison?durationSec/baseDurationSec:1;
+  const referenceDurationSec=Number(formula.poisonDurationSec ?? baseDurationSec);
+  const durationMultiplier=isPoison?durationSec/referenceDurationSec:1;
   const min=baseMin*mult*durationMultiplier,max=baseMax*mult*durationMultiplier;
-  return {level,baseMin,baseMax,synergyPct,effectiveResistancePct,effectivePlrPct,baseDurationSec,durationSec,
+  return {immune,beforeDurationSec,frameMin:isPoison?baseMin*mult/(referenceDurationSec*25):null,frameMax:isPoison?baseMax*mult/(referenceDurationSec*25):null,level,baseMin,baseMax,synergyPct,effectiveResistancePct,effectivePlrPct,baseDurationSec,durationSec,
     min,max,avg:(min+max)/2, dpsMin:isPoison?min/durationSec:null,dpsMax:isPoison?max/durationSec:null,
     dpsAvg:isPoison?(min+max)/2/durationSec:null};
 }
