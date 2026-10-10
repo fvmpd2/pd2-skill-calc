@@ -1,4 +1,4 @@
-# PD2 Damage Calculator — skill audit edition (v7)
+# PD2 Damage Calculator — skill audit edition (v8)
 
 Extract the ZIP and open `index.html`, or replace the calculator files in your GitHub Pages repository. Keep `index.html`, `style.css`, `skills.js`, `calc.js` and `main.js` together. Upload extracted files, not the ZIP. The original game text files are not required by the website.
 
@@ -66,4 +66,10 @@ Run `node test.js`. Tests cover every available component at eleven level bounda
 
 This is automated formula/UI-logic verification, **not a live in-game comparison or visual browser check**. Some server/tooltip discrepancies and equipment/conversion models remain unresolved; see the audit. No blanket claim that all skill components are fully modeled is made.
 
-The website retains the fiery dark theme, alphabetical classes, “Built with AI” and the fvm/Hiim resource notice together beneath the title. Versioned asset links request fresh v7 files. Wait for GitHub Pages deployment to complete and hard-refresh if the old version remains visible. Preserve unrelated files, `.git`, `.github` and any custom-domain `CNAME` when replacing calculator files.
+The website retains the fiery dark theme, alphabetical classes, “Built with AI” and the fvm/Hiim resource notice together beneath the title. Versioned asset links request fresh v8 files. Wait for GitHub Pages deployment to complete and hard-refresh if the old version remains visible. Preserve unrelated files, `.git`, `.github` and any custom-domain `CNAME` when replacing calculator files.
+
+## Teleport comparison (v8)
+
+Every selectable Sorceress skill has a **Teleport (slvl)** dropdown in Skill levels (1–100). Select your effective level including +skills. The calculated penalty appears beside it; level 1 is selected initially. The supplied Skills row and [Teleport skill table](https://wiki.projectdiablo2.cn/wiki/All_Sorceress_Skills#Teleport) give a one-second debuff, starting at 50% at level 1, decreasing by one percentage point per effective level to zero at level 51.
+
+The additional output below the main damage shows each component with the penalty, before and after resistance, using damage × (1 − penalty/100), with penalty = max(0, 51 − effective Teleport level). It preserves all existing synergies, bonuses and resistance inputs. Multi-component and continuous damage retain the units of their main output. This is a comparison while the debuff applies; the calculator does not simulate cast timing, persistent spell snapshotting or the lifetime of Hydra/ground effects. Main damage remains unchanged. Checks cover all selectable Sorceress skills, component output, 0–100% boundaries, changing the input and hiding the controls for other classes.

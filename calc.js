@@ -68,3 +68,11 @@ function calculateChargeComponent(component,options={}){
  const result=calculate({kind:'flat',damageType:'physical',min:[lo*multiplier,0,0,0,0,0],max:[hi*multiplier,0,0,0,0,0],synergy:[]},{...options,damageType:'physical',skillDamagePct:0});
  return {...result,enhancedPct};
 }
+
+/** Teleport is a separate spell-damage penalty; the main result stays unchanged. */
+function teleportDamage(beforeMin,beforeMax,afterMin,afterMax,penaltyPct){
+ const multiplier=1-clamp(Number(penaltyPct)||0,0,100)/100;
+ return {beforeMin:beforeMin*multiplier,beforeMax:beforeMax*multiplier,afterMin:afterMin*multiplier,afterMax:afterMax*multiplier};
+}
+
+function teleportPenalty(level){return clamp(51-Math.max(1,Math.floor(Number(level)||1)),0,50);}
