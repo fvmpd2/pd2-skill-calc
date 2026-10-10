@@ -36,3 +36,21 @@ mySkill.formula = {
 - Add automated per-skill regression tests matching in-game tooltips.
 
 Useful references: https://wiki.projectdiablo2.com/ and https://github.com/BetweenWalls/portal (existing open-source D2 planner with PD2 support). Check each project's licensing before copying code/data.
+
+## Interface update
+
+Skill selection now lists names without category labels. The single **Skill level** slider represents the total skill level (hard points and gear combined). **+ Skill damage (%)** and **− Enemy resistance (%)** are editable numbers alongside each other. The **Skill scaling & season adjustments** editor is collapsed by default. Expand it to modify per-level scaling arrays and synergies for the selected skill.
+
+The enemy resistance calculation currently assumes the target begins with **0% resistance**, clamps effective resistance to **−100%**, and does not handle immunities or damage-type-specific penetration mechanics. Treat this as a simplified damage model pending game-specific verification.
+
+
+## Damage type, resistance, and poison
+Select the damage type in the Build inputs panel (inferred from skill names only until verified). Enter enemy resistance, your -enemy resistance and, for poison, enemy PLR. Poison is calculated as **total damage over time**, plus displayed damage per second and the modified duration.
+
+For poison formulas, add `"damageType": "poison"` and `"poisonDurationSec": 2` (replace **2** with the verified duration) to the formula JSON. The input min/max values represent total poison damage over the unmodified base duration.
+
+Provisional D2-derived model: `effective resistance = clamp(enemyResistance - pierce, -100, 100)`; `effective PLR = clamp(enemyPLR - pierce, -100, 75)`; `duration = base duration × (1 - effective PLR/100)`; `total poison damage = base total × skill/synergy multipliers × (1 - effective resistance/100) × duration/base duration`. The -enemy resistance modifier is assumed to modify poison length resistance as in base Diablo II. **Verify these specifics against the current PD2 season**, including immunity rules, piercing limits, summon/trap modifiers, and any individual skill exceptions. The damage type chosen in the interface is saved as a temporary local override if the skill already has a formula; changes to JSON must be copied to skills.js to persist.
+
+## Compact layout update
+
+The main page now has class/skill selectors, skill level and synergy inputs, a damage-modifier panel, and a damage results table. Type, +skill damage, -enemy resistance, enemy resistance and conditional poison PLR are editable. Level-scaling JSON is collapsed by default and editable. Base DMG in the results includes synergies but excludes +skill damage and target resistances; Net DMG includes +skill damage; Effective Damage applies resistance, and for poison the provisional duration/PLR modifier. Skills without supplied formulas show no invented damage numbers.
