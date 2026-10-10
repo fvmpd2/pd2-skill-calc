@@ -12,7 +12,7 @@ $('class').replaceChildren(...classes.map(c=>new Option(c,c)));
 function refreshSkillList(){const matching=supportedSkills.filter(s=>s.className===$('class').value);$('skill').replaceChildren(...matching.map(s=>new Option(s.name,s.id)));active=matching[0]||null;changeSkill();}
 function changeSkill(){active=supportedSkills.find(s=>s.id===$('skill').value)||active;if(!active)return;$('feedback').textContent='';$('levelLabel').firstChild.textContent=`${active.name} (slvl)`;setupExtras();setupCharges();$('skillInfo').textContent=active.info||'';$('skillInfo').hidden=!active.info;$('damageType').value=skillFormula()?.damageType||guessedType(active);$('damageType').disabled=true;renderScaling();renderSynergies();compute();}
 function renderSynergies(){const f=skillFormula(),holder=$('synergies');holder.replaceChildren();for(const sy of synergyList()){const label=document.createElement('label');label.textContent=`${sy.name} (hlvl)`;const input=document.createElement('input');input.type='number';input.min=0;input.max=20;input.value=savedSynergies[active.id]?.[sy.name]??20;input.addEventListener('input',()=>{(savedSynergies[active.id]??={})[sy.name]=Number(input.value)||0;compute();});input.dataset.synergy=sy.name;label.append(input);holder.append(label);}}
-function compute(){$('teleportPenalty').textContent=`−${teleportPenalty(n('teleportLevel'))}% damage`;$('teleportField').hidden=active?.className!=='Sorceress';$('teleportResults').hidden=active?.className!=='Sorceress';$('teleportResults').replaceChildren();if(active?.charges){computeCharges();return;}const poison=$('damageType').value==='poison';$('plrField').hidden=!poison;$('poisonResults').hidden=!poison;const f=skillFormula();$('status').textContent=f?'':'No damage formula available.';if(!f){$('damageRows').replaceChildren();$('poisonResults').textContent='';$('comparison').textContent='';return;}
+function compute(){syncBuildLink();$('teleportPenalty').textContent=`−${teleportPenalty(n('teleportLevel'))}% damage`;$('teleportField').hidden=active?.className!=='Sorceress';$('teleportResults').hidden=active?.className!=='Sorceress';$('teleportResults').replaceChildren();if(active?.charges){computeCharges();return;}const poison=$('damageType').value==='poison';$('plrField').hidden=!poison;$('poisonResults').hidden=!poison;const f=skillFormula();$('status').textContent=f?'':'No damage formula available.';if(!f){$('damageRows').replaceChildren();$('poisonResults').textContent='';$('comparison').textContent='';return;}
  const sy={};for(const e of $('synergies').querySelectorAll('input'))sy[e.dataset.synergy]=Math.max(0,Math.min(20,Number(e.value)||0));const opts={breakingPiercePct:Array.from($('normalBreaking').querySelectorAll('input')).map(e=>Number(e.value)||0),extraInputs:readExtras(),skillLevel:Math.max(1,Math.min(100,Math.floor(n('level')))),skillDamagePct:n('pct'),enemyResistanceReductionPct:n('pierce'),enemyResistancePct:n('enemyRes'),enemyPlrPct:n('enemyPlr'),damageType:$('damageType').value,synergyPoints:sy};
  try{const base=calculate(f,opts),higher=calculate(f,{...opts,skillLevel:opts.skillLevel+1}),boost=calculate(f,{...opts,skillDamagePct:opts.skillDamagePct+5});const baseFactor=1+base.synergyPct/100,bonusFactor=(1+n('pct')/100)*(base.modifierMultiplier??1);const rawMin=base.baseMin*baseFactor,rawMax=base.baseMax*baseFactor;const netMin=rawMin*bonusFactor,netMax=rawMax*bonusFactor;
  const row=document.createElement('tr');for(const t of [$('damageType').selectedOptions[0].text,range(rawMin,rawMax),range(netMin,netMax),`${base.effectiveResistancePct.toFixed(1)}%`,range(base.min,base.max)]){let cell=document.createElement('td');cell.textContent=t;row.append(cell);}$('damageRows').replaceChildren(row);renderTeleport([{label:$('damageType').selectedOptions[0].text,beforeMin:netMin,beforeMax:netMax,afterMin:base.min,afterMax:base.max}]);
@@ -88,9 +88,8 @@ function computeCharges(){
   if(stage.note){const note=document.createElement('p');note.className='muted';note.textContent=stage.note;section.append(note);}holder.append(section);
  });renderTeleport(teleportRows);$('comparison').textContent='';}catch(e){holder.replaceChildren();$('status').textContent=`Charge calculation error: ${e.message}`;}
 }
-$('chargeEditor').addEventListener('change',()=>{renderScaling();$('feedback').textContent='';});
+$('chargeEditor').addEventListener('change',()=>{renderScaling();$('feedback').textContent='';syncBuildLink();});
 for(const id of ['weaponMin','weaponMax','otherEd'])$(id).addEventListener('input',compute);
-refreshSkillList();
 
 function renderTeleport(rows){
  if(active?.className!=='Sorceress')return;
@@ -101,3 +100,41 @@ function renderTeleport(rows){
  for(const row of rows){const v=teleportDamage(row.beforeMin,row.beforeMax,row.afterMin,row.afterMax,teleportPenalty(n('teleportLevel')));const tr=document.createElement('tr');for(const text of [row.label,range(v.beforeMin,v.beforeMax),range(v.afterMin,v.afterMax)]){const td=document.createElement('td');td.textContent=text;tr.append(td);}table.append(tr);}
  scroll.append(table);holder.append(scroll);
 }
+
+// Store a self-contained build in the URL fragment: GitHub Pages needs no backend.
+var linkReady=false,restoringBuild=false;
+const buildFields=['level','pct','pierce','enemyRes','enemyPlr','weaponMin','weaponMax','otherEd','teleportLevel'];
+function collectBuild(){
+ const values=Object.fromEntries(buildFields.map(id=>[id,String(n(id))]));
+ const inputs=holder=>Array.from($(holder).querySelectorAll('input')).map(e=>({key:e.dataset.synergy||e.dataset.extra||e.dataset.modifier,type:e.dataset.type||'',value:e.value}));
+ const scaling=Object.fromEntries(Object.entries(overrides).map(([key,f])=>[key,{min:f.min,max:f.max}]));
+ return {v:1,skill:active.id,values,synergies:inputs('synergies'),extras:inputs('extraFields'),modifiers:inputs(active.charges?'chargeModifiers':'normalBreaking'),editor:$('chargeEditor').value,scaling};
+}
+function buildUrl(){const url=new URL(window.location.href);url.hash='build='+encodeURIComponent(JSON.stringify(collectBuild()));return url.href;}
+function syncBuildLink(){if(!linkReady||restoringBuild||typeof window==='undefined')return;try{window.history.replaceState(null,'',buildUrl());}catch(e){/* Local-file browsers can disallow history updates; copying still works. */}}
+function restoreBuild(hash){
+ if(!hash.startsWith('#build='))return false;
+ try{
+  if(hash.length>100000)throw Error('Build link too large');
+  const data=JSON.parse(decodeURIComponent(hash.slice(7)));
+  const skill=supportedSkills.find(s=>s.id===data.skill);if(data.v!==1||!skill)throw Error('Unknown build');
+  restoringBuild=true;
+  for(const key of Object.keys(overrides))delete overrides[key];
+  for(const [key,steps] of Object.entries(data.scaling||{})){
+   const [id,stage,index]=key.split(':');const item=supportedSkills.find(s=>s.id===id);const f=item?.charges?item.charges[Number(stage)]?.components[Number(index)]?.formula:item?.formula;
+   if(f?.kind==='flat'&&['min','max'].every(k=>Array.isArray(steps[k])&&steps[k].length===6&&steps[k].every(x=>Number.isFinite(x)&&x>=0))&&steps.min.every((x,i)=>x<=steps.max[i]))overrides[key]={...f,min:steps.min,max:steps.max};
+  }
+  $('class').value=skill.className;refreshSkillList();$('skill').value=skill.id;changeSkill();
+  for(const id of buildFields){const value=Number(data.values?.[id]);if(Number.isFinite(value))$(id).value=String(value);}
+  function restoreInputs(holder,entries){for(const e of $(holder).querySelectorAll('input')){const entry=Array.isArray(entries)&&entries.find(x=>x.key===(e.dataset.synergy||e.dataset.extra||e.dataset.modifier)&&(x.type||'')===(e.dataset.type||''));if(entry&&Number.isFinite(Number(entry.value))){e.value=String(Number(entry.value));if(e.dataset.synergy)(savedSynergies[active.id]??={})[e.dataset.synergy]=Number(e.value);}}}
+  restoreInputs('synergies',data.synergies);restoreInputs('extraFields',data.extras);restoreInputs(active.charges?'chargeModifiers':'normalBreaking',data.modifiers);
+  if(active.charges&&active.charges.some((s,si)=>s.components.some((_,ci)=>data.editor===`${si}:${ci}`)))$('chargeEditor').value=data.editor;
+  renderScaling();compute();return true;
+ }catch(e){$('linkFeedback').textContent='This build link could not be loaded. Choose a skill to start again.';return false;}finally{restoringBuild=false;}
+}
+$('copyBuild').addEventListener('click',async()=>{
+ try{const url=buildUrl();await navigator.clipboard.writeText(url);$('linkFeedback').textContent='Build link copied. Save it as a bookmark or share it.';}
+ catch(e){$('linkFallback').value=buildUrl();$('linkFallback').hidden=false;$('linkFallback').select();$('linkFeedback').textContent='Copy the link from the box below.';}
+});
+refreshSkillList();
+if(typeof window!=='undefined'){restoreBuild(window.location.hash);linkReady=true;window.addEventListener('hashchange',()=>restoreBuild(window.location.hash));}

@@ -33,3 +33,5 @@ button{background:linear-gradient(#ad3d18,#6c1c0d);border-color:#e17636;color:#f
 .breaking-help{display:inline-flex;align-items:center;justify-content:center;width:15px;height:15px;border:1px solid #bf6b35;border-radius:50%;font-size:10px;color:#ffb464;cursor:help}.breaking-help:focus{outline:2px solid #ffb464}.breaking-box input{margin:0}.charge-modifier .fields .breaking-box{grid-column:auto}@media(max-width:750px){.charge-modifier .fields .breaking-box{grid-column:auto}}
 
 #teleportField{margin-bottom:10px}#teleportField select{max-width:150px}.teleport-penalty{margin-left:8px;color:#ffb464;font-size:11px;font-weight:400}#teleportResults{border-top:1px solid var(--border);margin-top:10px;padding-top:6px}#teleportResults h3{font-size:13px;color:#ffb464;margin:4px 0}
+
+.build-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 10px}.build-actions button{font-size:11px;padding:5px 9px}.build-actions span{font-size:11px}.build-actions input{width:100%;font-size:11px}

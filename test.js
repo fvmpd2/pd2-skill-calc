@@ -16,7 +16,7 @@ assert.equal(c.calc(null,{skillLevel:1}),null);
 for(const s of c.catalog)if(s.formula?.kind==='flat')for(const skillLevel of [1,8,9,16,17,22,23,28,29,50,100]){const v=c.calc(s.formula,{skillLevel});assert(Number.isFinite(v.min)&&Number.isFinite(v.max),s.name);}
 // Exercise UI event handling without a browser, including unsupported and editable formulas.
 class Element{constructor(){this.value='';this.children=[];this.listeners={};this.firstChild={textContent:''};this.dataset={};this.textContent='';}replaceChildren(...xs){this.children=xs;if(xs[0]?.value!==undefined)this.value=xs[0].value;}append(x){this.children.push(x);}addEventListener(name,fn){this.listeners[name]=fn;}querySelectorAll(selector){const all=this.children.flatMap(x=>[x,...x.querySelectorAll(selector)]);return all.filter(x=>selector==='input'&&x.type==='number');}get selectedOptions(){return [{text:this.value}];}}
-const ids=['class','skill','levelLabel','damageType','scalingGrid','scalingNote','synergies','level','pct','pierce','enemyRes','enemyPlr','plrField','poisonResults','status','damageRows','comparison','apply','feedback','reset','chargeModifiers','normalModifiers','chargeResults','normalResults','chargeEditorField','chargeEditor','weaponFields','weaponMin','weaponMax','otherEd','normalBreaking','teleportField','teleportLevel','teleportPenalty','teleportResults','extraFields','skillInfo','difficulty','difficultyField'];
+const ids=['class','skill','levelLabel','damageType','scalingGrid','scalingNote','synergies','level','pct','pierce','enemyRes','enemyPlr','plrField','poisonResults','status','damageRows','comparison','apply','feedback','reset','chargeModifiers','normalModifiers','chargeResults','normalResults','chargeEditorField','chargeEditor','weaponFields','weaponMin','weaponMax','otherEd','copyBuild','linkFeedback','linkFallback','normalBreaking','teleportField','teleportLevel','teleportPenalty','teleportResults','extraFields','skillInfo','difficulty','difficultyField'];
 const elements=Object.fromEntries(ids.map(id=>[id,new Element()]));elements.level.value='1';
 c.document={getElementById:id=>elements[id],createElement:()=>new Element()};c.Option=function(text,value){return {text,value};};
 vm.runInContext(fs.readFileSync(__dirname+'/main.js','utf8'),c);
@@ -139,3 +139,22 @@ elements.skill.value=skill('Fire Bolt').id;elements.skill.listeners.change();con
 for(const [level,want] of [[1,50],[20,31],[26,25],[50,1],[51,0],[100,0]])assert.equal(vm.runInContext(`teleportPenalty(${level})`,c),want);assert.equal(elements.teleportLevel.children.length,100);
 elements.skill.value=skill('Teeth').id;elements.skill.listeners.change();assert(elements.teleportField.hidden);assert(elements.teleportResults.hidden);assert.equal(elements.teleportResults.children.length,0);
 console.log('Passed: every Sorceress selection has Teleport controls and per-component pre/post-resistance output; penalty boundaries, main-output preservation and class visibility.');
+
+// Save/restore full builds, including mixed-component resistance and scaling.
+for(const name of ['Fire Bolt','Fists of Fire','Poison Nova','Fire Golem']){
+ elements.skill.value=skill(name).id;elements.skill.listeners.change();elements.level.value='44';elements.teleportLevel.value='30';elements.pct.value='70';elements.enemyRes.value='120';
+ for(const e of elements.synergies.querySelectorAll('input'))e.value='17';
+ for(const e of elements.extraFields.querySelectorAll('input'))e.value='12';
+ for(const e of elements.chargeModifiers.querySelectorAll('input'))e.value='33';
+ for(const e of elements.normalBreaking.querySelectorAll('input'))e.value='45';
+ vm.runInContext('compute()',c);
+ if(elements.scalingGrid.querySelectorAll('input').length){elements.scalingGrid.querySelectorAll('input')[0].value='1';elements.apply.listeners.click();}
+ const state=vm.runInContext('JSON.stringify(collectBuild())',c);const hash='#build='+encodeURIComponent(state);
+ elements.level.value='2';elements.skill.value=skill('Teeth').id;elements.skill.listeners.change();
+ c.restoreHash=hash;assert(vm.runInContext('restoreBuild(restoreHash)',c),name);assert.equal(vm.runInContext('JSON.stringify(collectBuild())',c),state,name);assert(!/error/i.test(elements.status.textContent),name);
+}
+assert.equal(vm.runInContext("restoreBuild('#build=bad')",c),false);
+assert.equal(vm.runInContext("restoreBuild('#build='+encodeURIComponent(JSON.stringify({v:1,skill:'missing'})))",c),false);
+c.URL=URL;let historyUrl='';c.window={location:{href:'https://example.com/calc/',hash:''},history:{replaceState:(a,b,url)=>historyUrl=url}};
+vm.runInContext('linkReady=true;syncBuildLink()',c);assert(historyUrl.includes('#build='));assert.equal(JSON.parse(decodeURIComponent(historyUrl.split('#build=')[1])).skill,elements.skill.value);
+console.log('Passed: build URL round trips for spells, martial arts, poison and summons, scaling edits, invalid links and automatic URL updates.');
