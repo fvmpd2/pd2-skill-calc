@@ -142,7 +142,7 @@ $('resetBuild').addEventListener('click',()=>{
  const id=active.id;
  for(const key of Object.keys(overrides))if(key===id||key.startsWith(id+':'))delete overrides[key];
  savedSynergies[id]={};
- for(const sy of synergyList())savedSynergies[id][sy.name]=0;
+ for(const sy of synergyList())savedSynergies[id][sy.name]=20;
  for(const field of buildFields)$(field).value=['level','teleportLevel'].includes(field)?'1':'0';
  changeSkill();
  for(const e of $('extraFields').querySelectorAll('input'))e.value=e.dataset.extra==='curseCount'||(e.dataset.extra==='masteryLevel'&&active.charges?.some(stage=>stage.components.some(c=>c.formula.model==='skeleton-mage')))?'1':'0';
