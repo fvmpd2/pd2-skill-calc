@@ -16,7 +16,7 @@ assert.equal(c.calc(null,{skillLevel:1}),null);
 for(const s of c.catalog)if(s.formula?.kind==='flat')for(const skillLevel of [1,8,9,16,17,22,23,28,29,50,100]){const v=c.calc(s.formula,{skillLevel});assert(Number.isFinite(v.min)&&Number.isFinite(v.max),s.name);}
 // Exercise UI event handling without a browser, including unsupported and editable formulas.
 class Element{constructor(){this.value='';this.children=[];this.listeners={};this.firstChild={textContent:''};this.dataset={};this.textContent='';}replaceChildren(...xs){this.children=xs;if(xs[0]?.value!==undefined)this.value=xs[0].value;}append(x){this.children.push(x);}addEventListener(name,fn){this.listeners[name]=fn;}querySelectorAll(selector){const all=this.children.flatMap(x=>[x,...x.querySelectorAll(selector)]);return all.filter(x=>selector==='input'&&x.type==='number');}get selectedOptions(){return [{text:this.value}];}}
-const ids=['class','skill','levelLabel','damageType','scalingGrid','scalingNote','synergies','level','pct','pierce','enemyRes','enemyPlr','plrField','poisonResults','status','damageRows','comparison','apply','feedback','reset','chargeModifiers','normalModifiers','chargeResults','normalResults','chargeEditorField','chargeEditor','weaponFields','weaponMin','weaponMax','otherEd','extraFields','skillInfo','difficulty','difficultyField'];
+const ids=['class','skill','levelLabel','damageType','scalingGrid','scalingNote','synergies','level','pct','pierce','enemyRes','enemyPlr','plrField','poisonResults','status','damageRows','comparison','apply','feedback','reset','chargeModifiers','normalModifiers','chargeResults','normalResults','chargeEditorField','chargeEditor','weaponFields','weaponMin','weaponMax','otherEd','normalBreaking','extraFields','skillInfo','difficulty','difficultyField'];
 const elements=Object.fromEntries(ids.map(id=>[id,new Element()]));elements.level.value='1';
 c.document={getElementById:id=>elements[id],createElement:()=>new Element()};c.Option=function(text,value){return {text,value};};
 vm.runInContext(fs.readFileSync(__dirname+'/main.js','utf8'),c);
@@ -113,3 +113,21 @@ elements.skill.value=skill('Raise Skeleton Mage').id;elements.skill.listeners.ch
 // At zero resistance, the bonus and effective columns agree, including automated mastery.
 for(const section of elements.chargeResults.children){const scroll=section.children.find(x=>x.className==='table-scroll');const table=scroll.children[0];for(const row of table.children.filter(x=>x.children.length===5&&x.children[0].textContent.includes('bolt'))){assert.equal(row.children[2].textContent,row.children[4].textContent);}}
 console.log('Passed: summon mastery is included consistently in both bonus and effective damage columns.');
+
+// Immunity breaking, per-source rounding, full item pierce after breaking,
+// and combined negative portion (no repeated halving between reductions).
+for(const [res,breaking,pierce,want,immune] of [
+ [110,[21],500,100,true],[110,[21,31],12,73,false],
+ [120,[40],500,100,true],[120,[42],20,79,false],
+ [25,[30,30],12,-23,false],[0,[40],40,-40,false],
+ [140,[100],100,-5,false],[100,[1,1],500,100,true],
+ [100,[2],0,99,false],[0,[500],500,-100,false]
+]){const v=c.calc(flat,{skillLevel:1,enemyResistancePct:res,breakingPiercePct:breaking,enemyResistanceReductionPct:pierce});assert.equal(v.effectiveResistancePct,want);assert.equal(v.immune,immune);}
+const brokenPoison=c.calc(poison,{skillLevel:1,enemyResistancePct:120,breakingPiercePct:50,enemyResistanceReductionPct:40});assert.equal(brokenPoison.durationSec,2.4);
+elements.skill.value=skill('Poison Nova').id;elements.skill.listeners.change();const b=elements.normalBreaking.querySelectorAll('input')[0];b.value='50';b.listeners.input();assert(!/error/i.test(elements.status.textContent));
+assert.equal(elements.normalBreaking.querySelectorAll('input').length,1);
+const poisonHelp=elements.normalBreaking.children[0].children[0].children[0];assert(poisonHelp.title.includes('Lower Resist'));assert(poisonHelp.title.includes('Poison Creeper'));assert(!poisonHelp.title.includes('Conviction'));
+for(const [type,want,exclude] of [['magic','Sanctuary','Lower Resist'],['fire','Inferno','Arctic Blast'],['cold','Arctic Blast','Inferno'],['lightning','Static Field','Sanctuary'],['physical','Amplify Damage','Conviction']]){const box=vm.runInContext(`breakingLabel('${type}')`,c);assert.equal(box.querySelectorAll('input').length,1);const hint=box.children[0].children[0].title;assert(hint.includes(want));assert(!hint.includes(exclude));}
+elements.skill.value=skill('Fire Golem').id;elements.skill.listeners.change();assert(elements.chargeModifiers.querySelectorAll('input').some(x=>x.dataset.modifier==='breaking'));
+assert(page.indexOf('Found an issue?')<page.indexOf('</header>'));assert(!page.includes('class="site-notice"'));
+console.log('Passed: Breaking pierce, immunity thresholds, separate source rounding, combined negative resistance, normal/multi-component controls and inline AI notice.');

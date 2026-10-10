@@ -1,4 +1,4 @@
-# PD2 calculator skill audit — v6
+# PD2 calculator skill audit — v7
 
 All 231 class-tagged Skills rows have a classification; 124 are selectable. This is a source/model audit, not in-game verification of every component.
 
@@ -174,7 +174,7 @@ Input SHA-256 fingerprints:
 
 | Skill | Selectable | Status | Components / limitations |
 | --- | --- | --- | --- |
-| Arctic Blast | yes | partial | Continuous damage: Stream (cold, per second); Shatter nova: Frost nova (cold, per hit) — Rate uses 25 fps, fire-wall damage function 3 uses ×75, and Wake of Inferno follows Skilldesc ×25/3. No source stacking or exposure duration is assumed. Built-in resistance debuff is not applied automatically; Enemy res must include it. |
+| Arctic Blast | yes | partial | Continuous damage: Stream (cold, per second); Shatter nova: Frost nova (cold, per hit) — Rate uses 25 fps, fire-wall damage function 3 uses ×75, and Wake of Inferno follows Skilldesc ×25/3. No source stacking or exposure duration is assumed. Built-in resistance debuff is not applied automatically; Breaking pierce must include it. |
 | Armageddon | yes | calculated | Impact: Physical (physical, per hit); Impact: Fire (fire, per hit); Ground fire: Ground fire (fire, per second) — Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled. |
 | Carrion Vine | no | non-damaging | Buff, resistance, defensive or utility stat fields are not direct attack damage. |
 | Cyclone Armor | no | non-damaging | Buff, resistance, defensive or utility stat fields are not direct attack damage. |
@@ -277,7 +277,7 @@ Input SHA-256 fingerprints:
 | Resist Lightning | no | non-damaging | Buff, resistance, defensive or utility stat fields are not direct attack damage. |
 | Sacrifice | yes | input-required | Weapon attack: Physical (physical, per hit) — Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled. |
 | Salvation | no | non-damaging | Buff, resistance, defensive or utility stat fields are not direct attack damage. |
-| Sanctuary | yes | partial | Aura pulse: Pulse (magic, per pulse); Added attack damage: Added magic (magic, per hit) — Sanctuary also reduces enemy magic resistance by 5 + skill level / 2. Enter the target’s resistance after that aura/debuff in Enemy res; do not enter it again as item pierce. |
+| Sanctuary | yes | partial | Aura pulse: Pulse (magic, per pulse); Added attack damage: Added magic (magic, per hit) — Sanctuary also reduces enemy magic resistance by 5 + skill level / 2. Enter its reduction in Breaking pierce and the target’s original resistance in Enemy starting res. |
 | Smite | no | needs-model | Requires shield base damage, Holy Shield and character/equipment enhanced damage. |
 | Thorns | yes | partial | Returned damage: Flat physical return (physical, per attacker hit); Added bleed · Allies: Deep Wounds (physical, per second); Added bleed · Paladin: Deep Wounds (physical, per second) — Conditional returned damage when the protected target is hit; not an active attack or DPS. |
 | Vengeance | no | needs-model | Amplifies added fire/cold/lightning damage; requires full weapon/gear elemental ranges and server behavior. |
@@ -309,7 +309,7 @@ Input SHA-256 fingerprints:
 | Ice Barrage | yes | calculated | cold per application — Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled. |
 | Ice Blast | yes | calculated | cold per application — Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled. |
 | Ice Bolt | yes | calculated | cold per application — Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled. |
-| Inferno | yes | partial | Continuous damage: Stream (fire, per second) — Rate uses 25 fps, fire-wall damage function 3 uses ×75, and Wake of Inferno follows Skilldesc ×25/3. No source stacking or exposure duration is assumed. Built-in resistance debuff is not applied automatically; Enemy res must include it. |
+| Inferno | yes | partial | Continuous damage: Stream (fire, per second) — Rate uses 25 fps, fire-wall damage function 3 uses ×75, and Wake of Inferno follows Skilldesc ×25/3. No source stacking or exposure duration is assumed. Built-in resistance debuff is not applied automatically; Breaking pierce must include it. |
 | Lesser Hydra | yes | calculated | fire per application — Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled. |
 | Lightning | yes | calculated | lightning per application — Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled. |
 | Lightning Mastery | no | non-damaging | Buff, resistance, defensive or utility stat fields are not direct attack damage. |

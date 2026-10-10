@@ -7,7 +7,7 @@ function scaledValue(steps, level) {
   return steps[0] + bands.reduce((sum,n,i)=>sum+n*steps[i+1],0);
 }
 function clamp(x,lo,hi){return Math.min(hi,Math.max(lo,x));}
-function calculate(formula, {skillLevel, synergyPoints={}, skillDamagePct=0, enemyResistancePct=0, enemyResistanceReductionPct=0, enemyPlrPct=0, damageType, extraInputs={}, difficulty='Hell'}={}) {
+function calculate(formula, {skillLevel, synergyPoints={}, skillDamagePct=0, enemyResistancePct=0, enemyResistanceReductionPct=0, breakingPiercePct=0, enemyPlrPct=0, damageType, extraInputs={}, difficulty='Hell'}={}) {
   if (!formula || formula.kind !== 'flat') return null;
   const level = Math.max(1, Math.floor(Number(skillLevel)));
   let baseMin=scaledValue(formula.min,level), baseMax=scaledValue(formula.max,level);
@@ -18,11 +18,16 @@ function calculate(formula, {skillLevel, synergyPoints={}, skillDamagePct=0, ene
   if(formula.model==='druid-summon'){const grizzly=formula.ownGrizzly?level:Number(extraInputs.grizzlyLevel||0);modifierMultiplier*=1+((grizzly>0?25+10*(grizzly-1):0)+Number(extraInputs.summonEd||0)+100*Math.min(1,Math.floor(extraInputs.corpseFed||0)))/100;}
   const isPoison=(damageType||formula.damageType)==='poison';
   const pierce=Math.max(0,Number(enemyResistanceReductionPct));
-  // Input resistance is the target's resistance before this attack's pierce.
-  // Gear pierce cannot break immunity. Below zero only the added negative portion is halved.
-  const resistance=Number(enemyResistancePct), immune=resistance>=100;
-  const positivePortion=Math.min(pierce,Math.max(0,resistance));
-  const effectiveResistancePct=immune?resistance:clamp(Math.trunc(resistance-positivePortion-(pierce-positivePortion)/2),-100,99);
+  // Breaking sources are applied simultaneously. Each source is halved and
+  // rounded separately against the target's original immunity, before item pierce.
+  const resistance=Number(enemyResistancePct), initiallyImmune=resistance>=100;
+  const breakingSources=Array.isArray(breakingPiercePct)?breakingPiercePct:[breakingPiercePct];
+  const appliedBreakingPct=breakingSources.reduce((sum,value)=>sum+Math.floor(Math.max(0,Number(value)||0)/(initiallyImmune?2:1)),0);
+  const resistanceAfterBreakingPct=resistance-appliedBreakingPct;
+  const immune=resistanceAfterBreakingPct>=100;
+  const totalReduction=appliedBreakingPct+(immune?0:pierce);
+  const positivePortion=Math.min(totalReduction,Math.max(0,resistance));
+  const effectiveResistancePct=immune?resistanceAfterBreakingPct:clamp(Math.trunc(resistance-positivePortion-(totalReduction-positivePortion)/2),-100,99);
   const mult=modifierMultiplier*(1+synergyPct/100)*(1+Number(skillDamagePct)/100)*Math.max(0,1-effectiveResistancePct/100);
   const length=formula.poisonLengthSteps;
   const baseDurationSec=isPoison?(length ? (length[0]+Math.min(level-1,7)*length[1]+Math.max(0,Math.min(level-8,8))*length[2]+Math.max(0,level-16)*length[3])/25 : Number(formula.poisonDurationSec ?? 2)):null;
@@ -34,7 +39,7 @@ function calculate(formula, {skillLevel, synergyPoints={}, skillDamagePct=0, ene
   const referenceDurationSec=Number(formula.poisonDurationSec ?? baseDurationSec);
   const durationMultiplier=isPoison?durationSec/referenceDurationSec:1;
   const min=baseMin*mult*durationMultiplier,max=baseMax*mult*durationMultiplier;
-  return {appliedBonusPct:Number(skillDamagePct),modifierMultiplier,immune,beforeDurationSec,frameMin:isPoison?baseMin*mult/(referenceDurationSec*25):null,frameMax:isPoison?baseMax*mult/(referenceDurationSec*25):null,level,baseMin,baseMax,synergyPct,effectiveResistancePct,effectivePlrPct,baseDurationSec,durationSec,
+  return {initiallyImmune,appliedBreakingPct,resistanceAfterBreakingPct,appliedBonusPct:Number(skillDamagePct),modifierMultiplier,immune,beforeDurationSec,frameMin:isPoison?baseMin*mult/(referenceDurationSec*25):null,frameMax:isPoison?baseMax*mult/(referenceDurationSec*25):null,level,baseMin,baseMax,synergyPct,effectiveResistancePct,effectivePlrPct,baseDurationSec,durationSec,
     min,max,avg:(min+max)/2, dpsMin:isPoison?min/durationSec:null,dpsMax:isPoison?max/durationSec:null,
     dpsAvg:isPoison?(min+max)/2/durationSec:null};
 }

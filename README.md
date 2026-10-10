@@ -1,4 +1,4 @@
-# PD2 Damage Calculator — skill audit edition (v6)
+# PD2 Damage Calculator — skill audit edition (v7)
 
 Extract the ZIP and open `index.html`, or replace the calculator files in your GitHub Pages repository. Keep `index.html`, `style.css`, `skills.js`, `calc.js` and `main.js` together. Upload extracted files, not the ZIP. The original game text files are not required by the website.
 
@@ -31,9 +31,11 @@ Continuous rates use 25 fps. Fire-wall damage function 3 uses three damage units
 
 ## Resistance and poison
 
-Enter **effective resistance before item pierce**, after external debuffs/immunity-breaking effects. Sanctuary, Inferno and Arctic Blast have skill debuffs that must already be reflected in this input; they are not automatically applied a second time. Apply any applicable pet/trap pierce adjustment before entering pierce; the calculator does not infer those ownership penalties.
+Enter **Enemy starting res** before debuffs. Enter the combined reduction from applicable immunity-breaking skills in **Breaking pierce**, as a positive percentage. The adjacent “?” lists relevant skills for that damage type (for example, Sanctuary for magic and Lower Resist/Poison Creeper for poison). Skill debuffs are entered manually, not automatically inferred. Ordinary item/skill pierce has a separate input. Apply any applicable pet/trap ownership adjustment before entering it.
 
-Item pierce cannot break resistance of 100% or more. Against a nonimmune target, pierce consumes positive resistance at full effectiveness and only the additional below-zero portion at half effectiveness. Results truncate toward zero and floor at −100. For example, 25 resistance with 40 pierce becomes −7; 0 with 40 pierce becomes −20. Additional pierce against an already negative effective resistance is halved. See [PD2 resistance mechanics](https://wiki.projectdiablo2.cn/wiki/Game_Mechanics#Reducing_Resistances).
+Breaking pierce is halved against a target initially at 100% resistance or more. Ordinary pierce applies only if immunity is broken (resistance below 100%). The combined below-zero portion is halved, truncating toward zero with a −100 floor. See [PD2 resistance mechanics](https://wiki.projectdiablo2.cn/wiki/Game_Mechanics#Reducing_Resistances).
+
+The single Breaking pierce box treats the entered total as one reduction for rounding. PD2 rounds each immunity-breaking source separately, so multiple odd-valued sources can give a different result: 21 + 31 gives 25 in game, whereas the combined 52 box gives 26. This is a limitation of the requested combined input. If starting resistance already includes debuffs, leave Breaking pierce at zero to avoid double counting.
 
 Poison damage rate and duration are independent. The calculator shows before/after duration, damage per frame at 25 fps, DPS and effective total poison damage. Totals equal per-frame damage × duration × 25.
 
@@ -64,4 +66,4 @@ Run `node test.js`. Tests cover every available component at eleven level bounda
 
 This is automated formula/UI-logic verification, **not a live in-game comparison or visual browser check**. Some server/tooltip discrepancies and equipment/conversion models remain unresolved; see the audit. No blanket claim that all skill components are fully modeled is made.
 
-The website retains the fiery dark theme, alphabetical classes, “Built with AI” beneath the title, and fvm/Hiim resource notice. Versioned asset links request fresh v6 files. Wait for GitHub Pages deployment to complete and hard-refresh if the old version remains visible. Preserve unrelated files, `.git`, `.github` and any custom-domain `CNAME` when replacing calculator files.
+The website retains the fiery dark theme, alphabetical classes, “Built with AI” and the fvm/Hiim resource notice together beneath the title. Versioned asset links request fresh v7 files. Wait for GitHub Pages deployment to complete and hard-refresh if the old version remains visible. Preserve unrelated files, `.git`, `.github` and any custom-domain `CNAME` when replacing calculator files.
