@@ -1,56 +1,31 @@
-# PD2 Damage Lab — GitHub Pages starter
+# PD2 Damage Calculator — game data import
 
-Static, mobile-friendly prototype with all seven classes, searchable preliminary skill roster, configurable skill inputs, editable formula workspace and +1 skill vs +5% damage comparison. No backend, install or build step.
+A static, GitHub Pages-compatible calculator. All seven classes are represented with 231 skills parsed from the supplied Skills(2).txt; the converter also searches Missiles(2).txt when the skill itself has no direct elemental damage. The provided Skilldesc(2).txt and MissCalc(2).txt are included as reference inputs but **not yet fully interpreted** by the converter.
 
-## Publish
-1. Make a **public** GitHub repository called `pd2-skill-calc`.
-2. Upload the files from this folder to the **repository root** (not inside another folder).
-3. Settings → Pages → Build and deployment → Deploy from a branch → `main` → `/ (root)` → Save.
-4. Visit `https://YOUR-USERNAME.github.io/pd2-skill-calc/` after GitHub has deployed it.
+## Import status
 
-Open `index.html` directly to run locally; or use `python3 -m http.server 8000` and visit http://localhost:8000.
+- 85 skills with direct elemental damage data imported from Skills.txt.
+- 2 skills with a missile damage component imported from Missiles.txt.
+- 144 skills require manual support (no simple, safely interpretable direct formula found).
+- Numerical damage scaling, selected synergy expressions, and poison base length have been imported for supported skills.
+- Formula editing remains in the collapsed *Skill scaling & season adjustments* panel. Changes last for the current browser session only.
 
-## Status / important accuracy warning
-The skill roster is an **unverified starter checklist** of potentially damage-related, summon and support skills (some are not direct damage skills). It is NOT claimed to reflect every current PD2 Season 14 skill. All real skills have `formula: null`; **no actual PD2 damage values have been entered**. The working example in the interface is deliberately fictional. Verify names, scaling, synergy rules and current patch data before publishing as accurate.
+**Do not treat these results as fully verified in-game damage.** The site currently models a single damage component per hit; weapon damage, multi-component skills, casts, missile hit functions, shot/projectile counts, trap and summon special logic, mastery stacking, immunity rules, and poison game-engine rounding are not fully modeled. Imported poison totals are estimates made from rate values in 256ths per frame and base duration in frames. The poison length/resistance model is provisional. Some skill names in the data may not match the in-game localized names.
 
-## Add a formula
-Open `skills.js`, find the intended skill object (produced in the `skills` array), and set `formula` on that object. The easiest first approach is to put explicit overrides at the bottom of `skills.js`:
+## Updating each season
 
-```js
-const mySkill = skills.find(s => s.id === 'necromancer-teeth');
-mySkill.formula = {
-  kind: 'flat', damageType: 'magic',
-  min: [10, 4, 5, 6, 7, 8],
-  max: [15, 5, 6, 7, 8, 9],
-  synergy: [{ name:'Example synergy', pctPerHardPoint:0.06 }]
-};
+On your laptop, put the new game files alongside `import_pd2.py` and run:
+
+```sh
+python3 import_pd2.py Skills.txt Missiles.txt > skills.js
 ```
 
-**These are fake example values; replace with game data.** Scaling arrays mean `[base at lvl 1, per-level gains for levels 2–8, 9–16, 17–22, 23–28, 29+]`. `pctPerHardPoint` is a fraction, e.g. `0.06` means +6% per hard point. This simplified model assumes additive synergy bonuses multiplied by gear skill-damage percentage. It DOES NOT model more complex PD2 mechanics.
+The site reads `skills.js` automatically. Do not upload the `.txt` files to GitHub unless you want to keep them as references: the website only requires `index.html`, `style.css`, `skills.js`, `calc.js`, and `main.js`.
 
-### Work left
-- Audit all class trees/names and which skills deal damage in your target season.
-- Import **verified** data from PD2 game TXT files or patch-specific wiki. Record formula source/version.
-- Extend `calc.js` with separate formula kinds for weapon damage, physical ED, poison/burn duration, summon minions, multi-hit missiles, aura pulses, conversion, attack frames, enemy resistances and pierce.
-- Support relevant mastery interactions, +skill buckets and synergy snapshots.
-- Add automated per-skill regression tests matching in-game tooltips.
+## GitHub Pages
 
-Useful references: https://wiki.projectdiablo2.com/ and https://github.com/BetweenWalls/portal (existing open-source D2 planner with PD2 support). Check each project's licensing before copying code/data.
+Upload the five website files into the repository root; in Settings → Pages deploy the `main` branch from `/ (root)`. The importer is only needed when game data changes.
 
-## Interface update
+## Data provenance
 
-Skill selection now lists names without category labels. The single **Skill level** slider represents the total skill level (hard points and gear combined). **+ Skill damage (%)** and **− Enemy resistance (%)** are editable numbers alongside each other. The **Skill scaling & season adjustments** editor is collapsed by default. Expand it to modify per-level scaling arrays and synergies for the selected skill.
-
-The enemy resistance calculation currently assumes the target begins with **0% resistance**, clamps effective resistance to **−100%**, and does not handle immunities or damage-type-specific penetration mechanics. Treat this as a simplified damage model pending game-specific verification.
-
-
-## Damage type, resistance, and poison
-Select the damage type in the Build inputs panel (inferred from skill names only until verified). Enter enemy resistance, your -enemy resistance and, for poison, enemy PLR. Poison is calculated as **total damage over time**, plus displayed damage per second and the modified duration.
-
-For poison formulas, add `"damageType": "poison"` and `"poisonDurationSec": 2` (replace **2** with the verified duration) to the formula JSON. The input min/max values represent total poison damage over the unmodified base duration.
-
-Provisional D2-derived model: `effective resistance = clamp(enemyResistance - pierce, -100, 100)`; `effective PLR = clamp(enemyPLR - pierce, -100, 75)`; `duration = base duration × (1 - effective PLR/100)`; `total poison damage = base total × skill/synergy multipliers × (1 - effective resistance/100) × duration/base duration`. The -enemy resistance modifier is assumed to modify poison length resistance as in base Diablo II. **Verify these specifics against the current PD2 season**, including immunity rules, piercing limits, summon/trap modifiers, and any individual skill exceptions. The damage type chosen in the interface is saved as a temporary local override if the skill already has a formula; changes to JSON must be copied to skills.js to persist.
-
-## Compact layout update
-
-The main page now has class/skill selectors, skill level and synergy inputs, a damage-modifier panel, and a damage results table. Type, +skill damage, -enemy resistance, enemy resistance and conditional poison PLR are editable. Level-scaling JSON is collapsed by default and editable. Base DMG in the results includes synergies but excludes +skill damage and target resistances; Net DMG includes +skill damage; Effective Damage applies resistance, and for poison the provisional duration/PLR modifier. Skills without supplied formulas show no invented damage numbers.
+Converted from the four user-provided game exports: `Skills(2).txt`, `Missiles(2).txt`, `Skilldesc(2).txt`, and `MissCalc(2).txt`. The first two are parsed by the initial converter, the remaining two need integration for better skill descriptions and expression support.
