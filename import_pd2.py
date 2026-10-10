@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """Convert PD2 tab-separated Skills/Missiles into a browsable calculator catalogue.
-Run: python3 import_pd2.py Skills.txt Missiles.txt Skilldesc.txt MissCalc.txt > skills.js
+Run: python3 import_pd2.py Skills.txt Missiles.txt Skilldesc.txt MissCalc.txt [MonStats.txt MonLvl.txt] > skills.js
 Damage depends on in-game engine details; conservative direct-damage import only.
 """
 import csv,json,re,sys
 CLASS={'ama':'Amazon','ass':'Assassin','bar':'Barbarian','dru':'Druid','nec':'Necromancer','pal':'Paladin','sor':'Sorceress'}
-DISPLAY_NAMES={'Royal Strike':'Phoenix Strike','Poison Dagger':'Poison Strike','Fire Trauma':'Fire Blast','Shock Field':'Shock Web','Wake of Fire Sentry':'Wake of Fire','Inferno Sentry':'Wake of Inferno','FireGolem':'Fire Golem','ClayGolem':'Clay Golem','BloodGolem':'Blood Golem','IronGolem':'Iron Golem','Plague Poppy':'Poison Creeper','Summon Fenris':'Summon Dire Wolf','Eruption':'Fissure','Enchant':'Enchant Fire','AmpDmg':'Amplify Damage','LowRes':'Lower Resist','CurMas':'Curse Mastery','Shape Shifting':'Lycanthropy','Wearbear':'Werebear','Cycle of Life':'Carrion Vine','Vines':'Solar Creeper','Wake Of Fire Sentry':'Wake of Fire','Lightning bolt':'Lightning Bolt'}
+DISPLAY_NAMES={'Royal Strike':'Phoenix Strike','Poison Dagger':'Poison Strike','Fire Trauma':'Fire Blast','Shock Field':'Shock Web','Wake of Fire Sentry':'Wake of Fire','Inferno Sentry':'Wake of Inferno','FireGolem':'Fire Golem','ClayGolem':'Clay Golem','BloodGolem':'Blood Golem','IronGolem':'Iron Golem','Plague Poppy':'Poison Creeper','Summon Fenris':'Summon Dire Wolf','Eruption':'Fissure','Enchant':'Enchant Fire','AmpDmg':'Amplify Damage','LowRes':'Lower Resist','CurMas':'Curse Mastery','Shape Shifting':'Lycanthropy','Wearbear':'Werebear','Wearwolf':'Werewolf','Dopplezon':'Decoy','Quickness':'Burst of Speed','Cycle of Life':'Carrion Vine','Vines':'Solar Creeper','Wake Of Fire Sentry':'Wake of Fire','Lightning bolt':'Lightning Bolt'}
 TYPE={'mag':'magic','fire':'fire','cold':'cold','ltng':'lightning','pois':'poison','phys':'physical'}
 def load(path):
  with open(path,encoding='utf-8-sig',newline='') as f:return list(csv.DictReader(f,delimiter='\t'))
@@ -77,7 +77,7 @@ def charge_data(r, missiles):
  if name=='Tiger Strike':return [stage('Charge '+str(i)+' · Physical hit',[weapon('Physical hit',float(r['Param1']),float(r['Param2']),i)],'Uses your weapon damage and other off-weapon enhanced damage inputs.') for i in range(1,4)]
  if name=='Cobra Strike':return [stage('Charge 1 · Poison bolts',[component('Poison bolt','cobrastrikepoisonbolt')],'Poison per bolt. Added Venom/gear poison is not included.'),stage('Charge 2 · Physical hit',[weapon('Physical hit',float(r['Param6'])+float(r['Param7']),float(r['Param7']))],'Life/mana leech bonus: '+r['Param1']+'% + '+r['Param2']+'% per additional skill level. Leech recovery and added gear damage are not calculated.'),stage('Charge 3 · Poison cloud',[component('Poison cloud','cobrastrikepoisoncloud')],'One poison application; added Venom/gear poison and repeated cloud applications are not included.')]
 
-def make_data(skill_path,missile_path,desc_path=None,calc_path=None):
+def make_data(skill_path,missile_path,desc_path=None,calc_path=None,monstats_path=None,monlvl_path=None):
  rows=load(skill_path); missiles=load(missile_path)
  descs={r["skilldesc"]:r for r in load(desc_path)} if desc_path else {}
  codes={r["code"]:r.get("*desc", "") for r in load(calc_path)} if calc_path else {}
@@ -145,9 +145,13 @@ def make_data(skill_path,missile_path,desc_path=None,calc_path=None):
   for f in formulas:
    for sy in f.get('synergy',[]):
     sy['name']=DISPLAY_NAMES.get(sy['name'],sy['name'])
+ from audit_pd2 import audit
+ out=audit(out,rows,missiles,load(desc_path) if desc_path else [],(numeric,extract_synergies,TYPE,DISPLAY_NAMES))
+ from summons_pd2 import add_summons
+ out=add_summons(out,rows,load(monstats_path) if monstats_path else [],load(monlvl_path) if monlvl_path else [])
  stats['chargeSkills']=sum(bool(s.get('charges')) for s in out)
  stats['supported']=sum(s['formula'] is not None for s in out)
  stats['review']=len(out)-stats['supported']
  return out,stats
 if __name__=='__main__':
- data,stats=make_data(*sys.argv[1:5]);print('// Generated from uploaded PD2 text files. Review special skill mechanics; do not assume exact displayed DPS.');print('const skills = '+json.dumps(data,ensure_ascii=False,separators=(',',':'))+';');print('// Import summary: '+json.dumps(stats))
+ data,stats=make_data(*sys.argv[1:7]);print('// Generated from uploaded PD2 text files. Review special skill mechanics; do not assume exact displayed DPS.');print('const skills = '+json.dumps(data,ensure_ascii=False,separators=(',',':'))+';');print('// Import summary: '+json.dumps(stats))

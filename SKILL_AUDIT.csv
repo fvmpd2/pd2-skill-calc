@@ -1,0 +1,232 @@
+class,skill,internal_name,game_id,selectable,status,components,limits
+Amazon,Avoid,Avoid,18,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Amazon,Charged Strike,Charged Strike,24,yes,partial,"Weapon strike: Physical weapon (physical, per hit); Elemental damage: Lightning (lightning, per hit)",Weapon strike and elemental damage are shown separately; projectile counts and additional gear elements are not totaled.
+Amazon,Cold Arrow,Cold Arrow,11,yes,partial,cold per application,Added cold damage shown; weapon damage and conversion effects are not included.
+Amazon,Critical Strike,Critical Strike,9,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Amazon,Decoy,Dopplezon,28,no,needs-model,,Monster attack data are absent from the supplied files.
+Amazon,Dodge,Dodge,13,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Amazon,Evade,Evade,29,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Amazon,Exploding Arrow,Exploding Arrow,16,yes,partial,fire per application,Added fire damage shown; weapon damage and conversion effects are not included.
+Amazon,Fend,Fend,30,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Amazon,Fire Arrow,Fire Arrow,7,yes,partial,"Arrow impact: Added fire (fire, per hit); Ground fire: Burning ground (fire, per second)",Added fire and ground fire shown; weapon damage and conversion are not included.
+Amazon,Freezing Arrow,Freezing Arrow,31,yes,partial,cold per application,Added cold damage shown; weapon damage and conversion effects are not included.
+Amazon,Guided Arrow,Guided Arrow,22,no,needs-model,,Weapon/source fractions and magic conversion need a dedicated model.
+Amazon,Ice Arrow,Ice Arrow,21,yes,partial,cold per application,Added cold damage shown; weapon damage and conversion effects are not included.
+Amazon,Immolation Arrow,Immolation Arrow,27,yes,partial,"Impact: Fire (fire, per hit); Ground fire: Ground fire (fire, per second)",Explosion and ground fire shown separately; arrow weapon damage is not included.
+Amazon,Inner Sight,Inner Sight,8,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Amazon,Jab,Jab,10,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Amazon,Javelin and Spear Mastery,Javelin and Spear Mastery,19,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Amazon,Lightning Bolt,Lightning Bolt,20,yes,partial,lightning per application,Added lightning damage shown; weapon damage and conversion effects are not included.
+Amazon,Lightning Fury,Lightning Fury,35,yes,partial,lightning per application,Added lightning damage shown; weapon damage and conversion effects are not included.
+Amazon,Lightning Strike,Lightning Strike,34,yes,partial,"Weapon strike: Physical weapon (physical, per hit); Elemental damage: Lightning (lightning, per hit)",Weapon strike and elemental damage are shown separately; projectile counts and additional gear elements are not totaled.
+Amazon,Magic Arrow,Magic Arrow,6,yes,partial,magic per application,Added magic damage shown; weapon damage and conversion effects are not included.
+Amazon,Multiple Shot,Multiple Shot,12,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Amazon,Penetrate,Penetrate,23,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Amazon,Pierce,Pierce,33,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Amazon,Plague Javelin,Plague Javelin,25,yes,partial,poison per application,Added poison damage shown; weapon damage and conversion effects are not included.
+Amazon,Poison Javelin,Poison Javelin,15,yes,partial,poison per application,Added poison damage shown; weapon damage and conversion effects are not included.
+Amazon,Power Strike,Power Strike,14,yes,partial,"Weapon strike: Physical weapon (physical, per hit); Elemental damage: Lightning (lightning, per hit); Triggered nova: Lightning nova (lightning, per hit)",Weapon strike and elemental damage are shown separately; projectile counts and additional gear elements are not totaled.
+Amazon,Shattering Arrow,Shattering Arrow,365,no,internal,,"Hidden/internal entry, not a separate selectable skill-tree attack."
+Amazon,Slow Movement,Slow Movement,17,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Amazon,Strafe,Strafe,26,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Amazon,Valkyrie,Valkyrie,32,no,needs-model,,Monster attack data and equipment rolls are absent from the supplied files.
+Amazon,amatemp2,amatemp2,372,no,internal,,"Hidden/internal entry, not a separate selectable skill-tree attack."
+Amazon,amatemp3,amatemp3,379,no,internal,,"Hidden/internal entry, not a separate selectable skill-tree attack."
+Assassin,Blade Dance,Blade Dance,380,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Assassin,Blade Fury,Blade Fury,266,yes,partial,"Blade hit: Flat physical (physical, per hit); Blade hit: Weapon physical (physical, per hit)",Flat physical + weapon physical shown. Use a one-handed weapon; other weapon types need additional penalties.
+Assassin,Blade Sentinel,Blade Sentinel,257,yes,partial,"Blade hit: Flat physical (physical, per hit); Blade hit: Weapon physical (physical, per hit)",Flat physical + weapon physical shown. Use a one-handed weapon; other weapon types need additional penalties.
+Assassin,Blade Shield,Blade Shield,277,yes,partial,"Blade hit: Flat physical (physical, per hit); Blade hit: Weapon physical (physical, per hit)",Flat physical + weapon physical shown. Use a one-handed weapon; other weapon types need additional penalties.
+Assassin,Blades of Ice,Blades of Ice,274,yes,calculated,"Charge 1 · Cold hit: Cold hit (cold, per hit); Charge 2 · Ice waves: Ice wave (cold, per hit); Charge 3 · Ice bolts: Ice bolt (cold, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Assassin,Burst of Speed,Quickness,258,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Assassin,Chain Lightning Sentry,Chain Lightning Sentry,271,yes,calculated,lightning per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Assassin,Charged Bolt Sentry,Charged Bolt Sentry,261,yes,calculated,lightning per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Assassin,Claw Mastery,Claw Mastery,252,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Assassin,Claws of Thunder,Claws of Thunder,269,yes,calculated,"Charge 1 · Lightning hit: Lightning hit (lightning, per hit); Charge 2 · Nova: Lightning nova (lightning, per hit); Charge 3 · Charged bolts: Charged bolt (lightning, per hit); Charge 3 · Charged bolts: Lightning strike (lightning, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Assassin,Cloak of Shadows,Cloak of Shadows,264,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Assassin,Cobra Strike,Cobra Strike,265,yes,calculated,"Charge 1 · Poison bolts: Poison bolt (poison, per hit); Charge 2 · Physical hit: Physical hit (physical, per hit); Charge 3 · Poison cloud: Poison cloud (poison, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Assassin,Death Sentry,Death Sentry,276,yes,partial,"Impact: Physical (physical, per hit); Impact: Fire (fire, per hit)","Flat physical + fire damage shown. Also adds 3–5% of corpse base life, split equally between physical and fire; corpse-life damage is not included. Summoned mon death sentry has different physical increments (3/5/7/9/11 versus tooltip 5/7/9/11/13); using the server summon values."
+Assassin,Dragon Claw,Dragon Claw,260,no,needs-model,,Requires per-claw ranges and effective Claw Mastery level.
+Assassin,Dragon Flight,Dragon Flight,275,no,needs-model,,Requires kick/shoe/stats and skill enhanced damage.
+Assassin,Dragon Tail,Dragon Tail,270,no,needs-model,,Kick physical damage creates a fire explosion; requires kick/shoe/stats and conversion order.
+Assassin,Dragon Talon,Dragon Talon,255,no,needs-model,,Requires kick/shoe/stats and skill enhanced damage.
+Assassin,Fade,Fade,267,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Assassin,Fire Blast,Fire Trauma,251,yes,calculated,fire per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Assassin,Fists of Fire,Fists of Fire,259,yes,calculated,"Charge 1 · Explosion: Fire explosion (fire, per hit); Charge 1 · Explosion: Ground fire (fire, per second); Charge 2 · Fire nova: Fire nova (fire, per hit); Charge 3 · Meteors: Meteor impact · Fire (fire, per hit); Charge 3 · Meteors: Meteor impact · Physical (physical, per hit); Charge 3 · Meteors: Meteor ground fire (fire, per second)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Assassin,Lightning Sentry,Lightning Sentry,366,yes,calculated,lightning per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Assassin,Mind Blast,Mind Blast,273,yes,calculated,physical per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Assassin,Phoenix Strike,Royal Strike,280,yes,calculated,"Charge 1 · Meteor: Meteor impact (fire, per hit); Charge 1 · Meteor: Ground fire (fire, per second); Charge 2 · Chain lightning: Chain lightning (lightning, per hit); Charge 3 · Ice bolts: Ice bolt (cold, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Assassin,Psychic Hammer,Psychic Hammer,253,yes,calculated,magic per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Assassin,Shadow Master,Shadow Master,279,no,needs-model,,Uses multiple autonomous skills and equipment; cannot infer a single damage range.
+Assassin,Shadow Warrior,Shadow Warrior,268,no,needs-model,,"Uses copied skills, monster stats and equipment; cannot infer a single damage range."
+Assassin,Shock Web,Shock Field,256,yes,calculated,lightning per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Assassin,Tiger Strike,Tiger Strike,254,yes,calculated,"Charge 1 · Physical hit: Physical hit (physical, per hit); Charge 2 · Physical hit: Physical hit (physical, per hit); Charge 3 · Physical hit: Physical hit (physical, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Assassin,Venom,Venom,278,yes,calculated,poison per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Assassin,Wake of Fire,Wake of Fire Sentry,262,yes,calculated,fire per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Assassin,Wake of Inferno,Inferno Sentry,272,yes,calculated,"Continuous damage: Stream (fire, per second)","Rate uses 25 fps, fire-wall damage function 3 uses ×75, and Wake of Inferno follows Skilldesc ×25/3. No source stacking or exposure duration is assumed."
+Assassin,Weapon Block,Weapon Block,263,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Assassin,asatemp2,asatemp2,373,no,internal,,"Hidden/internal entry, not a separate selectable skill-tree attack."
+Barbarian,Bash,Bash,126,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Barbarian,Battle Command,Battle Command,155,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Battle Cry,Battle Cry,146,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Battle Orders,Battle Orders,149,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Berserk,Berserk,152,no,needs-model,,Weapon attack and server-specific resistance effects require a dedicated model.
+Barbarian,Combat Reflexes,Combat Reflexes,141,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Concentrate,Concentrate,144,no,needs-model,,Weapon attack and additional resistance effects require a dedicated model.
+Barbarian,Deep Wounds,Deep Wounds,368,no,conditional,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Double Swing,Double Swing,133,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Barbarian,Double Throw,Double Throw,140,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Barbarian,Find Item,Find Item,142,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Find Potion,Find Potion,131,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Frenzy,Frenzy,147,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Barbarian,Grim Ward,Grim Ward,150,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Howl,Howl,130,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Increased Speed,Increased Speed,148,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Iron Skin,Iron Skin,145,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Leap,Leap,132,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Leap Attack,Leap Attack,143,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Barbarian,Mace Mastery,Mace Mastery,129,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Natural Resistance,Natural Resistance,153,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,One Hand Mastery,One Hand Mastery,128,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Shout,Shout,138,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Spear Mastery,Spear Mastery,136,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Split Throw,Split Throw,375,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Barbarian,Stun,Stun,139,yes,partial,physical per application,Added physical damage shown; weapon damage and conversion effects are not included.
+Barbarian,Sword Mastery,Sword Mastery,127,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Taunt,Taunt,137,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Throwing Mastery,Throwing Mastery,135,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,Two Hand Mastery,Two Hand Mastery,134,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Barbarian,War Cry,War Cry,154,yes,calculated,physical per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Barbarian,Whirlwind,Whirlwind,151,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Barbarian,bartemp3,bartemp3,382,no,internal,,"Hidden/internal entry, not a separate selectable skill-tree attack."
+Druid,Arctic Blast,Arctic Blast,230,yes,partial,"Continuous damage: Stream (cold, per second); Shatter nova: Frost nova (cold, per hit)","Rate uses 25 fps, fire-wall damage function 3 uses ×75, and Wake of Inferno follows Skilldesc ×25/3. No source stacking or exposure duration is assumed. Built-in resistance debuff is not applied automatically; Enemy res must include it."
+Druid,Armageddon,Armageddon,249,yes,calculated,"Impact: Physical (physical, per hit); Impact: Fire (fire, per hit); Ground fire: Ground fire (fire, per second)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Druid,Carrion Vine,Cycle of Life,231,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Druid,Cyclone Armor,Cyclone Armor,235,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Druid,Feral Rage,Feral Rage,232,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Druid,Fire Claws,Fire Claws,239,yes,partial,"Weapon strike: Physical weapon (physical, per hit); Elemental damage: Fire (fire, per hit)",Weapon strike and elemental damage are shown separately; projectile counts and additional gear elements are not totaled.
+Druid,Firestorm,Firestorm,225,yes,calculated,fire per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Druid,Fissure,Eruption,234,yes,calculated,fire per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Druid,Fury,Fury,248,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Druid,Gust,Gust,370,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Druid,Heart of Wolverine,Heart of Wolverine,236,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Druid,Hunger,Hunger,242,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Druid,Hurricane,Hurricane,250,yes,calculated,"Storm pulse: Cold (cold, per pulse)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Druid,Lycanthropy,Shape Shifting,224,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Druid,Maul,Maul,233,no,needs-model,,Charge-dependent enhanced damage requires active charge count.
+Druid,Molten Boulder,Molten Boulder,229,yes,calculated,"Impact: Physical (physical, per hit); Impact: Fire (fire, per hit); Fire trail: Fire trail (fire, per second)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Druid,Oak Sage,Oak Sage,226,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Druid,Poison Creeper,Plague Poppy,222,yes,calculated,poison per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Druid,Rabies,Rabies,238,yes,calculated,poison per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Druid,Raven,Raven,221,yes,calculated,cold per application,"Cold damage per peck. Damage comes from the Raven skill referenced by MonStats; no additional physical base attack is recorded. Attack timing, total pecks and item-specific bonuses are not totaled."
+Druid,Shock Wave,Shock Wave,243,yes,calculated,physical per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Druid,Solar Creeper,Vines,241,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Druid,Spirit of Barbs,Spirit of Barbs,246,yes,conditional,"Returned damage: Flat physical return (physical, per attacker hit)",Conditional returned damage when the protected target is hit; not an active attack or DPS.
+Druid,Summon Dire Wolf,Summon Fenris,237,yes,calculated,"Summon attack: Physical (physical, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Druid,Summon Grizzly,Summon Grizzly,247,yes,calculated,"Summon attack: Physical (physical, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Druid,Summon Spirit Wolf,Summon Spirit Wolf,227,yes,calculated,"Summon attack: Physical (physical, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Druid,Tornado,Tornado,245,yes,calculated,"Collision hit: Physical (physical, per hit); Area pulse: Physical (physical, per pulse)",Area damage checks every 15 frames (0.6 s). Collision and pulse are separate sources; hit count depends on path and target overlap.
+Druid,Twister,Twister,240,yes,calculated,physical per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Druid,Volcano,Volcano,244,yes,calculated,"Impact: Physical (physical, per hit); Impact: Fire (fire, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Druid,Werebear,Wearbear,228,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Druid,Werewolf,Wearwolf,223,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Druid,drutemp2,drutemp2,377,no,internal,,"Hidden/internal entry, not a separate selectable skill-tree attack."
+Druid,drutemp3,drutemp3,384,no,internal,,"Hidden/internal entry, not a separate selectable skill-tree attack."
+Necromancer,Amplify Damage,AmpDmg,66,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Necromancer,Attract,Attract,86,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Necromancer,Blood Golem,BloodGolem,85,yes,partial,"Melee attack: Physical (physical, per hit); Bleed: Added Deep Wounds (physical, per second)","Hell A1 base damage imported from MonStats; noRatio=1, so MonLvl multipliers do not apply. A2 ranges are not treated as an additional simultaneous hit."
+Necromancer,Blood Warp,Blood Warp,367,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Necromancer,Bone Armor,Bone Armor,68,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Necromancer,Bone Prison,Bone Prison,88,yes,conditional,"Returned damage: Flat physical return (physical, per attacker hit)",Conditional returned damage when the protected target is hit; not an active attack or DPS.
+Necromancer,Bone Spear,Bone Spear,84,yes,calculated,magic per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Necromancer,Bone Spirit,Bone Spirit,93,yes,calculated,magic per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Necromancer,Bone Wall,Bone Wall,78,yes,conditional,"Returned damage: Flat physical return (physical, per attacker hit)",Conditional returned damage when the protected target is hit; not an active attack or DPS.
+Necromancer,Clay Golem,Clay Golem,75,yes,calculated,"Melee attack: Physical (physical, per hit)","Hell A1 base damage imported from MonStats; noRatio=1, so MonLvl multipliers do not apply. A2 ranges are not treated as an additional simultaneous hit."
+Necromancer,Confuse,Confuse,81,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Necromancer,Corpse Explosion,Corpse Explosion,74,yes,partial,"Impact: Physical (physical, per hit); Impact: Fire (fire, per hit)","Flat physical + fire damage shown. Also adds 5–10% of corpse base life, split equally between physical and fire; corpse-life damage is not included."
+Necromancer,Curse Mastery,CurMas,374,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Necromancer,Dark Pact,Dark Pact,381,yes,calculated,"Dark Pact: Magic (magic, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Necromancer,Decrepify,Decrepify,87,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Necromancer,Desecrate,Desecrate,83,yes,calculated,poison per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Necromancer,Dim Vision,Dim Vision,71,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Necromancer,Fire Golem,FireGolem,94,yes,calculated,"Punch: Physical punch (physical, per hit); Punch: Added fire (fire, per hit); Holy Fire aura: Aura fire (fire, per pulse)","Hell A1 base damage imported from MonStats; noRatio=1, so MonLvl multipliers do not apply. A2 ranges are not treated as an additional simultaneous hit."
+Necromancer,Golem Mastery,Golem Mastery,79,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Necromancer,Iron Golem,IronGolem,90,no,needs-model,,Omitted by request: item-derived or arbitrary-monster attacks require too much input.
+Necromancer,Iron Maiden,Iron Maiden,76,no,conditional,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Necromancer,Life Tap,Life Tap,82,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Necromancer,Lower Resist,LowRes,91,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Necromancer,Poison Nova,Poison Nova,92,yes,calculated,poison per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Necromancer,Poison Strike,Poison Dagger,73,yes,partial,poison per application,Added poison damage shown; weapon damage and conversion effects are not included.
+Necromancer,Raise Skeleton Archer,Raise Skeleton Archer,89,yes,calculated,"Summon attack: Physical (physical, per hit)","Includes mastery flat damage, hard-point synergies and skill enhanced damage. Does not include summon attack speed, crits, external elemental damage or army DPS."
+Necromancer,Raise Skeleton Mage,Raise Skeletal Mage,80,yes,calculated,"Poison mage: Poison bolt (poison, per hit); Cold mage: Cold bolt (cold, per hit); Fire mage: Fire bolt (fire, per hit); Lightning mage: Lightning bolt (lightning, per hit)","All four bolt types and soft-level mastery are modeled separately; poison uses the source missile’s 12-frame (0.48 s) duration, matching the PD2 wiki table."
+Necromancer,Raise Skeleton Warrior,Raise Skeleton,70,yes,calculated,"Summon attack: Physical (physical, per hit)","Includes mastery flat damage, hard-point synergies and skill enhanced damage. Does not include summon attack speed, crits, external elemental damage or army DPS."
+Necromancer,Revive,Revive,95,no,needs-model,,Omitted by request: item-derived or arbitrary-monster attacks require too much input.
+Necromancer,Skeleton Mastery,Skeleton Mastery,69,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Necromancer,Teeth,Teeth,67,yes,calculated,magic per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Necromancer,Terror,Terror,77,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Necromancer,Weaken,Weaken,72,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Blessed Aim,Blessed Aim,108,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Blessed Hammer,Blessed Hammer,112,yes,calculated,magic per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Paladin,Charge,Charge,107,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Paladin,Cleansing,Cleansing,109,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Concentration,Concentration,113,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Conviction,Conviction,123,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Defiance,Defiance,104,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Fanaticism,Fanaticism,122,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Fist of the Heavens,Fist of the Heavens,121,yes,calculated,"Direct target: Lightning strike (lightning, per hit); Surrounding targets: Holy bolt (magic, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Paladin,Holy Bolt,Holy Bolt,101,yes,calculated,magic per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Paladin,Holy Fire,Holy Fire,102,yes,calculated,"Aura pulse: Pulse (fire, per pulse); Added attack damage: Added fire (fire, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Paladin,Holy Freeze,Holy Freeze,114,yes,calculated,"Aura pulse: Pulse (cold, per pulse); Added attack damage: Added cold (cold, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Paladin,Holy Light,Holy Light,371,yes,calculated,"Cast on enemy: Magic area damage (magic, per hit); Cast on ally: Magic area damage (magic, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Paladin,Holy Nova,Holy Nova,364,yes,calculated,magic per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Paladin,Holy Shield,Holy Shield,117,no,conditional,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Holy Shock,Holy Shock,118,yes,partial,"Aura pulse: Pulse (lightning, per pulse); Added attack damage: Added lightning (lightning, per hit)",Attack minimum follows the server passive formula; the tooltip forces a minimum of 1 and may display a different value.
+Paladin,Holy Sword,Holy Sword,116,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Joust,Joust,378,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Paladin,Meditation,Meditation,120,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Might,Might,98,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Prayer,Prayer,99,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Redemption,Redemption,124,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Resist Cold,Resist Cold,105,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Resist Fire,Resist Fire,100,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Resist Lightning,Resist Lightning,110,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Sacrifice,Sacrifice,96,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Paladin,Salvation,Salvation,125,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Sanctuary,Sanctuary,119,yes,partial,"Aura pulse: Pulse (magic, per pulse); Added attack damage: Added magic (magic, per hit)",Sanctuary also reduces enemy magic resistance by 5 + skill level / 2. Enter the target’s resistance after that aura/debuff in Enemy res; do not enter it again as item pierce.
+Paladin,Smite,Smite,97,no,needs-model,,"Requires shield base damage, Holy Shield and character/equipment enhanced damage."
+Paladin,Thorns,Thorns,103,yes,partial,"Returned damage: Flat physical return (physical, per attacker hit); Added bleed · Allies: Deep Wounds (physical, per second); Added bleed · Paladin: Deep Wounds (physical, per second)",Conditional returned damage when the protected target is hit; not an active attack or DPS.
+Paladin,Vengeance,Vengeance,111,no,needs-model,,Amplifies added fire/cold/lightning damage; requires full weapon/gear elemental ranges and server behavior.
+Paladin,Vigor,Vigor,115,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Paladin,Zeal,Zeal,106,yes,input-required,"Weapon attack: Physical (physical, per hit)","Per hit from one weapon. Enter weapon-local damage before off-weapon ED; include strength/dexterity, mastery and aura ED in Other enhanced damage. Attack speed, crits and extra gear elemental damage are not totaled."
+Sorceress,Blaze,Blaze,46,yes,partial,"Continuous damage: Fire trail (fire, per second); Initial explosion: Fire explosion · tooltip (fire, per hit)","Rate uses 25 fps, fire-wall damage function 3 uses ×75, and Wake of Inferno follows Skilldesc ×25/3. No source stacking or exposure duration is assumed. Tooltip explosion and ignition missile disagree; tooltip calculation is shown explicitly and is not claimed to reproduce the server ignition result."
+Sorceress,Blizzard,Blizzard,59,yes,calculated,cold per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Chain Lightning,Chain Lightning,53,yes,calculated,lightning per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Charged Bolt,Charged Bolt,38,yes,calculated,lightning per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Chilling Armor,Chilling Armor,60,yes,calculated,cold per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Cold Enchant,Cold Enchant,40,yes,conditional,cold per application,Added attack damage only; this buff does not deal a separate hit.
+Sorceress,Cold Mastery,Cold Mastery,65,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Sorceress,Combustion,Combustion,376,yes,calculated,fire per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Enchant Fire,Enchant,52,yes,conditional,fire per application,Added attack damage only; this buff does not deal a separate hit.
+Sorceress,Energy Shield,Energy Shield,58,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Sorceress,Fire Ball,Fire Ball,47,yes,calculated,fire per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Fire Bolt,Fire Bolt,36,yes,calculated,fire per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Fire Mastery,Fire Mastery,61,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Sorceress,Fire Wall,Fire Wall,51,yes,calculated,"Continuous damage: Fire wall (fire, per second)","Rate uses 25 fps, fire-wall damage function 3 uses ×75, and Wake of Inferno follows Skilldesc ×25/3. No source stacking or exposure duration is assumed."
+Sorceress,Frost Nova,Frost Nova,44,yes,calculated,cold per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Frozen Orb,Frozen Orb,64,yes,calculated,cold per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Glacial Spike,Glacial Spike,55,yes,calculated,cold per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Hydra,Hydra,62,yes,calculated,fire per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Ice Barrage,Ice Barrage,369,yes,calculated,cold per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Ice Blast,Ice Blast,45,yes,calculated,cold per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Ice Bolt,Ice Bolt,39,yes,calculated,cold per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Inferno,Inferno,41,yes,partial,"Continuous damage: Stream (fire, per second)","Rate uses 25 fps, fire-wall damage function 3 uses ×75, and Wake of Inferno follows Skilldesc ×25/3. No source stacking or exposure duration is assumed. Built-in resistance debuff is not applied automatically; Enemy res must include it."
+Sorceress,Lesser Hydra,Lesser Hydra,383,yes,calculated,fire per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Lightning,Lightning,49,yes,calculated,lightning per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Lightning Mastery,Lightning Mastery,63,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Sorceress,Meteor,Meteor,56,yes,calculated,"Impact: Physical (physical, per hit); Impact: Fire (fire, per hit); Ground fire: Ground fire (fire, per second)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Nova,Nova,48,yes,calculated,lightning per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Shiver Armor,Shiver Armor,50,yes,calculated,cold per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Static Field,Static Field,42,no,needs-model,,Percentage-of-current-life attack with difficulty/target rules; no flat range.
+Sorceress,Telekinesis,Telekinesis,43,yes,calculated,lightning per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Sorceress,Teleport,Teleport,54,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
+Sorceress,Thunder Storm,Thunder Storm,57,yes,calculated,"Lightning strike: Lightning (lightning, per hit); Triggered nova: Lightning nova (lightning, per hit)",The strike triggers an area nova. Each rolls its own damage; no assumed overlap or attack frequency.
+Sorceress,Warmth,Warmth,37,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."

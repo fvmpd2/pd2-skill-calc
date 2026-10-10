@@ -16,12 +16,12 @@ assert.equal(c.calc(null,{skillLevel:1}),null);
 for(const s of c.catalog)if(s.formula?.kind==='flat')for(const skillLevel of [1,8,9,16,17,22,23,28,29,50,100]){const v=c.calc(s.formula,{skillLevel});assert(Number.isFinite(v.min)&&Number.isFinite(v.max),s.name);}
 // Exercise UI event handling without a browser, including unsupported and editable formulas.
 class Element{constructor(){this.value='';this.children=[];this.listeners={};this.firstChild={textContent:''};this.dataset={};this.textContent='';}replaceChildren(...xs){this.children=xs;if(xs[0]?.value!==undefined)this.value=xs[0].value;}append(x){this.children.push(x);}addEventListener(name,fn){this.listeners[name]=fn;}querySelectorAll(selector){const all=this.children.flatMap(x=>[x,...x.querySelectorAll(selector)]);return all.filter(x=>selector==='input'&&x.type==='number');}get selectedOptions(){return [{text:this.value}];}}
-const ids=['class','skill','levelLabel','damageType','scalingGrid','scalingNote','synergies','level','pct','pierce','enemyRes','enemyPlr','plrField','poisonResults','status','damageRows','comparison','apply','feedback','reset','chargeModifiers','normalModifiers','chargeResults','normalResults','chargeEditorField','chargeEditor','weaponFields','weaponMin','weaponMax','otherEd'];
+const ids=['class','skill','levelLabel','damageType','scalingGrid','scalingNote','synergies','level','pct','pierce','enemyRes','enemyPlr','plrField','poisonResults','status','damageRows','comparison','apply','feedback','reset','chargeModifiers','normalModifiers','chargeResults','normalResults','chargeEditorField','chargeEditor','weaponFields','weaponMin','weaponMax','otherEd','extraFields','skillInfo','difficulty','difficultyField'];
 const elements=Object.fromEntries(ids.map(id=>[id,new Element()]));elements.level.value='1';
 c.document={getElementById:id=>elements[id],createElement:()=>new Element()};c.Option=function(text,value){return {text,value};};
 vm.runInContext(fs.readFileSync(__dirname+'/main.js','utf8'),c);
 assert.equal(elements.skill.children.some(x=>x.text.includes('unsupported')),false);
-for(const s of c.catalog.filter(s=>s.formula)){elements.skill.value=s.id;vm.runInContext('changeSkill()',c);assert(!/error/i.test(elements.status.textContent),s.name);if(s.charges){assert.equal(elements.chargeResults.children.length,3,s.name);}else{assert.equal(elements.damageRows.children.length,1,s.name);}assert.equal(elements.scalingGrid.querySelectorAll('input').length,s.formula.kind==='weapon'?0:12,s.name);}
+for(const s of c.catalog.filter(s=>s.formula)){elements.skill.value=s.id;vm.runInContext('changeSkill()',c);assert(!/error/i.test(elements.status.textContent),s.name);if(s.charges){assert.equal(elements.chargeResults.children.length,s.charges.length,s.name);}else{assert.equal(elements.damageRows.children.length,1,s.name);}assert.equal(elements.scalingGrid.querySelectorAll('input').length,(s.charges?s.charges[0].components[0].formula:s.formula).kind!=='flat'?0:12,s.name);}
 for(const className of new Set(c.catalog.map(s=>s.className))){elements.class.value=className;elements.class.listeners.change();assert(elements.skill.children.every(option=>c.catalog.find(s=>s.id===option.value).formula));}
 elements.skill.value=c.catalog.find(s=>s.name==='Poison Nova').id;elements.skill.listeners.change();assert.equal(elements.poisonResults.children.length,4);
 const original=vm.runInContext('skillFormula().min[0]',c);const synergy=vm.runInContext('JSON.stringify(skillFormula().synergy)',c);
@@ -49,3 +49,67 @@ console.log('Passed: in-game name aliases and site notice/resource links.');
 
 assert.equal(elements.status.textContent,'');assert(!page.includes('Supported component'));assert(!page.includes('class="footer"'));assert(page.includes('class="ai-credit"'));assert(!page.includes('build-label'));assert.deepEqual(Array.from(elements.class.children.map(c=>c.text)),Array.from(elements.class.children.map(c=>c.text)).sort((a,b)=>a.localeCompare(b)));
 console.log('Passed: alphabetical classes, compact poison cards, clean header/footer and removed routine status.');
+
+// Audit regressions: false damage stats, hidden helper, mixed damage and custom inputs.
+const skill=name=>c.catalog.find(s=>s.name===name);
+for(const name of ['Resist Fire','Resist Cold','Resist Lightning','Salvation','Holy Sword','Energy Shield','Inner Sight','Shattering Arrow'])assert.equal(skill(name).formula,null,name);
+const component=(name,group=0,index=0)=>skill(name).charges[group].components[index];
+const evalComp=(name,group,index,opts={})=>c.charge(component(name,group,index),{skillLevel:1,...opts});
+for(const name of ['Corpse Explosion','Death Sentry','Meteor','Molten Boulder','Volcano','Armageddon'])assert.deepEqual(Array.from(skill(name).charges[0].components.map(x=>x.formula.damageType)),['physical','fire'],name);
+assert(skill('Corpse Explosion').info.includes('5–10%'));
+assert.equal(evalComp('Fire Golem',0,0,{extraInputs:{summonMin:18,summonMax:47}}).min,18);
+assert.equal(evalComp('Fire Golem',0,1).min,9);
+assert.equal(evalComp('Fire Golem',1,0).min,7);
+assert.equal(evalComp('Fire Golem',0,0).needsBaseInput,false);
+assert.equal(evalComp('Fire Golem',0,0,{difficulty:'Hell'}).min,18);
+assert.equal(evalComp('Dark Pact',0,0,{extraInputs:{curseCount:0}}).min,0);
+assert.equal(evalComp('Dark Pact',0,0,{extraInputs:{curseCount:1}}).min,3);
+assert(Math.abs(evalComp('Dark Pact',0,0,{extraInputs:{curseCount:3}}).min-3.6)<1e-10);
+assert.equal(evalComp('Dark Pact',0,0,{extraInputs:{curseCount:3},skillDamagePct:50}).modifierMultiplier,1.2);
+assert(Math.abs(evalComp('Raise Skeleton Warrior',0,0,{skillLevel:4,extraInputs:{masteryLevel:10},synergyPoints:{'Skeleton Mastery':5,'Raise Skeleton Archer':10}}).min-38.4)<1e-10); // (1+3+20) × (1+.1+.3+.2)
+assert.equal(evalComp('Raise Skeleton Archer',0,0,{extraInputs:{masteryLevel:10},synergyPoints:{'Skeleton Mastery':5}}).min,45.5);
+assert.equal(skill('Raise Skeleton Mage').charges.length,4);
+assert.equal(evalComp('Raise Skeleton Mage',2,0,{skillLevel:4,extraInputs:{masteryLevel:1}}).min,8.8); // bolt level 2, 8 fire, +10% mastery
+assert.equal(evalComp('Holy Fire',0,0).min,1.25);
+assert.equal(evalComp('Holy Fire',1,0).min,5);
+assert.equal(evalComp('Holy Light',1,0).min,3.5);
+assert.equal(evalComp('Bone Wall',0,0).min,15);
+assert.equal(evalComp('Bone Prison',0,0).min,30);
+assert.equal(evalComp('Meteor',0,0,{skillDamagePct:100}).min,50); // physical inherits fire mastery
+assert.equal(evalComp('Jab',0,0,{weaponMin:100,weaponMax:200,synergyPoints:{Fend:2},otherEnhancedDamagePct:40}).min,200);
+assert(Math.abs(evalComp('Clay Golem',0,0,{skillLevel:2,difficulty:'Hell',synergyPoints:{'Golem Mastery':1}}).min-201.6)<1e-10);
+assert(Math.abs(evalComp('Blood Golem',0,0,{skillLevel:2,difficulty:'Hell',synergyPoints:{'Golem Mastery':1}}).min-112.2)<1e-10);
+assert.equal(skill('Revive').formula,null);assert.equal(skill('Iron Golem').formula,null);
+assert.equal(c.calc(skill('Cold Arrow').formula,{skillLevel:1}).min,7);
+assert.equal(c.calc(skill('Magic Arrow').formula,{skillLevel:1}).min,2.25);
+assert.equal(evalComp('Fire Arrow',0,0).min,8.5);
+assert.equal(component('Immolation Arrow',1,0).formula.source,'missile:immolationarrow fire');
+assert.equal(component('Fists of Fire',2,2).formula.source,'missile:fofmeteorfire');
+for(const s of c.catalog.filter(s=>s.formula)){
+ assert(s.auditStatus&&s.auditDetail,s.name+' audit classification');
+ for(const comp of s.charges?.flatMap(g=>g.components)||[{formula:s.formula}])for(const skillLevel of [1,8,9,16,17,22,23,28,29,50,100]){
+  const result=c.charge(comp,{skillLevel,weaponMin:100,weaponMax:200,extraInputs:{summonMin:10,summonMax:20,masteryLevel:20,grizzlyLevel:20,curseCount:3}});
+  assert(Number.isFinite(result.min)&&Number.isFinite(result.max)&&result.min>=0&&result.max>=result.min,s.name+': '+comp.label+' level '+skillLevel);
+ }
+}
+assert.equal(c.catalog.length,231);
+console.log('Passed: all 231 audited entries, every available component at 11 level boundaries, mixed damage, curse counts, aura/attack separation, summon/mastery inputs and weapon synergy ED.');
+assert(!page.includes('difficultyField'));assert(!page.includes('>Normal<'));assert(!page.includes('>Nightmare<'));
+assert.equal(evalComp('Power Strike',2,0).max,3);
+assert.equal(evalComp('Thunder Storm',1,0).max,100);
+assert.equal(evalComp('Inferno',0,0).min,6.25);
+assert.equal(evalComp('Arctic Blast',0,0).min,12.5);
+assert.equal(evalComp('Arctic Blast',1,0).min,3);
+assert.equal(evalComp('Fire Wall',0,0).min,14.0625);
+assert.equal(evalComp('Wake of Inferno',0,0).min,31.250000000000004);
+assert.equal(skill('Tornado').charges.length,2);
+assert.equal(evalComp('Raise Skeleton Mage',0,0,{extraInputs:{masteryLevel:1}}).durationSec,.48);
+elements.skill.value=skill('Dark Pact').id;elements.skill.listeners.change();const curses=elements.extraFields.querySelectorAll('input').find(x=>x.dataset.extra==='curseCount');curses.value='3';curses.listeners.input();assert.equal(elements.status.textContent,'');
+assert.equal(vm.runInContext('readExtras().curseCount',c),3);
+elements.skill.value=skill('Fire Golem').id;elements.skill.listeners.change();assert(elements.extraFields.querySelectorAll('input').every(x=>!['summonMin','summonMax'].includes(x.dataset.extra)));assert.equal(elements.chargeResults.children.length,2);
+console.log('Passed: Hell-only fixed summon bases, secondary novas, continuous rates, shatter nova, mage poison duration and dynamic input updates.');
+assert.equal(evalComp('Raise Skeleton Mage',2,0,{extraInputs:{masteryLevel:20},skillDamagePct:50}).appliedBonusPct,250);
+elements.skill.value=skill('Raise Skeleton Mage').id;elements.skill.listeners.change();
+// At zero resistance, the bonus and effective columns agree, including automated mastery.
+for(const section of elements.chargeResults.children){const scroll=section.children.find(x=>x.className==='table-scroll');const table=scroll.children[0];for(const row of table.children.filter(x=>x.children.length===5&&x.children[0].textContent.includes('bolt'))){assert.equal(row.children[2].textContent,row.children[4].textContent);}}
+console.log('Passed: summon mastery is included consistently in both bonus and effective damage columns.');

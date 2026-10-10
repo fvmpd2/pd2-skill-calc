@@ -1,89 +1,67 @@
-# PD2 Damage Calculator — ember edition
+# PD2 Damage Calculator — skill audit edition (v6)
 
-Extract this ZIP and open `index.html` in a modern browser. No installation or server is required. For GitHub Pages, replace the existing calculator files in your repository and publish the repository root. No original game files are needed at runtime.
+Extract the ZIP and open `index.html`, or replace the calculator files in your GitHub Pages repository. Keep `index.html`, `style.css`, `skills.js`, `calc.js` and `main.js` together. Upload extracted files, not the ZIP. The original game text files are not required by the website.
 
-## What changed
+## This release
 
-- Compact controls, spacing, typography and two-column desktop layout. The main calculator is designed for a typical 1366×768 desktop at 100% zoom with season scaling closed. Smaller windows and expanded scaling can scroll.
-- 231 class skills: 97 selectable skills with imported damage components and/or charge calculations, versus 87 in the original archive. 134 unsupported entries are excluded from the calculator selector. They remain in the generated source catalogue for future importer work; only the 97 supported skills are available in the UI.
-- Corrected `HitShift`: damage fields × 2^HitShift / 256. Blank HitShift is zero. Added non-weapon physical components, including War Cry, Twister, Tornado and Mind Blast.
-- Poison uses the shifted damage rate × duration in frames. It displays skill duration, target duration before/after pierce, effective total damage, DPS and damage per frame at 25 fps. Small values retain three decimal places.
-- Editable **Skill scaling & season adjustments** remains collapsed. It now has twelve number boxes: starting Min/Max at level 1, then Min/Max increments for levels 2–8, 9–16, 17–22, 23–28 and 29+. Apply/Reset changes only the current browser session. No formula text is required.
-- Poison results use cards for before/after duration, damage each frame and damage each second, plus a plain-language duration explanation.
-- Diablo II-inspired charcoal, aged gold, parchment and dark red theme.
+All **231 class-tagged source rows** have been classified. **124 entries** have selectable damage models. The row-by-row findings are in `SKILL_AUDIT.md` and `SKILL_AUDIT.csv`. “Calculated” means the listed damage application is modeled; it does not mean full character/army DPS or exact in-game verification.
 
-## Resistance inputs and rules
+- Fire Golem: separate **physical punch**, **added melee fire**, and **Holy Fire aura pulse**. Clay/Blood/Fire physical bases use the newly supplied MonStats **Hell** values. Normal/Nightmare controls are omitted. Iron Golem and Revive are omitted because their item/monster inputs are outside the requested scope.
+- Necromancer summons: warrior and archer physical damage, effective Skeleton Mastery levels, hard-point synergies, warrior level ED, and the four alternative mage elements. Mage bolts use their own effective missile level. Poison mages use the supplied 12-frame duration (0.48 seconds), consistent with the PD2 reference table.
+- Dark Pact: curse count is a separate damage modifier. No curse means no damage; each curse after the first adds 10%. This multiplier is applied in the damage-bonus column, separately from hard-point synergies.
+- Corpse Explosion: flat physical and fire are separate rows with separate resistances. The damage area mentions the additional 5–10% corpse-base-life contribution, split equally between physical/fire; that contribution is deliberately not calculated. Death Sentry has the corresponding 3–5% note.
+- Paladin: removed false damage entries such as Resist Fire/Cold/Lightning, Salvation and defensive bonuses. Holy Fire/Freeze/Shock and Sanctuary separate aura pulse from added attack damage. Fist of the Heavens separates lightning strike and surrounding magic bolts. Holy Light distinguishes enemy versus ally casts.
+- Other components: physical/fire impacts for Meteor, Molten Boulder, Volcano and Armageddon; ground fire; Power Strike and Thunder Storm novas; Arctic Blast shatter nova; Tornado collision and area pulses; weapon/source physical damage for supported attacks and blade skills.
+- Druid summons: effective Grizzly passive ED and optional Dire Wolf corpse-fed ED are included. Results are per summon, not an army total.
+- Source/tooltip conflicts are identified locally: Blaze ignition, Holy Shock minimum, and Death Sentry server/player scaling. Results for these should not be treated as confirmed server matches.
 
-Enter the target resistance **before item/skill pierce**, after any immunity-breaking effects such as Lower Resist or Conviction. The calculator does not derive those debuff values or break immunity itself.
+Shattering Arrow was a hidden internal entry, not an additional player skill-tree choice. Its Skilldesc coordinates are zero and its name token matches Freezing Arrow; it is referenced by internal missiles such as `shatteringarrowexp2`. It has been removed from the selector.
 
-Item pierce cannot break a target resistance of 100% or more: damage stays zero. For nonimmune targets, pierce consumes the positive resistance portion at full strength, and the remaining portion at half strength. A target at 25 resistance with 40 pierce reaches -7 after integer truncation (the continuous value is -7.5). Zero resistance with 40 pierce reaches -20. Resistance floors at -100. If entering an already negative resistance, enter its effective value; additional pierce is halved.
+## Inputs and interpretation
 
-PD2 negative-resistance mechanics are documented at:
-- https://wiki.projectdiablo2.com/wiki/Game_Mechanics
-- Accessible translated mirror: https://wiki.projectdiablo2.cn/wiki/Game_Mechanics#Reducing_Resistances
+Skill level includes gear. Synergy inputs are hard points, defaulting to 20; set your actual build. Separate “effective level” inputs include gear and are used only where the game formula uses soft levels. Damage-type controls are locked to the imported component to prevent changing a fire formula into poison or another invalid type.
 
-### Poison length: requested model, not independently verified
+For weapon attacks, enter weapon-local physical Min/Max **before off-weapon ED**. Other ED includes applicable strength/dexterity, mastery, aura and equipment bonuses; skill and hard-point synergy ED are added by the calculator. Values are per hit from one weapon. Dual-wield averaging, critical/deadly strike, hit chance, gear elemental damage and attacks per second are not inferred. Blade skills currently assume a one-handed weapon; other weapon-type penalties remain excluded.
 
-Poison resistance controls damage rate; poison length resistance (PLR) independently controls duration. This version implements the user's requested half-strength length effect: effective PLR = clamp(target PLR − pierce/2, −100, 75). This is half of the full pierce input, not half of the resulting effective damage resistance. No length effect applies while immune.
+Fire Golem’s Hell base punch is 18–47 before added fire and other summon ED; Clay is 84–120 and Blood is 60–188. These monster rows have `noRatio=1`, so MonLvl scaling does not apply. MonLvl was checked rather than applied as an additional multiplier. Skeleton Archer’s attack uses the skill’s physical scaling; native monster baseline is not added again. Raven damage comes from its skill referenced by MonStats; no additional physical base attack is recorded.
 
-Before duration = base duration × (1 − clamped target PLR/100).
-After duration = base duration × (1 − effective PLR/100).
-Per-frame damage = synergy/bonus-adjusted rate × resistance multiplier.
-Total effective damage = per-frame damage × after duration × 25.
+Separate groups distinguish attacks, pulses, alternate targets/charges, and persistent damage. Instant impacts are combined only within a group; damage per second and poison totals are not added to instantaneous impacts. Projectile count, overlap and exposure time are not assumed. Multi-stage skills may require scrolling despite the compact layout.
 
-Example: two seconds at PLR 0 with 40 pierce lasts 2.4 seconds; resistance 0 becomes -20 and damage rate increases 20%. Duration and rate changes are separate.
+Continuous rates use 25 fps. Fire-wall damage function 3 uses three damage units per frame (×75); Wake of Inferno follows its explicit Skilldesc ×25/3 display formula. Arctic Blast’s shatter nova uses the tooltip’s ×6 damage. Source data remains authoritative when wiki patch notes differ. Blaze’s explosion is explicitly labeled as a tooltip calculation because its ignition missile differs.
 
-The PD2-specific half-strength PLR rule could not be confirmed in available PD2 documentation. It is explicitly labeled in the UI. Do not treat poison totals as independently validated in-game values. Game fixed-point rounding and integer duration truncation can cause small differences; duration uses continuous arithmetic here.
+## Resistance and poison
 
-## Scaling and imported data
+Enter **effective resistance before item pierce**, after external debuffs/immunity-breaking effects. Sanctuary, Inferno and Arctic Blast have skill debuffs that must already be reflected in this input; they are not automatically applied a second time. Apply any applicable pet/trap pierce adjustment before entering pierce; the calculator does not infer those ownership penalties.
 
-The scaling boxes show base damage at level 1, followed by per-level increments for levels 2–8, 9–16, 17–22, 23–28 and 29+. For example, level 8 uses starting damage plus seven increments from the 2–8 tier. Apply validates all twelve boxes and retains the imported duration and synergies. Reset restores that skill’s original values. Synergy `pctPerHardPoint` uses fractions (0.24 = 24% per hard point). Synergy controls default to 20; set actual hard points for your build. +skill damage is applied multiplicatively after the summed synergy bonus.
+Item pierce cannot break resistance of 100% or more. Against a nonimmune target, pierce consumes positive resistance at full effectiveness and only the additional below-zero portion at half effectiveness. Results truncate toward zero and floor at −100. For example, 25 resistance with 40 pierce becomes −7; 0 with 40 pierce becomes −20. Additional pierce against an already negative effective resistance is halved. See [PD2 resistance mechanics](https://wiki.projectdiablo2.cn/wiki/Game_Mechanics#Reducing_Resistances).
 
-Poison Min/Max boxes show total damage over the imported base poison duration, not raw damage per frame. This duration is stated below the boxes. Duration scaling and synergies are preserved automatically. Advanced season changes to those fields require updating the source data and reimporting.
+Poison damage rate and duration are independent. The calculator shows before/after duration, damage per frame at 25 fps, DPS and effective total poison damage. Totals equal per-frame damage × duration × 25.
 
-Reimport future data with Python 3:
+**The half-strength poison-length effect remains the user-requested model, not an independently confirmed PD2 rule:** effective PLR = clamp(target PLR − pierce/2, −100, 75). No pierce length effect is applied while immune. Duration uses continuous arithmetic; fixed-point rounding and integer-frame behavior can differ in game. This qualification lives here rather than in the removed long website footer.
+
+## Editable scaling
+
+The collapsed editor retains twelve boxes: starting Min/Max at level 1, followed by increments at levels 2–8, 9–16, 17–22, 23–28 and 29+. Select a component to edit when a skill has several components. Apply preserves synergies and special-model metadata; Reset restores that component. Changes affect this browser session only.
+
+Poison boxes hold total damage over the formula’s reference duration. Rate-component boxes hold damage per second. Mage scaling refers to the effective **bolt level**, not directly to summon level. Weapon and monster-base models use their designated inputs instead of editable flat tiers.
+
+## Rebuilding the catalogue and audit
+
+Python 3 is needed only to rebuild, not to use the website:
 
 ```sh
-python3 import_pd2.py Skills.txt Missiles.txt Skilldesc.txt MissCalc.txt > skills.js
+python3 import_pd2.py Skills.txt Missiles.txt Skilldesc.txt MissCalc.txt MonStats.txt MonLvl.txt > skills.js
+python3 build_audit.py Skills.txt Missiles.txt Skilldesc.txt MissCalc.txt MonStats.txt MonLvl.txt
 ```
 
-Original uploaded names may be used with quoted paths. The order is Skills, Missiles, Skilldesc, MissCalc. Skills/Missiles provide numeric damage and restricted linear hard-point synergies. Skilldesc display-damage expressions and related MissCalc token descriptions are retained as audit metadata. These two files are not full calculation engines; arbitrary tooltip expressions, missile functions and game server functions are not interpreted.
+MonStats/MonLvl are optional for the converter; supplying them enables fixed Hell golem bases. Keep `audit_pd2.py` and `summons_pd2.py` beside the importer. `Skilldesc` and `MissCalc` metadata are retained; arbitrary server functions are not universally interpreted. The semantic audit includes rules for the supplied season and must be reviewed when updating future seasons.
 
-Reference for game-data damage precision:
-https://github.com/andersgong/d2bin2txt/blob/master/bin2txt/skills.c (embedded Skills.txt file guide).
+`SKILL_AUDIT.md` lists numeric source fingerprints, all seven classes, excluded entries, calculated components and remaining work. Numeric data comes from the six uploaded files. The [PD2 Necromancer](https://wiki.projectdiablo2.cn/wiki/All_Necromancer_Skills), [Paladin](https://wiki.projectdiablo2.cn/wiki/All_Paladin_Skills), [Amazon](https://wiki.projectdiablo2.cn/wiki/All_Amazon_Skills), [Assassin](https://wiki.projectdiablo2.cn/wiki/All_Assassin_Skills), [Druid](https://wiki.projectdiablo2.cn/wiki/All_Druid_Skills) and [Sorceress](https://wiki.projectdiablo2.cn/wiki/All_Sorceress_Skills) descriptions were cross-checked. The Barbarian mirror was inaccessible; supplied formulas were used. Damage-field precision reference: [converter author’s embedded Skills guide](https://github.com/andersgong/d2bin2txt/blob/master/bin2txt/skills.c).
 
-## Scope and limitations
+## Verification and deployment
 
-Results are a **single imported damage component**, not necessarily complete skill damage or DPS. Outside the martial arts breakdown, full weapon damage and multiple simultaneous damage components are not modeled. Summons/trap pierce penalties, mastery automation, attack speed, damage conversion, projectile overlap and special server-function details remain outside scope. Use the matching damage type and the +damage field for applicable bonuses. Other components may be omitted even where one component is supported. Unsupported skills are omitted from the selector; there is no example-formula button.
+Run `node test.js`. Tests cover every available component at eleven level boundaries; all selectable UI entries; damage types; immunity/negative resistance; poison rate/duration consistency; charge/summon/curse modifiers; mixed impacts; Hell monster bases; editable overrides; and dynamic inputs using a simulated document. All checks passed.
 
-## Validation
+This is automated formula/UI-logic verification, **not a live in-game comparison or visual browser check**. Some server/tooltip discrepancies and equipment/conversion models remain unresolved; see the audit. No blanket claim that all skill components are fully modeled is made.
 
-Run `node test.js` with Node.js. Tests check all imported flat components across eleven levels, scaling boundaries, level-one reference values, below-zero resistance, immunity, resistance cap, poison length/rate consistency, and UI logic for all supported selections, class filtering, the twelve tier boxes, poison cards and Apply/Reset/error handling using a simulated document.
-
-Automated tests passed. Browser visual verification was unavailable: local hosting was denied by the environment and the browser security policy blocked local-file navigation. Desktop fit is a design target, not a screenshot-verified guarantee.
-
-## Clean replacement / troubleshooting
-
-If your repository contains only this calculator, replace its existing files with all eight files from this ZIP in the same repository folder. Keep index.html, style.css, skills.js, calc.js and main.js together. Upload the extracted files, not the ZIP itself. Preserve unrelated projects, .git, .github and any custom domain CNAME file.
-
-This build displays “Built with AI” beneath the title and uses versioned style/script links to request fresh assets. The visible version badge is removed. An empty skill list with the old blue theme suggests mismatched or cached files. Wait for GitHub Pages deployment to finish, then use Command+Shift+R on Mac or Ctrl+Shift+R on Windows.
-
-## Martial arts / in-game names (v4)
-
-All six charge-up skills now show three stages: Tiger Strike, Fists of Fire, Cobra Strike, Claws of Thunder, Blades of Ice and Phoenix Strike. Select a charge component in the collapsed season editor to edit its Min/Max tiers independently.
-
-Fists of Fire charge 3 has separate fire and physical impact rows and a combined impact total **per meteor**, using independent type resistance/pierce. Three meteors are released, but all three are not assumed to hit the same target. Ground fire is shown separately per second for one active damage source, with no assumed exposure duration or stacking. Charge 1 explosion and charge 2 nova use their own scaling. Claws of Thunder charge 3 separates a bolt and its independently rolled lightning strike. Poison charges show before/after duration and per-frame damage.
-
-For Tiger Strike and Cobra Strike charge 2, enter the weapon's physical damage range after weapon-local bonuses but before off-weapon enhanced damage. “Other off-weapon enhanced damage” includes applicable strength/dexterity, mastery, aura and equipment bonuses; the calculator adds the charge's supplied enhanced damage separately. No critical/deadly strike, dual-wield averaging, added gear damage, hit chance or attack speed is inferred. Weapon scaling is not edited through the flat Min/Max tier boxes. Cobra Strike added Venom/gear poison and leech recovery are excluded.
-
-The uploaded source data is authoritative for this build. Current wiki descriptions differ in places: e.g. Fists of Fire meteor physical synergy references Phoenix Strike in current patch notes but the supplied Missile row uses Dragon Flight; Blades of Ice / Phoenix Strike cold synergies and ground-fire scaling also differ. This build retains the supplied formulas rather than mixing seasons. Charge descriptions and projectile behavior were cross-checked with https://wiki.projectdiablo2.cn/wiki/All_Assassin_Skills ; complete in-game matching is not guaranteed.
-
-Internal names are mapped to player-visible names throughout the selector and synergy controls: Royal Strike → Phoenix Strike, Poison Dagger → Poison Strike, Fire Trauma → Fire Blast, Shock Field → Shock Web, Wake of Fire Sentry → Wake of Fire, Inferno Sentry → Wake of Inferno, Plague Poppy → Poison Creeper, Summon Fenris → Summon Dire Wolf, Eruption → Fissure, Enchant → Enchant Fire, and golem spacing. Original internal names/IDs and raw formulas remain available in the generated data for auditing. Name references: PD2 wiki All Assassin, Necromancer, Druid and Sorceress Skills pages.
-
-The title has a small “Built with AI” credit. The bottom notice says “Found an issue? Tag fvm on the PD2 Discord.” It recommends https://hiimpd2.com/planner and https://hiimpd2.com/damage-calc for more detailed information.
-
-## Ember layout update (v5)
-
-Classes sort alphabetically. The version badge and explanatory subtitle are removed; only “Built with AI” sits beneath the title. Routine supported-component messages and the long technical footer are removed. Calculation errors and immunity messages still appear when relevant. Model limitations remain documented in this README.
-
-Poison results use four small two-line cards; charge poison summaries are condensed. Modifier fields align at the bottom of each grid row, with elemental/physical resistance and pierce occupying matching columns. The palette now uses near-black panels, ember-red borders and orange firelit headings. Issue-reporting and Hiim resource links remain at the bottom. Automated regression tests passed; browser visual verification remains unavailable in this environment.
+The website retains the fiery dark theme, alphabetical classes, “Built with AI” beneath the title, and fvm/Hiim resource notice. Versioned asset links request fresh v6 files. Wait for GitHub Pages deployment to complete and hard-refresh if the old version remains visible. Preserve unrelated files, `.git`, `.github` and any custom-domain `CNAME` when replacing calculator files.
