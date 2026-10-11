@@ -254,3 +254,14 @@ console.log('Passed: shorter build links and lossless restoration, including cus
 elements.skill.value=skill('Fire Bolt').id;elements.skill.listeners.change();assert(!elements.synergyDetails.open);assert(!elements.synergyNote.hidden);
 const updatedPage=fs.readFileSync(__dirname+'/index.html','utf8');assert(updatedPage.indexOf('id="synergyNote"')<updatedPage.indexOf('id="synergyDetails"'));
 console.log('Passed: synergy note remains visible outside collapsed dropdown.');
+
+// Switching skills discards session scaling; saved links still restore overrides.
+elements.skill.value=skill('Poison Nova').id;elements.skill.listeners.change();
+const originalNovaMin=vm.runInContext('skillFormula().min[0]',c);
+elements.scalingGrid.querySelectorAll('input')[0].value='1';elements.apply.listeners.click();assert.equal(vm.runInContext('skillFormula().min[0]',c),1);
+const editedState=vm.runInContext('JSON.stringify(collectBuild())',c);
+elements.skill.value=skill('Meteor').id;elements.skill.listeners.change();
+elements.skill.value=skill('Poison Nova').id;elements.skill.listeners.change();assert.equal(vm.runInContext('skillFormula().min[0]',c),originalNovaMin);
+c.editedHash='#build='+encodeURIComponent(editedState);assert(vm.runInContext('restoreBuild(editedHash)',c));assert.equal(vm.runInContext('skillFormula().min[0]',c),1);
+elements.skill.value=skill('Meteor').id;elements.skill.listeners.change();assert.equal(vm.runInContext('Object.keys(overrides).length',c),0);
+console.log('Passed: skill switches restore S13 scaling; explicitly loaded build links retain saved scaling.');

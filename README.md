@@ -18,7 +18,7 @@ Weapon-dependent player skills are excluded; Barbarian offers War Cry only. Summ
 
 Open [the calculator](https://fvmpd2.github.io/pd2-skill-calc/) or download the files and open `index.html` locally. No installation or account is needed.
 
-Skill levels include gear; synergy levels are hard points. Synergies default to 20 hard points. With four or more, only three default to 20, prioritizing the largest bonuses; all are editable. Changing skills clears damage and resistance modifiers. **Reset** keeps your selected class/skill and restores default inputs and synergies.
+Skill levels include gear; synergy levels are hard points. Synergies default to 20 hard points. With four or more, only three default to 20, prioritizing the largest bonuses; all are editable. Changing skills clears damage and resistance modifiers and discards custom scaling, restoring the original S13 values. **Reset** keeps your selected class/skill and restores default inputs and synergies.
 
 Use **Copy build link** or bookmark the updated address to save your setup. Compact links include applied scaling edits and display preferences. Older saved links remain supported. Future game-data updates can change their results.
 
