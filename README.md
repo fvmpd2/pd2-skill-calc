@@ -8,6 +8,7 @@ A compact calculator for supported Project Diablo 2 skill damage, built with AI.
 - Hard-point synergies, mastery and skill-specific modifiers such as Dark Pact curse count.
 - Enemy resistance, ordinary −enemy resistance and immunity-breaking reductions.
 - Poison duration before/after pierce, damage per frame (25 fps), per second and total damage.
+- Side-by-side S13/S14 beta Poison Nova final damage using your entered build.
 - Sorceress damage with and without the Teleport debuff.
 - An optional **hypothetical** Critical/Deadly Strike comparison for Shock Wave and War Cry, including outcome chances and average damage. Their in-game eligibility is not verified.
 
@@ -39,7 +40,7 @@ Found an issue? Tag **fvm** on the PD2 Discord. For more detailed planning, use 
 
 ## Development
 
-The website needs `index.html`, `style.css`, `skills.js`, `calc.js` and `main.js`. Deploy these together to GitHub Pages; the original game files are not needed to run it.
+The website needs `index.html`, `style.css`, `skills.js`, `seasons.js`, `calc.js` and `main.js`. Deploy these together to GitHub Pages; the original game files are not needed to run it.
 
 Run the automated formula and UI-logic checks with:
 

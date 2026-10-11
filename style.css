@@ -69,3 +69,5 @@ th,td,.charge-stage th,.charge-stage td,.damage-breakdown th,.damage-breakdown t
 .synergy-details{margin:10px 0 0!important;border-top:1px solid var(--border)}.synergy-details summary{padding:9px 0;font-family:system-ui;font-size:var(--font-body)}.synergy-details #synergies{border-top:0;margin:0;padding:0}.synergy-details #synergies:before{display:none}
 
 #synergies small{display:block;font-size:var(--font-helper);font-weight:400;margin:3px 0 5px}.synergy-details>p{margin:0 0 8px}
+
+.season-comparison{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}.season-comparison>div{padding:9px 12px;border:1px solid #8b3d1e;border-radius:5px;background:#291509}.season-comparison span{display:block;color:var(--muted);font-size:var(--font-body)}.season-comparison strong{display:block;color:#ffd08a;font-size:var(--font-subheading);margin-top:3px}
