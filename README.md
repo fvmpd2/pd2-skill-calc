@@ -1,4 +1,4 @@
-# PD2 Damage Calculator — skill audit edition (v12)
+# PD2 Damage Calculator — skill audit edition (v13)
 
 Extract the ZIP and open `index.html`, or replace the calculator files in your GitHub Pages repository. Keep `index.html`, `style.css`, `skills.js`, `calc.js` and `main.js` together. Upload extracted files, not the ZIP. The original game text files are not required by the website.
 
@@ -66,21 +66,21 @@ Run `node test.js`. Tests cover every available component at eleven level bounda
 
 This is automated formula/UI-logic verification, **not a live in-game comparison or visual browser check**. Some server/tooltip discrepancies and equipment/conversion models remain unresolved; see the audit. No blanket claim that all skill components are fully modeled is made.
 
-The website retains the fiery dark theme, alphabetical classes, “Built with AI” and the fvm/Hiim resource notice together beneath the title. Versioned asset links request fresh v12 files. Wait for GitHub Pages deployment to complete and hard-refresh if the old version remains visible. Preserve unrelated files, `.git`, `.github` and any custom-domain `CNAME` when replacing calculator files.
+The website retains the fiery dark theme, alphabetical classes, “Built with AI” and the fvm/Hiim resource notice together beneath the title. Versioned asset links request fresh v13 files. Wait for GitHub Pages deployment to complete and hard-refresh if the old version remains visible. Preserve unrelated files, `.git`, `.github` and any custom-domain `CNAME` when replacing calculator files.
 
-## Teleport comparison (v12)
+## Teleport comparison (v13)
 
 Every selectable Sorceress skill has a **Teleport (slvl)** dropdown in Skill levels (1–100). Select your effective level including +skills. The calculated penalty appears beside it; level 1 is selected initially. The supplied Skills row and [Teleport skill table](https://wiki.projectdiablo2.cn/wiki/All_Sorceress_Skills#Teleport) give a one-second debuff, starting at 50% at level 1, decreasing by one percentage point per effective level to zero at level 51.
 
 The additional output below the main damage shows each component with the penalty, before and after resistance, using damage × (1 − penalty/100), with penalty = max(0, 51 − effective Teleport level). It preserves all existing synergies, bonuses and resistance inputs. Multi-component and continuous damage retain the units of their main output. This is a comparison while the debuff applies; the calculator does not simulate cast timing, persistent spell snapshotting or the lifetime of Hydra/ground effects. Main damage remains unchanged. Checks cover all selectable Sorceress skills, component output, 0–100% boundaries, changing the input and hiding the controls for other classes.
 
-## Saving and sharing (v12)
+## Saving and sharing (v13)
 
 The address updates automatically as you change calculator inputs. Click **Copy build link** to save or share the current setup, or bookmark the page. Opening the link restores skill selection, levels, synergies, resistance/bonus inputs, summon/weapon inputs, Teleport level, selected scaling component and applied custom scaling. Unapplied scaling edits are not included. If clipboard access is unavailable, a selectable link box appears.
 
 Build data is embedded in the URL fragment (`#build=...`); no account or database is needed. Custom scaling can make links longer. Links restore inputs against the site's current game data, so future season updates may change results. Unsupported/invalid skill links show a helpful message; malformed scaling is ignored. Tested with saved/restored spell, martial arts, poison and summon builds, custom scaling and invalid links.
 
-## Results layout (v12)
+## Results layout (v13)
 
 Every damage type uses the same modifier slots: Skill damage, −Enemy res %, Enemy res on the first row; Breaking pierce on the left and poison length reduction on the right of the second row. Physical skill damage is disabled because that modifier does not apply. Normal and Teleport results sit together per component, with before/after resistance columns. Synergy and bonus details are in a collapsed Calculation breakdown.
 
@@ -89,3 +89,11 @@ Every damage type uses the same modifier slots: Skill damage, −Enemy res %, En
 Typography uses a shared scale: 12px controls/table text, 11px helper text, 13px component headings, 15px panel headings and a 22px page title.
 
 The Reset button beside Copy build link keeps the selected class/skill and display preference. It resets main/Teleport levels to 1, synergies to their default 20 (still editable), modifiers to zero, weapon inputs to zero, and clears applied scaling edits for the selected skill. Mastery resets to zero except Skeleton Mage’s required minimum of 1; Dark Pact curse count resets to 1. Other extra inputs reset to zero. The saved link updates to the reset setup.
+
+## Critical damage (v13)
+
+Shock Wave and War Cry have Critical damage inputs: Critical Strike chance, Deadly Strike chance (both 0–100%), and additive multiplier bonuses. Defaults are 0% chances and bonuses, with Critical Strike at 2× and Deadly Strike at 1.5×. Chance inputs above the normal in-game caps are permitted as requested; enter the effective chances you intend to model. Critical Strike rolls first; Deadly Strike can occur only if it fails, and never stacks with it.
+
+With chances C and D as fractions, effective Deadly Strike chance = D × (1 − C), either-strike chance = C + D × (1 − C), and normal-hit chance = (1 − C) × (1 − D). Average multiplier = C × (2 + critical bonus/100) + D × (1 − C) × (1.5 + deadly bonus/100) + (1 − C) × (1 − D). [PD2 critical damage mechanics](https://wiki.projectdiablo2.cn/wiki/Game_Mechanics#Critical_Damage).
+
+The results include actual outcome probabilities and ranges before/after resistance, a highlighted weighted-average range and expected average damage per hit. The average represents many hits, not a separate proc. With 75% Critical Strike and 30% Deadly Strike and no multiplier bonuses, either-strike chance is 82.5% and the average multiplier is 178.75% (1.7875×, +78.75% damage). Calculations retain full precision; the existing display checkbox controls displayed damage only. Inputs are saved in build links and Reset restores them to zero, preserving synergy defaults of 20. Older build links remain usable.

@@ -12,11 +12,12 @@ $('class').replaceChildren(...classes.map(c=>new Option(c,c)));
 function refreshSkillList(){const matching=supportedSkills.filter(s=>s.className===$('class').value);$('skill').replaceChildren(...matching.map(s=>new Option(s.name,s.id)));active=matching[0]||null;changeSkill();}
 function changeSkill(){active=supportedSkills.find(s=>s.id===$('skill').value)||active;if(!active)return;$('feedback').textContent='';$('levelLabel').firstChild.textContent=`${active.name} (slvl)`;setupExtras();setupCharges();$('skillInfo').textContent=active.info||'';$('skillInfo').hidden=!active.info;$('damageType').value=skillFormula()?.damageType||guessedType(active);$('damageType').disabled=true;$('normalModifierType').textContent=$('damageType').value[0].toUpperCase()+$('damageType').value.slice(1);$('pct').disabled=$('damageType').value==='physical';renderScaling();renderSynergies();compute();}
 function renderSynergies(){const f=skillFormula(),holder=$('synergies');holder.replaceChildren();for(const sy of synergyList()){const label=document.createElement('label');label.textContent=`${sy.name} (hlvl)`;const input=document.createElement('input');input.type='number';input.min=0;input.max=20;input.value=savedSynergies[active.id]?.[sy.name]??20;input.addEventListener('input',()=>{(savedSynergies[active.id]??={})[sy.name]=Number(input.value)||0;compute();});input.dataset.synergy=sy.name;label.append(input);holder.append(label);}}
-function compute(){syncBuildLink();$('teleportPenalty').textContent=`−${teleportPenalty(n('teleportLevel'))}% damage`;$('teleportField').hidden=active?.className!=='Sorceress';$('teleportResults').hidden=active?.className!=='Sorceress';$('teleportResults').replaceChildren();if(active?.charges){computeCharges();return;}const poison=$('damageType').value==='poison';$('plrField').hidden=!poison;$('poisonResults').hidden=!poison;const f=skillFormula();$('status').textContent=f?'':'No damage formula available.';if(!f){$('damageRows').replaceChildren();$('poisonResults').textContent='';$('comparison').textContent='';return;}
- const sy={};for(const e of $('synergies').querySelectorAll('input'))sy[e.dataset.synergy]=Math.max(0,Math.min(20,Number(e.value)||0));const opts={breakingPiercePct:Array.from($('normalBreaking').querySelectorAll('input')).map(e=>Number(e.value)||0),extraInputs:readExtras(),skillLevel:Math.max(1,Math.min(100,Math.floor(n('level')))),skillDamagePct:n('pct'),enemyResistanceReductionPct:n('pierce'),enemyResistancePct:n('enemyRes'),enemyPlrPct:n('enemyPlr'),damageType:$('damageType').value,synergyPoints:sy};
- try{const base=calculate(f,opts),higher=calculate(f,{...opts,skillLevel:opts.skillLevel+1}),boost=calculate(f,{...opts,skillDamagePct:opts.skillDamagePct+5});const baseFactor=1+base.synergyPct/100,bonusFactor=(1+n('pct')/100)*(base.modifierMultiplier??1);const rawMin=base.baseMin*baseFactor,rawMax=base.baseMax*baseFactor;const netMin=rawMin*bonusFactor,netMax=rawMax*bonusFactor;
+function compute(){syncBuildLink();$('criticalPanel').hidden=!hasCriticalDamage();$('criticalResults').hidden=!hasCriticalDamage();$('criticalResults').replaceChildren();$('teleportPenalty').textContent=`−${teleportPenalty(n('teleportLevel'))}% damage`;$('teleportField').hidden=active?.className!=='Sorceress';$('teleportResults').hidden=active?.className!=='Sorceress';$('teleportResults').replaceChildren();if(active?.charges){computeCharges();return;}const poison=$('damageType').value==='poison';$('plrField').hidden=!poison;$('poisonResults').hidden=!poison;const f=skillFormula();$('status').textContent=f?'':'No damage formula available.';if(!f){$('damageRows').replaceChildren();$('poisonResults').textContent='';$('comparison').textContent='';return;}
+ const sy={};for(const e of $('synergies').querySelectorAll('input'))sy[e.dataset.synergy]=Math.max(0,Math.min(20,Number(e.value)||0));const opts={breakingPiercePct:Array.from($('normalBreaking').querySelectorAll('input')).map(e=>Number(e.value)||0),extraInputs:readExtras(),skillLevel:Math.max(1,Math.min(100,Math.floor(n('level')))),skillDamagePct:$('damageType').value==='physical'?0:n('pct'),enemyResistanceReductionPct:n('pierce'),enemyResistancePct:n('enemyRes'),enemyPlrPct:n('enemyPlr'),damageType:$('damageType').value,synergyPoints:sy};
+ try{const base=calculate(f,opts),higher=calculate(f,{...opts,skillLevel:opts.skillLevel+1}),boost=calculate(f,{...opts,skillDamagePct:opts.skillDamagePct+5});const baseFactor=1+base.synergyPct/100,bonusFactor=(1+opts.skillDamagePct/100)*(base.modifierMultiplier??1);const rawMin=base.baseMin*baseFactor,rawMax=base.baseMax*baseFactor;const netMin=rawMin*bonusFactor,netMax=rawMax*bonusFactor;
  const component={label:$('damageType').value,beforeMin:netMin,beforeMax:netMax,afterMin:base.min,afterMax:base.max};
  $('damageRows').replaceChildren(...comparisonRows(component));
+ renderCriticalDamage(component);
  $('normalResistance').textContent=`Enemy resistance after pierce: ${base.effectiveResistancePct}%`;
  $('normalBreakdown').replaceChildren(damageBreakdown([{label:component.label,rawMin,rawMax,netMin,netMax,res:base.effectiveResistancePct,min:base.min,max:base.max}]));
  if(poison){$('poisonResults').hidden=false;const holder=$('poisonResults');holder.replaceChildren();
@@ -24,7 +25,7 @@ function compute(){syncBuildLink();$('teleportPenalty').textContent=`−${telepo
  for(const [title,value,hint] of cards){const card=document.createElement('div');card.className='poison-card';const label=document.createElement('span');label.textContent=title;const strong=document.createElement('strong');strong.textContent=value;card.append(label);card.append(strong);holder.append(card);}
 }if(base.immune)$('status').textContent+=' Immune after Breaking pierce; damage is zero.';const inc=x=>base.avg?`${((x.avg/base.avg-1)*100).toFixed(2)}%`:'n/a';$('comparison').textContent=`+1 skill level: ${inc(higher)} · +5% skill damage: ${inc(boost)}`;
  }catch(e){$('status').textContent=`Formula error: ${e.message}`;$('damageRows').replaceChildren();$('poisonResults').textContent='';$('comparison').textContent='';}}
-$('class').addEventListener('change',refreshSkillList);$('skill').addEventListener('change',changeSkill);for(const id of ['level','pct','pierce','enemyRes','enemyPlr','damageType','teleportLevel','truncateNumbers'])$(id).addEventListener('input',compute);
+$('class').addEventListener('change',refreshSkillList);$('skill').addEventListener('change',changeSkill);for(const id of ['level','pct','pierce','enemyRes','enemyPlr','damageType','teleportLevel','truncateNumbers','criticalChance','deadlyChance','criticalBonus','deadlyBonus'])$(id).addEventListener('input',compute);
 function renderScaling(){
  const f=skillFormula(),holder=$('scalingGrid');holder.replaceChildren();$('apply').disabled=f?.kind!=='flat';if(!f)return;if(f.kind!=='flat'){$('scalingNote').textContent=f.kind==='summon-base'?'This attack uses the summon base-damage inputs above; skill and synergy bonuses come from its passive stats.':'This attack scales your weapon range and enhanced damage inputs above.';return;}
  const tiers=['Level 1','Levels 2–8','Levels 9–16','Levels 17–22','Levels 23–28','Levels 29+'];
@@ -107,9 +108,28 @@ function damageBreakdown(rows){
  for(const v of rows){const tr=document.createElement('tr');for(const text of [v.label,range(v.rawMin,v.rawMax),range(v.netMin,v.netMax),`${v.res}%`,range(v.min,v.max)]){const td=document.createElement('td');td.textContent=text;tr.append(td);}table.append(tr);}scroll.append(table);details.append(scroll);return details;
 }
 
+function hasCriticalDamage(){return active?.name==='Shock Wave'||active?.name==='War Cry';}
+const pctText=value=>value.toLocaleString(undefined,{maximumFractionDigits:3});
+function renderCriticalDamage(component){
+ if(!hasCriticalDamage())return;
+ const v=criticalDamage({criticalChancePct:n('criticalChance'),deadlyChancePct:n('deadlyChance'),criticalBonusPct:n('criticalBonus'),deadlyBonusPct:n('deadlyBonus')});
+ $('criticalMultiplierHint').textContent=`Base 2× + ${pctText(Math.max(0,n('criticalBonus')))}% = ${pctText(v.criticalMultiplier)}× damage`;
+ $('deadlyMultiplierHint').textContent=`Base 1.5× + ${pctText(Math.max(0,n('deadlyBonus')))}% = ${pctText(v.deadlyMultiplier)}× damage`;
+ const holder=$('criticalResults');holder.hidden=false;
+ const stats=document.createElement('div');stats.className='critical-stats';
+ for(const [title,value] of [['Chance of either strike',`${pctText(v.eitherChance*100)}%`],['Effective Deadly Strike chance',`${pctText(v.deadlyChance*100)}%`],['Average damage multiplier',`${pctText(v.averageMultiplier*100)}% (+${pctText((v.averageMultiplier-1)*100)}%)`]]){
+  const card=document.createElement('div');const label=document.createElement('span');label.textContent=title;const strong=document.createElement('strong');strong.textContent=value;card.append(label);card.append(strong);stats.append(card);
+ }holder.append(stats);
+ const scroll=document.createElement('div');scroll.className='table-scroll';const table=document.createElement('table');const header=document.createElement('tr');for(const text of ['Outcome','Actual chance','Before resistance','After resistance']){const th=document.createElement('th');th.textContent=text;header.append(th);}table.append(header);
+ for(const [label,chance,multiplier] of [['Normal hit',v.normalChance,1],[`Critical Strike · ${pctText(v.criticalMultiplier)}×`,v.criticalChance,v.criticalMultiplier],[`Deadly Strike · ${pctText(v.deadlyMultiplier)}×`,v.deadlyChance,v.deadlyMultiplier],['Average multiplier damage',null,v.averageMultiplier]]){
+  const tr=document.createElement('tr');if(chance===null)tr.className='critical-average';for(const text of [label,chance===null?'Weighted average':`${pctText(chance*100)}%`,range(component.beforeMin*multiplier,component.beforeMax*multiplier),range(component.afterMin*multiplier,component.afterMax*multiplier)]){const td=document.createElement('td');td.textContent=text;tr.append(td);}table.append(tr);
+ }scroll.append(table);holder.append(scroll);
+ const average=document.createElement('p');average.className='critical-expected';average.textContent=`Expected average per hit: ${fmt((component.beforeMin+component.beforeMax)/2*v.averageMultiplier)} before resistance → ${fmt((component.afterMin+component.afterMax)/2*v.averageMultiplier)} after resistance`;holder.append(average);
+}
+
 // Store a self-contained build in the URL fragment: GitHub Pages needs no backend.
 var linkReady=false,restoringBuild=false;
-const buildFields=['level','pct','pierce','enemyRes','enemyPlr','weaponMin','weaponMax','otherEd','teleportLevel'];
+const buildFields=['level','pct','pierce','enemyRes','enemyPlr','weaponMin','weaponMax','otherEd','teleportLevel','criticalChance','deadlyChance','criticalBonus','deadlyBonus'];
 function collectBuild(){
  const values=Object.fromEntries(buildFields.map(id=>[id,String(n(id))]));
  const inputs=holder=>Array.from($(holder).querySelectorAll('input')).map(e=>({key:e.dataset.synergy||e.dataset.extra||e.dataset.modifier,type:e.dataset.type||'',value:e.value}));
@@ -131,7 +151,7 @@ function restoreBuild(hash){
    if(f?.kind==='flat'&&['min','max'].every(k=>Array.isArray(steps[k])&&steps[k].length===6&&steps[k].every(x=>Number.isFinite(x)&&x>=0))&&steps.min.every((x,i)=>x<=steps.max[i]))overrides[key]={...f,min:steps.min,max:steps.max};
   }
   $('class').value=skill.className;refreshSkillList();$('skill').value=skill.id;changeSkill();
-  for(const id of buildFields){const value=Number(data.values?.[id]);if(Number.isFinite(value))$(id).value=String(value);}
+  for(const id of buildFields){const value=Number(data.values?.[id]??(['criticalChance','deadlyChance','criticalBonus','deadlyBonus'].includes(id)?0:NaN));if(Number.isFinite(value))$(id).value=String(value);}
   function restoreInputs(holder,entries){for(const e of $(holder).querySelectorAll('input')){const entry=Array.isArray(entries)&&entries.find(x=>x.key===(e.dataset.synergy||e.dataset.extra||e.dataset.modifier)&&(x.type||'')===(e.dataset.type||''));if(entry&&Number.isFinite(Number(entry.value))){e.value=String(Number(entry.value));if(e.dataset.synergy)(savedSynergies[active.id]??={})[e.dataset.synergy]=Number(e.value);}}}
   restoreInputs('synergies',data.synergies);restoreInputs('extraFields',data.extras);restoreInputs(active.charges?'chargeModifiers':'normalBreaking',data.modifiers);
   if(active.charges&&active.charges.some((s,si)=>s.components.some((_,ci)=>data.editor===`${si}:${ci}`)))$('chargeEditor').value=data.editor;

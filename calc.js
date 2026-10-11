@@ -76,3 +76,15 @@ function teleportDamage(beforeMin,beforeMax,afterMin,afterMax,penaltyPct){
 }
 
 function teleportPenalty(level){return clamp(51-Math.max(1,Math.floor(Number(level)||1)),0,50);}
+
+/** Critical Strike rolls first; Deadly Strike is conditional on its failure. */
+function criticalDamage({criticalChancePct=0,deadlyChancePct=0,criticalBonusPct=0,deadlyBonusPct=0}={}){
+ const criticalChance=clamp(Number(criticalChancePct)||0,0,100)/100;
+ const deadlyChance=clamp(Number(deadlyChancePct)||0,0,100)/100*(1-criticalChance);
+ const normalChance=(1-criticalChance)*(1-clamp(Number(deadlyChancePct)||0,0,100)/100);
+ const criticalMultiplier=2+Math.max(0,Number(criticalBonusPct)||0)/100;
+ const deadlyMultiplier=1.5+Math.max(0,Number(deadlyBonusPct)||0)/100;
+ const eitherChance=criticalChance+deadlyChance;
+ const averageMultiplier=criticalChance*criticalMultiplier+deadlyChance*deadlyMultiplier+normalChance;
+ return {criticalChance,deadlyChance,normalChance,eitherChance,criticalMultiplier,deadlyMultiplier,averageMultiplier};
+}
