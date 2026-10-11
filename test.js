@@ -216,8 +216,17 @@ elements.skill.value=skill('Poison Nova').id;elements.skill.listeners.change();e
 assert(!elements.seasonComparison.hidden);assert.equal(elements.seasonComparison.children.length,2);
 const seasonOpts={skillLevel:40,synergyPoints:{'Poison Strike':20,Desecrate:20},skillDamagePct:50,enemyResistancePct:50,enemyResistanceReductionPct:30,enemyPlrPct:25};
 c.seasonOpts=seasonOpts;
-for(const [i,expr] of [[0,"active.formula"],[1,"seasonComparisons[active.id]['S14 beta']"]]){const result=vm.runInContext(`calculate(${expr},seasonOpts)`,c);c.seasonExpected=result;assert.equal(elements.seasonComparison.children[i].children[1].textContent,vm.runInContext('range(seasonExpected.min,seasonExpected.max)',c));}
-assert.equal(elements.seasonComparison.children[0].children[1].textContent,elements.damageRows.children[0].children[2].textContent);
+const betaRow=elements.seasonComparison.children[1].children[0].children[0];
+const betaResult=vm.runInContext("calculate(seasonComparisons[active.id]['S14 beta'],seasonOpts)",c);c.seasonExpected=betaResult;
+assert(betaRow.children[2].textContent.startsWith(vm.runInContext('range(seasonExpected.min,seasonExpected.max)',c)));
+const mainResult=c.calc(skill('Poison Nova').formula,seasonOpts);
+assert(betaRow.children[2].textContent.includes((((betaResult.avg/mainResult.avg)-1)*100).toFixed(2)+'%'));
+assert.equal(betaRow.children[0].textContent,'S14 beta');
+// Applied S13 scaling is the comparison baseline; the beta remains its supplied data.
+elements.scalingGrid.querySelectorAll('input')[0].value='1';elements.apply.listeners.click();
+const alteredRow=elements.seasonComparison.children[1].children[0].children[0];
+const current=vm.runInContext('calculate(skillFormula(),seasonOpts)',c);
+assert(alteredRow.children[2].textContent.includes((((betaResult.avg/current.avg)-1)*100).toFixed(2)+'%'));
 const s14=vm.runInContext("seasonComparisons[active.id]['S14 beta']",c);assert.equal(s14.min[5],28.125);assert.equal(s14.synergy[0].pctPerHardPoint,.11);
 elements.skill.value=skill('Meteor').id;elements.skill.listeners.change();assert(elements.seasonComparison.hidden);assert.equal(elements.seasonComparison.children.length,0);
 console.log('Passed: S13/S14 Poison Nova final damage comparison and visibility.');

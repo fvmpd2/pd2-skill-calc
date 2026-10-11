@@ -8,7 +8,7 @@ A compact calculator for supported Project Diablo 2 skill damage, built with AI.
 - Hard-point synergies, mastery and skill-specific modifiers such as Dark Pact curse count.
 - Enemy resistance, ordinary −enemy resistance and immunity-breaking reductions.
 - Poison duration before/after pierce, damage per frame (25 fps), per second and total damage.
-- Side-by-side S13/S14 beta Poison Nova final damage using your entered build.
+- S14 beta Poison Nova comparison below the main S13 damage, with before/after-resistance values and percentage changes in average damage.
 - Sorceress damage with and without the Teleport debuff.
 - An optional **hypothetical** Critical/Deadly Strike comparison for Shock Wave and War Cry, including outcome chances and average damage. Their in-game eligibility is not verified.
 

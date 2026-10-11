@@ -14,9 +14,9 @@ function changeSkill(){active=supportedSkills.find(s=>s.id===$('skill').value)||
 function renderSynergies(){const f=skillFormula(),holder=$('synergies'),defaults=defaultSynergies();$('synergyDetails').open=synergyList().length>3;$('synergyDetails').hidden=!synergyList().length;holder.replaceChildren();for(const sy of synergyList()){const label=document.createElement('label');label.textContent=`${sy.name} (hlvl)`;if(active.name==='Meteor'&&sy.name==='Fire Wall'){const note=document.createElement('small');note.className='muted';note.textContent='Ground fire only: +6% per hard point. Impact uses Inferno instead in the supplied game files.';label.append(note);}const input=document.createElement('input');input.type='number';input.min=0;input.max=20;input.value=savedSynergies[active.id]?.[sy.name]??defaults[sy.name];input.addEventListener('input',()=>{(savedSynergies[active.id]??={})[sy.name]=Number(input.value)||0;compute();});input.dataset.synergy=sy.name;label.append(input);holder.append(label);}}
 function compute(){syncBuildLink();$('seasonComparison').hidden=true;$('seasonComparison').replaceChildren();$('criticalPanel').hidden=!hasCriticalDamage();$('criticalTitle').textContent='Strike comparison · hypothetical';$('criticalResults').hidden=!hasCriticalDamage();$('criticalResults').replaceChildren();$('teleportPenalty').textContent=`−${teleportPenalty(n('teleportLevel'))}% damage`;$('teleportField').hidden=active?.className!=='Sorceress';$('teleportResults').hidden=active?.className!=='Sorceress';$('teleportResults').replaceChildren();if(active?.charges){computeCharges();return;}const poison=$('damageType').value==='poison';$('plrField').hidden=!poison;$('poisonResults').hidden=!poison;const f=skillFormula();$('status').textContent=f?'':'No damage formula available.';if(!f){$('damageRows').replaceChildren();$('poisonResults').textContent='';$('comparison').textContent='';return;}
  const sy={};for(const e of $('synergies').querySelectorAll('input'))sy[e.dataset.synergy]=Math.max(0,Math.min(20,Number(e.value)||0));const opts={breakingPiercePct:Array.from($('normalBreaking').querySelectorAll('input')).map(e=>Number(e.value)||0),extraInputs:readExtras(),skillLevel:Math.max(1,Math.min(100,Math.floor(n('level')))),skillDamagePct:$('damageType').value==='physical'?0:n('pct'),enemyResistanceReductionPct:n('pierce'),enemyResistancePct:n('enemyRes'),enemyPlrPct:n('enemyPlr'),damageType:$('damageType').value,synergyPoints:sy};
- try{const base=calculate(f,opts),higher=calculate(f,{...opts,skillLevel:opts.skillLevel+1}),boost=calculate(f,{...opts,skillDamagePct:opts.skillDamagePct+5});renderSeasonComparison(opts);const baseFactor=1+base.synergyPct/100,bonusFactor=(1+opts.skillDamagePct/100)*(base.modifierMultiplier??1);const rawMin=base.baseMin*baseFactor,rawMax=base.baseMax*baseFactor;const netMin=rawMin*bonusFactor,netMax=rawMax*bonusFactor;
+ try{const base=calculate(f,opts),higher=calculate(f,{...opts,skillLevel:opts.skillLevel+1}),boost=calculate(f,{...opts,skillDamagePct:opts.skillDamagePct+5});const baseFactor=1+base.synergyPct/100,bonusFactor=(1+opts.skillDamagePct/100)*(base.modifierMultiplier??1);const rawMin=base.baseMin*baseFactor,rawMax=base.baseMax*baseFactor;const netMin=rawMin*bonusFactor,netMax=rawMax*bonusFactor;
  const component={label:$('damageType').value,beforeMin:netMin,beforeMax:netMax,afterMin:base.min,afterMax:base.max};
- $('damageRows').replaceChildren(...comparisonRows(component));
+ $('damageRows').replaceChildren(...comparisonRows(component));renderSeasonComparison(opts,component);
  renderCriticalDamage(component);
  $('normalResistance').textContent=`Enemy resistance after pierce: ${base.effectiveResistancePct}%`;
  $('normalBreakdown').replaceChildren(damageBreakdown([{label:component.label,rawMin,rawMax,netMin,netMax,res:base.effectiveResistancePct,min:base.min,max:base.max}]));
@@ -179,13 +179,17 @@ $('copyBuild').addEventListener('click',async()=>{
 refreshSkillList();
 if(typeof window!=='undefined'){restoreBuild(window.location.hash);linkReady=true;window.addEventListener('hashchange',()=>restoreBuild(window.location.hash));}
 
-function renderSeasonComparison(options){
+function renderSeasonComparison(options,current){
  const alternatives=seasonComparisons[active.id];if(!alternatives)return;
  const holder=$('seasonComparison');holder.hidden=false;
- for(const [season,formula] of [['S13',active.formula],...Object.entries(alternatives)]){
-  const result=calculate(formula,options),card=document.createElement('div');
-  const title=document.createElement('span');title.textContent=season;
-  const value=document.createElement('strong');value.textContent=range(result.min,result.max);
-  card.append(title);card.append(value);holder.append(card);
+ const note=document.createElement('p');note.className='muted';note.textContent='S14 beta comparison · Same build inputs. Percentage change uses average damage versus the main S13 result.';holder.append(note);
+ const scroll=document.createElement('div');scroll.className='table-scroll';const table=document.createElement('table');
+ const change=(lo,hi,baseLo,baseHi)=>{const base=(baseLo+baseHi)/2;if(!base)return 'n/a';const pct=((lo+hi)/2/base-1)*100;return `${pct>=0?'+':''}${pct.toFixed(2)}%`;};
+ for(const [season,formula] of Object.entries(alternatives)){
+  const result=calculate(formula,options),factor=(1+result.synergyPct/100)*(1+options.skillDamagePct/100)*(result.modifierMultiplier??1);
+  const beforeMin=result.baseMin*factor,beforeMax=result.baseMax*factor;
+  const row=document.createElement('tr');
+  for(const text of [season,`${range(beforeMin,beforeMax)} (${change(beforeMin,beforeMax,current.beforeMin,current.beforeMax)})`,`${range(result.min,result.max)} (${change(result.min,result.max,current.afterMin,current.afterMax)})`]){const cell=document.createElement('td');cell.textContent=text;row.append(cell);}table.append(row);
  }
+ scroll.append(table);holder.append(scroll);
 }

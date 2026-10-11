@@ -70,4 +70,6 @@ th,td,.charge-stage th,.charge-stage td,.damage-breakdown th,.damage-breakdown t
 
 #synergies small{display:block;font-size:var(--font-helper);font-weight:400;margin:3px 0 5px}.synergy-details>p{margin:0 0 8px}
 
-.season-comparison{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:12px}.season-comparison>div{padding:9px 12px;border:1px solid #8b3d1e;border-radius:5px;background:#291509}.season-comparison span{display:block;color:var(--muted);font-size:var(--font-body)}.season-comparison strong{display:block;color:#ffd08a;font-size:var(--font-subheading);margin-top:3px}
+/* Main damage leads; beta figures are a quieter comparison below. */
+.normal-row{background:#3b2112;border-left:3px solid #db782e}.normal-row td:nth-child(n+2){color:#ffe2b3;font-weight:700;font-size:var(--font-subheading);padding-top:12px;padding-bottom:12px}.normal-row td:last-child{color:#ffca7d}
+.season-comparison{margin:9px 0 12px;padding:0 0 8px;border-bottom:1px solid var(--border)}.season-comparison>p{margin:0 0 5px}.season-comparison td{font-size:var(--font-body);color:#c9ae94;background:#1d120d}.season-comparison td:first-child{color:#e9b37a}.season-comparison td{border-top:0}
