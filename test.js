@@ -199,3 +199,14 @@ for(const name of ['War Cry','Dark Pact','Fire Bolt']){elements.skill.value=skil
 elements.skill.value=skill('War Cry').id;elements.skill.listeners.change();elements.resetBuild.listeners.click();for(const name of ['Howl','Battle Cry'])assert.equal(Number(elements.synergies.querySelectorAll('input').find(e=>e.dataset.synergy===name).value),20);
 elements.pct.value='80';elements.pierce.value='70';elements.enemyRes.value='99';elements.criticalChance.value='75';elements.skill.value=skill('Fire Bolt').id;elements.skill.listeners.change();for(const id of ['pct','pierce','enemyRes','enemyPlr','criticalChance','deadlyChance','criticalBonus','deadlyBonus'])assert.equal(elements[id].value,'0');
 console.log('Passed: weapon-dependent exclusions, War Cry-only Barbarian, shared Thunderstorm range, collapsed synergies/strongest-three defaults and zeroed modifiers on skill change.');
+
+// Mixed Sorceress components stay together before the Teleport comparison.
+elements.skill.value=skill('Meteor').id;elements.skill.listeners.change();
+const meteorSection=elements.chargeResults.children[0];
+const meteorTable=meteorSection.children.find(x=>x.className==='table-scroll').children[0];
+assert.deepEqual(meteorTable.children.slice(1).map(x=>x.className),['normal-row','normal-row','teleport-row','teleport-row']);
+assert.deepEqual(meteorTable.children.slice(1).map(x=>x.children[0].textContent),['Physical (per hit)','Fire (per hit)','Physical (per hit) · After Teleport (−50%)','Fire (per hit) · After Teleport (−50%)']);
+const firewallLabel=elements.synergies.children.find(x=>x.textContent==='Fire Wall (hlvl)');
+assert(firewallLabel.children.some(x=>x.textContent.includes('Ground fire only')));
+assert(!elements.synergies.children.find(x=>x.textContent==='Inferno (hlvl)').children.some(x=>x.textContent.includes('Ground fire only')));
+console.log('Passed: Meteor ground-fire note and normal/Teleport component grouping.');

@@ -17,7 +17,7 @@ Weapon-dependent player skills are excluded; Barbarian offers War Cry only. Summ
 
 Open [the calculator](https://fvmpd2.github.io/pd2-skill-calc/) or download the files and open `index.html` locally. No installation or account is needed.
 
-Skill levels include gear; synergy levels are hard points. Up to three synergies default to 20, prioritizing the largest bonuses; all are editable. Changing skills clears damage and resistance modifiers. **Reset** keeps your selected class/skill and restores default inputs and synergies.
+Skill levels include gear; synergy levels are hard points. Synergies default to 20 hard points. With four or more, only three default to 20, prioritizing the largest bonuses; all are editable. Changing skills clears damage and resistance modifiers. **Reset** keeps your selected class/skill and restores default inputs and synergies.
 
 Use **Copy build link** or bookmark the updated address to save your setup. Links include applied scaling edits and display preferences. Future game-data updates can change their results.
 
@@ -30,6 +30,8 @@ Results describe the listed damage applications, not complete character or army 
 Breaking pierce is halved against initial immunity; ordinary −enemy resistance applies only once immunity is broken. The below-zero resistance portion is halved. The combined Breaking pierce input can differ from in-game rounding when several sources are rounded separately. [PD2 resistance reference](https://wiki.projectdiablo2.cn/wiki/Game_Mechanics#Reducing_Resistances).
 
 The poison-length effect uses the requested half-pierce model: target PLR minus half of ordinary pierce, clamped to −100–75%. This rule is **not independently confirmed for PD2**; integer-frame and fixed-point rounding are not reproduced.
+
+Meteor’s supplied impact formula uses Fire Ball, Blaze and Inferno; its ground-fire formula uses Fire Ball, Blaze and Fire Wall instead (6% per hard point). The Fire Wall input is marked as ground-fire only. Normal component rows are grouped before their Teleport comparison rows.
 
 Thunder Storm shows one shared strike/nova damage range. Those effects roll independently; whether its nova rolls separately for each monster remains unverified. Other source/tooltip discrepancies and component limitations are documented in [SKILL_AUDIT.md](SKILL_AUDIT.md), with a [CSV audit](SKILL_AUDIT.csv) covering all 231 source entries.
 
