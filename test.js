@@ -16,12 +16,12 @@ assert.equal(c.calc(null,{skillLevel:1}),null);
 for(const s of c.catalog)if(s.formula?.kind==='flat')for(const skillLevel of [1,8,9,16,17,22,23,28,29,50,100]){const v=c.calc(s.formula,{skillLevel});assert(Number.isFinite(v.min)&&Number.isFinite(v.max),s.name);}
 // Exercise UI event handling without a browser, including unsupported and editable formulas.
 class Element{constructor(){this.value='';this.children=[];this.listeners={};this.firstChild={textContent:''};this.dataset={};this.textContent='';}replaceChildren(...xs){this.children=xs;if(xs[0]?.value!==undefined)this.value=xs[0].value;}append(x){this.children.push(x);}addEventListener(name,fn){this.listeners[name]=fn;}querySelectorAll(selector){const all=this.children.flatMap(x=>[x,...x.querySelectorAll(selector)]);return all.filter(x=>selector==='input'&&x.type==='number');}get selectedOptions(){return [{text:this.value}];}}
-const ids=['class','skill','levelLabel','damageType','normalModifierType','scalingGrid','scalingNote','synergies','level','pct','pierce','enemyRes','enemyPlr','plrField','poisonResults','status','damageRows','criticalPanel','criticalResults','criticalChance','deadlyChance','criticalBonus','deadlyBonus','criticalMultiplierHint','deadlyMultiplierHint','normalResistance','normalBreakdown','truncateNumbers','comparison','apply','feedback','reset','chargeModifiers','normalModifiers','chargeResults','normalResults','chargeEditorField','chargeEditor','weaponFields','weaponMin','weaponMax','otherEd','copyBuild','resetBuild','linkFeedback','linkFallback','normalBreaking','teleportField','teleportLevel','teleportPenalty','teleportResults','extraFields','skillInfo','difficulty','difficultyField'];
+const ids=['class','skill','levelLabel','damageType','normalModifierType','scalingGrid','scalingNote','synergies','synergyDetails','criticalTitle','level','pct','pierce','enemyRes','enemyPlr','plrField','poisonResults','status','damageRows','criticalPanel','criticalResults','criticalChance','deadlyChance','criticalBonus','deadlyBonus','criticalMultiplierHint','deadlyMultiplierHint','normalResistance','normalBreakdown','truncateNumbers','comparison','apply','feedback','reset','chargeModifiers','normalModifiers','chargeResults','normalResults','chargeEditorField','chargeEditor','weaponFields','weaponMin','weaponMax','otherEd','copyBuild','resetBuild','linkFeedback','linkFallback','normalBreaking','teleportField','teleportLevel','teleportPenalty','teleportResults','extraFields','skillInfo','difficulty','difficultyField'];
 const elements=Object.fromEntries(ids.map(id=>[id,new Element()]));elements.level.value='1';elements.truncateNumbers.checked=true;
 c.document={getElementById:id=>elements[id],createElement:()=>new Element()};c.Option=function(text,value){return {text,value};};
 vm.runInContext(fs.readFileSync(__dirname+'/main.js','utf8'),c);
 assert.equal(elements.skill.children.some(x=>x.text.includes('unsupported')),false);
-for(const s of c.catalog.filter(s=>s.formula)){elements.skill.value=s.id;vm.runInContext('changeSkill()',c);assert(!/error/i.test(elements.status.textContent),s.name);if(s.charges){assert.equal(elements.chargeResults.children.length,s.charges.length,s.name);}else{assert.equal(elements.damageRows.children.length,s.className==='Sorceress'?2:1,s.name);}assert.equal(elements.scalingGrid.querySelectorAll('input').length,(s.charges?s.charges[0].components[0].formula:s.formula).kind!=='flat'?0:12,s.name);}
+for(const s of c.catalog.filter(s=>s.formula&&!s.excluded)){elements.skill.value=s.id;vm.runInContext('changeSkill()',c);assert(!/error/i.test(elements.status.textContent),s.name);if(s.charges){assert.equal(elements.chargeResults.children.length,s.charges.length,s.name);}else{assert.equal(elements.damageRows.children.length,s.className==='Sorceress'?2:1,s.name);}assert.equal(elements.scalingGrid.querySelectorAll('input').length,(s.charges?s.charges[0].components[0].formula:s.formula).kind!=='flat'?0:12,s.name);}
 for(const className of new Set(c.catalog.map(s=>s.className))){elements.class.value=className;elements.class.listeners.change();assert(elements.skill.children.every(option=>c.catalog.find(s=>s.id===option.value).formula));}
 elements.skill.value=c.catalog.find(s=>s.name==='Poison Nova').id;elements.skill.listeners.change();assert.equal(elements.poisonResults.children.length,4);
 const original=vm.runInContext('skillFormula().min[0]',c);const synergy=vm.runInContext('JSON.stringify(skillFormula().synergy)',c);
@@ -85,7 +85,7 @@ assert.equal(c.calc(skill('Magic Arrow').formula,{skillLevel:1}).min,2.25);
 assert.equal(evalComp('Fire Arrow',0,0).min,8.5);
 assert.equal(component('Immolation Arrow',1,0).formula.source,'missile:immolationarrow fire');
 assert.equal(component('Fists of Fire',2,2).formula.source,'missile:fofmeteorfire');
-for(const s of c.catalog.filter(s=>s.formula)){
+for(const s of c.catalog.filter(s=>s.formula&&!s.excluded)){
  assert(s.auditStatus&&s.auditDetail,s.name+' audit classification');
  for(const comp of s.charges?.flatMap(g=>g.components)||[{formula:s.formula}])for(const skillLevel of [1,8,9,16,17,22,23,28,29,50,100]){
   const result=c.charge(comp,{skillLevel,weaponMin:100,weaponMax:200,extraInputs:{summonMin:10,summonMax:20,masteryLevel:20,grizzlyLevel:20,curseCount:3}});
@@ -96,7 +96,7 @@ assert.equal(c.catalog.length,231);
 console.log('Passed: all 231 audited entries, every available component at 11 level boundaries, mixed damage, curse counts, aura/attack separation, summon/mastery inputs and weapon synergy ED.');
 assert(!page.includes('difficultyField'));assert(!page.includes('>Normal<'));assert(!page.includes('>Nightmare<'));
 assert.equal(evalComp('Power Strike',2,0).max,3);
-assert.equal(evalComp('Thunder Storm',1,0).max,100);
+assert.equal(c.calc(skill('Thunder Storm').formula,{skillLevel:1}).max,100);
 assert.equal(evalComp('Inferno',0,0).min,6.25);
 assert.equal(evalComp('Arctic Blast',0,0).min,12.5);
 assert.equal(evalComp('Arctic Blast',1,0).min,3);
@@ -134,7 +134,7 @@ console.log('Passed: Breaking pierce, immunity thresholds, separate source round
 
 for(const [penalty,want] of [[0,100],[25,75],[50,50],[100,0],[150,0],[-10,100]]){const v=vm.runInContext(`teleportDamage(100,200,60,120,${penalty})`,c);assert.equal(v.beforeMin,want);assert.equal(v.afterMin,want*.6);}
 elements.teleportLevel.value='26';
-for(const s of c.catalog.filter(s=>s.formula&&s.className==='Sorceress')){elements.skill.value=s.id;elements.skill.listeners.change();assert(!elements.teleportField.hidden,s.name);if(!s.charges)assert.equal(elements.damageRows.children.length,2,s.name);assert(!/error/i.test(elements.status.textContent),s.name);}
+for(const s of c.catalog.filter(s=>s.formula&&!s.excluded&&s.className==='Sorceress')){elements.skill.value=s.id;elements.skill.listeners.change();assert(!elements.teleportField.hidden,s.name);if(!s.charges)assert.equal(elements.damageRows.children.length,2,s.name);assert(!/error/i.test(elements.status.textContent),s.name);}
 elements.skill.value=skill('Fire Bolt').id;elements.skill.listeners.change();const unchanged=elements.damageRows.children[0].children.map(x=>x.textContent);elements.teleportLevel.value='51';elements.teleportLevel.listeners.input();assert.deepEqual(elements.damageRows.children[0].children.map(x=>x.textContent),unchanged);assert.equal(elements.damageRows.children[1].children[1].textContent,unchanged[1]);assert.equal(elements.teleportPenalty.textContent,'−0% damage');
 for(const [level,want] of [[1,50],[20,31],[26,25],[50,1],[51,0],[100,0]])assert.equal(vm.runInContext(`teleportPenalty(${level})`,c),want);assert.equal(elements.teleportLevel.children.length,100);
 elements.skill.value=skill('Teeth').id;elements.skill.listeners.change();assert(elements.teleportField.hidden);assert(elements.teleportResults.hidden);assert.equal(elements.teleportResults.children.length,0);
@@ -160,7 +160,7 @@ vm.runInContext('linkReady=true;syncBuildLink()',c);assert(historyUrl.includes('
 console.log('Passed: build URL round trips for spells, martial arts, poison and summons, scaling edits, invalid links and automatic URL updates.');
 
 // Stable modifier order, combined rows, and display-only precision control.
-for(const s of c.catalog.filter(s=>s.formula)){elements.skill.value=s.id;elements.skill.listeners.change();if(s.charges){for(const box of elements.chargeModifiers.children){const fields=box.children[1];assert.deepEqual(fields.children.slice(0,3).map(x=>x.dataset.modifier),['bonus','res','pierce']);assert.equal(fields.children.at(-1).dataset.modifier,'breaking');}}}
+for(const s of c.catalog.filter(s=>s.formula&&!s.excluded)){elements.skill.value=s.id;elements.skill.listeners.change();if(s.charges){for(const box of elements.chargeModifiers.children){const fields=box.children[1];assert.deepEqual(fields.children.slice(0,3).map(x=>x.dataset.modifier),['bonus','res','pierce']);assert.equal(fields.children.at(-1).dataset.modifier,'breaking');}}}
 elements.skill.value=skill('Fire Bolt').id;elements.skill.listeners.change();elements.level.value='44';elements.pct.value='70';elements.truncateNumbers.checked=false;vm.runInContext('compute()',c);const precise=elements.damageRows.children[0].children[1].textContent;assert(precise.includes('.'));elements.truncateNumbers.checked=true;elements.truncateNumbers.listeners.input();const short=elements.damageRows.children[0].children[1].textContent;assert(!short.includes('.'));assert.equal(elements.damageRows.children.length,2);assert.equal(elements.normalBreakdown.children[0].children[0].textContent,'Calculation breakdown');
 const displayState=vm.runInContext('JSON.stringify(collectBuild())',c);elements.truncateNumbers.checked=false;c.restoreHash='#build='+encodeURIComponent(displayState);assert(vm.runInContext('restoreBuild(restoreHash)',c));assert(elements.truncateNumbers.checked);
 console.log('Passed: consistent modifier order, combined normal/Teleport rows, collapsed breakdown, display truncation and saved display preference.');
@@ -191,3 +191,11 @@ for(const name of ['Shock Wave','War Cry']){
 }
 elements.skill.value=skill('Fire Bolt').id;elements.skill.listeners.change();assert(elements.criticalPanel.hidden);assert(elements.criticalResults.hidden);assert.equal(elements.criticalResults.children.length,0);
 console.log('Passed: Critical/Deadly chance probabilities, 0–100% boundaries, additive multipliers, Shock Wave/War Cry weighted pre/post-res damage, immunity, shared links, reset and visibility.');
+
+for(const name of ['Bash','Jab','Strafe','Fend','Tiger Strike','Blade Fury','Fury','Zeal'])assert(skill(name).excluded,name);
+assert.deepEqual(Array.from(vm.runInContext("supportedSkills.filter(s=>s.className==='Barbarian').map(s=>s.name)",c)),['War Cry']);
+assert(!skill('Thunder Storm').charges);elements.skill.value=skill('Thunder Storm').id;elements.skill.listeners.change();assert.equal(elements.damageRows.children.length,2); // Normal + Teleport, one damage component
+for(const name of ['War Cry','Dark Pact','Fire Bolt']){elements.skill.value=skill(name).id;elements.skill.listeners.change();const inputs=elements.synergies.querySelectorAll('input');if(inputs.length>3){assert(elements.synergyDetails.open);assert.equal(inputs.filter(e=>Number(e.value)===20).length,3);}else{assert(!elements.synergyDetails.open);}}
+elements.skill.value=skill('War Cry').id;elements.skill.listeners.change();elements.resetBuild.listeners.click();for(const name of ['Howl','Battle Cry'])assert.equal(Number(elements.synergies.querySelectorAll('input').find(e=>e.dataset.synergy===name).value),20);
+elements.pct.value='80';elements.pierce.value='70';elements.enemyRes.value='99';elements.criticalChance.value='75';elements.skill.value=skill('Fire Bolt').id;elements.skill.listeners.change();for(const id of ['pct','pierce','enemyRes','enemyPlr','criticalChance','deadlyChance','criticalBonus','deadlyBonus'])assert.equal(elements[id].value,'0');
+console.log('Passed: weapon-dependent exclusions, War Cry-only Barbarian, shared Thunderstorm range, collapsed synergies/strongest-three defaults and zeroed modifiers on skill change.');

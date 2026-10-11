@@ -149,8 +149,16 @@ def make_data(skill_path,missile_path,desc_path=None,calc_path=None,monstats_pat
  out=audit(out,rows,missiles,load(desc_path) if desc_path else [],(numeric,extract_synergies,TYPE,DISPLAY_NAMES))
  from summons_pd2 import add_summons
  out=add_summons(out,rows,load(monstats_path) if monstats_path else [],load(monlvl_path) if monlvl_path else [])
+ # Keep archived models for audit, but omit equipment-dependent attacks from selection.
+ for e in out:
+  components=[c for stage in e.get('charges') or [] for c in stage['components']]
+  if (e['formula'] and e['formula'].get('kind')=='weapon') or any(c['formula'].get('kind')=='weapon' for c in components) or (e['className']=='Barbarian' and e['name']!='War Cry'):
+   e['excluded']=True;e['auditDetail']+=' Excluded from selection: requires player weapon/equipment damage inputs, or is outside the War Cry-only Barbarian scope.'
+  if e['name']=='Thunder Storm':
+   e.pop('charges',None);e['auditDetail']='One shared strike/nova lightning damage range is displayed. Wiki describes independent rolls; no doubled or combined hit is assumed.'
+   e['info']='One shared lightning damage range for strike/nova; independent rolls are not added together.'
  stats['chargeSkills']=sum(bool(s.get('charges')) for s in out)
- stats['supported']=sum(s['formula'] is not None for s in out)
+ stats['supported']=sum(s['formula'] is not None and not s.get('excluded') for s in out)
  stats['review']=len(out)-stats['supported']
  return out,stats
 if __name__=='__main__':
