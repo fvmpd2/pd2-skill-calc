@@ -78,7 +78,7 @@ function computeCharges(){
  const holder=$('chargeResults'),teleportRows=[];holder.replaceChildren();$('status').textContent='';
  try{active.charges.forEach((stage,si)=>{
   const section=document.createElement('div');section.className='charge-stage';const heading=document.createElement('h3');heading.textContent=stage.label;section.append(heading);
-  const breakdown=[],stageTeleportRows=[];const scroll=document.createElement('div');scroll.className='table-scroll';const table=document.createElement('table');const header=document.createElement('tr');for(const text of ['Component / condition','Before resistance','After resistance']){const th=document.createElement('th');th.textContent=text;header.append(th);}if(si===0)table.append(header);
+  const breakdown=[],stageTeleportRows=[];const scroll=document.createElement('div');scroll.className='table-scroll';const table=document.createElement('table');const header=document.createElement('tr');for(const text of ['','Before resistance','After resistance']){const th=document.createElement('th');th.textContent=text;header.append(th);}if(si===0)table.append(header);
   let sumMin=0,sumMax=0,hitCount=0,missingBase=false;
   stage.components.forEach((original,ci)=>{const c={...original,formula:overrides[`${active.id}:${si}:${ci}`]||original.formula},m=modifiers[c.formula.damageType]||{},bonusM=modifiers[c.formula.bonusType||c.formula.damageType]||{};
    const result=calculateChargeComponent(c,{skillLevel:level,difficulty:'Hell',synergyPoints:sy,skillDamagePct:bonusM.bonus||0,extraInputs:readExtras(),breakingPiercePct:m.breaking||[],enemyResistancePct:m.res||0,enemyResistanceReductionPct:m.pierce||0,enemyPlrPct:m.plr||0,weaponMin:n('weaponMin'),weaponMax:n('weaponMax'),otherEnhancedDamagePct:n('otherEd')});
@@ -101,9 +101,9 @@ $('chargeEditor').addEventListener('change',()=>{renderScaling();$('feedback').t
 for(const id of ['weaponMin','weaponMax','otherEd'])$(id).addEventListener('input',compute);
 
 function comparisonRows(component,multiple=false,missing=false){
- const rows=[];const conditions=[{label:multiple?component.label:'Normal',...component}];
+ const rows=[];const conditions=[{label:multiple?component.label:'',...component}];
  if(active.className==='Sorceress')conditions.push({label:`${multiple?component.label+' · ':''}After Teleport (−${teleportPenalty(n('teleportLevel'))}%)`,...teleportDamage(component.beforeMin,component.beforeMax,component.afterMin,component.afterMax,teleportPenalty(n('teleportLevel')))});
- conditions.forEach((v,i)=>{const tr=document.createElement('tr');tr.className=i?'teleport-row':'normal-row';for(const t of [i?v.label:(multiple?component.label:'Normal'),missing?'Enter base damage':range(v.beforeMin,v.beforeMax),missing?'—':range(v.afterMin,v.afterMax)]){const td=document.createElement('td');td.textContent=t;tr.append(td);}rows.push(tr);});return rows;
+ conditions.forEach((v,i)=>{const tr=document.createElement('tr');tr.className=i?'teleport-row':'normal-row';for(const t of [i?v.label:(multiple?component.label:''),missing?'Enter base damage':range(v.beforeMin,v.beforeMax),missing?'—':range(v.afterMin,v.afterMax)]){const td=document.createElement('td');td.textContent=t;tr.append(td);}rows.push(tr);});return rows;
 }
 function damageBreakdown(rows){
  const details=document.createElement('details');details.className='damage-breakdown';const summary=document.createElement('summary');summary.textContent='Calculation breakdown';details.append(summary);

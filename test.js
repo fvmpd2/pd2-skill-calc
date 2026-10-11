@@ -221,3 +221,12 @@ assert.equal(elements.seasonComparison.children[0].children[1].textContent,eleme
 const s14=vm.runInContext("seasonComparisons[active.id]['S14 beta']",c);assert.equal(s14.min[5],28.125);assert.equal(s14.synergy[0].pctPerHardPoint,.11);
 elements.skill.value=skill('Meteor').id;elements.skill.listeners.change();assert(elements.seasonComparison.hidden);assert.equal(elements.seasonComparison.children.length,0);
 console.log('Passed: S13/S14 Poison Nova final damage comparison and visibility.');
+
+// The first result column has no heading or redundant Normal label.
+elements.skill.value=skill('Fire Bolt').id;elements.skill.listeners.change();
+assert.equal(elements.damageRows.children[0].children[0].textContent,'');
+assert(elements.damageRows.children[1].children[0].textContent.includes('After Teleport'));
+elements.skill.value=skill('Meteor').id;elements.skill.listeners.change();
+assert.equal(elements.chargeResults.children[0].children.find(x=>x.className==='table-scroll').children[0].children[0].children[0].textContent,'');
+assert(!fs.readFileSync(__dirname+'/index.html','utf8').includes('<th>Condition</th>'));
+console.log('Passed: untitled condition column and removed Normal labels.');
