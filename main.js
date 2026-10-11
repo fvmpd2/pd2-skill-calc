@@ -139,13 +139,24 @@ function collectBuild(){
  const scaling=Object.fromEntries(Object.entries(overrides).map(([key,f])=>[key,{min:f.min,max:f.max}]));
  return {v:1,skill:active.id,values,synergies:inputs('synergies'),extras:inputs('extraFields'),modifiers:inputs(active.charges?'chargeModifiers':'normalBreaking'),editor:$('chargeEditor').value,truncated:!!$('truncateNumbers').checked,scaling};
 }
-function buildUrl(){const url=new URL(window.location.href);url.hash='build='+encodeURIComponent(JSON.stringify(collectBuild()));return url.href;}
+function compactBuild(data){
+ const values=Object.fromEntries(buildFields.flatMap((id,i)=>Number(data.values[id])===(['level','teleportLevel'].includes(id)?1:0)?[]:[[i,Number(data.values[id])]]));
+ const pairs=entries=>entries.map(e=>[e.key,Number(e.value)]);
+ return [active.gameId,values,pairs(data.synergies),pairs(data.extras),data.modifiers.map(e=>[e.key,e.type,Number(e.value)]),data.editor,data.truncated?1:0,Object.entries(data.scaling).map(([key,v])=>[key,v.min,v.max])];
+}
+function expandBuild(compact){
+ if(!Array.isArray(compact)||compact.length!==8)throw Error('Invalid compact build');
+ const skill=supportedSkills.find(s=>s.gameId===compact[0]);if(!skill)throw Error('Unknown skill');
+ const entries=pairs=>pairs.map(([key,value])=>({key,value:String(value),type:''}));
+ return {v:1,skill:skill.id,values:Object.fromEntries(buildFields.map((id,i)=>[id,String(compact[1][i]??(['level','teleportLevel'].includes(id)?1:0))])),synergies:entries(compact[2]),extras:entries(compact[3]),modifiers:compact[4].map(([key,type,value])=>({key,type,value:String(value)})),editor:compact[5],truncated:!!compact[6],scaling:Object.fromEntries(compact[7].map(([key,min,max])=>[key,{min,max}]))};
+}
+function buildUrl(){const url=new URL(window.location.href);url.hash='b='+encodeURIComponent(JSON.stringify(compactBuild(collectBuild())));return url.href;}
 function syncBuildLink(){if(!linkReady||restoringBuild||typeof window==='undefined')return;try{window.history.replaceState(null,'',buildUrl());}catch(e){/* Local-file browsers can disallow history updates; copying still works. */}}
 function restoreBuild(hash){
- if(!hash.startsWith('#build='))return false;
+ if(!hash.startsWith('#build=')&&!hash.startsWith('#b='))return false;
  try{
   if(hash.length>100000)throw Error('Build link too large');
-  const data=JSON.parse(decodeURIComponent(hash.slice(7)));
+  const data=hash.startsWith('#b=')?expandBuild(JSON.parse(decodeURIComponent(hash.slice(3)))):JSON.parse(decodeURIComponent(hash.slice(7))); 
   const skill=supportedSkills.find(s=>s.id===data.skill);if(data.v!==1||!skill)throw Error('Unknown build');
   restoringBuild=true;$('truncateNumbers').checked=data.truncated!==false;
   for(const key of Object.keys(overrides))delete overrides[key];

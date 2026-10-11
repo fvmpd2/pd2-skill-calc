@@ -156,7 +156,7 @@ for(const name of ['Fire Bolt','Fists of Fire','Poison Nova','Fire Golem']){
 assert.equal(vm.runInContext("restoreBuild('#build=bad')",c),false);
 assert.equal(vm.runInContext("restoreBuild('#build='+encodeURIComponent(JSON.stringify({v:1,skill:'missing'})))",c),false);
 c.URL=URL;let historyUrl='';c.window={location:{href:'https://example.com/calc/',hash:''},history:{replaceState:(a,b,url)=>historyUrl=url}};
-vm.runInContext('linkReady=true;syncBuildLink()',c);assert(historyUrl.includes('#build='));assert.equal(JSON.parse(decodeURIComponent(historyUrl.split('#build=')[1])).skill,elements.skill.value);
+vm.runInContext('linkReady=true;syncBuildLink()',c);assert(historyUrl.includes('#b='));c.compactHash='#'+historyUrl.split('#')[1];assert.equal(vm.runInContext('expandBuild(JSON.parse(decodeURIComponent(compactHash.slice(3)))).skill',c),elements.skill.value);
 console.log('Passed: build URL round trips for spells, martial arts, poison and summons, scaling edits, invalid links and automatic URL updates.');
 
 // Stable modifier order, combined rows, and display-only precision control.
@@ -239,3 +239,14 @@ elements.skill.value=skill('Meteor').id;elements.skill.listeners.change();
 assert.equal(elements.chargeResults.children[0].children.find(x=>x.className==='table-scroll').children[0].children[0].children[0].textContent,'');
 assert(!fs.readFileSync(__dirname+'/index.html','utf8').includes('<th>Condition</th>'));
 console.log('Passed: untitled condition column and removed Normal labels.');
+
+for(const name of ['Poison Nova','Meteor','Fire Golem','War Cry']){
+ elements.skill.value=skill(name).id;elements.skill.listeners.change();elements.level.value='44';elements.pct.value='70';elements.teleportLevel.value='26';
+ for(const e of elements.synergies.querySelectorAll('input'))e.value='17';
+ for(const e of elements.chargeModifiers.querySelectorAll('input'))e.value='33';
+ if(elements.scalingGrid.querySelectorAll('input').length){elements.scalingGrid.querySelectorAll('input')[0].value='1';elements.apply.listeners.click();}
+ const state=vm.runInContext('JSON.stringify(collectBuild())',c);const url=vm.runInContext('buildUrl()',c);
+ assert(url.length<('https://example.com/calc/#build='+encodeURIComponent(state)).length*.75);
+ c.shortHash='#'+url.split('#')[1];assert(vm.runInContext('restoreBuild(shortHash)',c));assert.equal(vm.runInContext('JSON.stringify(collectBuild())',c),state,name);
+}
+console.log('Passed: shorter build links and lossless restoration, including custom scaling; legacy links remain supported.');

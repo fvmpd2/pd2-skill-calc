@@ -20,7 +20,7 @@ Open [the calculator](https://fvmpd2.github.io/pd2-skill-calc/) or download the 
 
 Skill levels include gear; synergy levels are hard points. Synergies default to 20 hard points. With four or more, only three default to 20, prioritizing the largest bonuses; all are editable. Changing skills clears damage and resistance modifiers. **Reset** keeps your selected class/skill and restores default inputs and synergies.
 
-Use **Copy build link** or bookmark the updated address to save your setup. Links include applied scaling edits and display preferences. Future game-data updates can change their results.
+Use **Copy build link** or bookmark the updated address to save your setup. Compact links include applied scaling edits and display preferences. Older saved links remain supported. Future game-data updates can change their results.
 
 **Truncate numbers** displays whole damage values; unchecking it shows up to three decimal places. The collapsed scaling editor lets you adjust starting Min/Max and five level tiers for the current browser session.
 
