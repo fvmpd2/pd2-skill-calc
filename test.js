@@ -281,3 +281,11 @@ for(const name of ['Poison Nova','Meteor']){
  fields.forEach(e=>e.value='-75');vm.runInContext('compute()',c);assert.equal(JSON.stringify(capture(skill(name).charges?elements.chargeResults:elements.damageRows)),positive);
 }
 console.log('Passed: either sign for resistance reductions across immunity, poison duration and single/multi-component UI.');
+
+for(const name of ['Poison Nova','Holy Fire']){
+ elements.skill.value=skill(name).id;elements.skill.listeners.change();
+ const inputs=skill(name).charges?elements.chargeModifiers.querySelectorAll('input').filter(e=>['breaking','pierce'].includes(e.dataset.modifier)):[elements.pierce,...elements.normalBreaking.querySelectorAll('input')];
+ for(const input of inputs){input.value='-75';input.listeners.input();assert.equal(input.value,'75');}
+ const resist=skill(name).charges?elements.chargeModifiers.querySelectorAll('input').find(e=>e.dataset.modifier==='res'):elements.enemyRes;resist.value='-25';resist.listeners.input();assert.equal(resist.value,'-25');
+}
+console.log('Passed: negative reduction entries display as positive; enemy resistance keeps its sign.');
