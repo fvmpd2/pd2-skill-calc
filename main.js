@@ -56,9 +56,9 @@ function breakingLabel(type){
  const box=document.createElement('label');box.className='breaking-box';box.dataset.modifier='breaking';
  const title=document.createElement('span');title.textContent='Breaking pierce (%) ';
  const help=document.createElement('span');help.className='breaking-help';help.textContent='?';help.tabIndex=0;
- help.title=`${type[0].toUpperCase()+type.slice(1)} immunity-breaking skills: ${(breakingSources[type]||[]).join(', ')}. Enter their combined reduction as a positive percentage. Against immunity, the total is halved; combining odd-valued sources can differ slightly from individual in-game rounding.`;
+ help.title=`${type[0].toUpperCase()+type.slice(1)} immunity-breaking skills: ${(breakingSources[type]||[]).join(', ')}. Enter their combined reduction with either sign (75 and −75 are equivalent). Against immunity, the total is halved; combining odd-valued sources can differ slightly from individual in-game rounding.`;
  help.ariaLabel=help.title;title.append(help);box.append(title);
- const input=document.createElement('input');input.type='number';input.min=0;input.step=1;input.value='0';input.ariaLabel=`${type} Breaking pierce (%)`;input.dataset.type=type;input.dataset.modifier='breaking';input.addEventListener('input',compute);box.append(input);return box;
+ const input=document.createElement('input');input.type='number';input.step=1;input.value='0';input.ariaLabel=`${type} Breaking pierce (%)`;input.dataset.type=type;input.dataset.modifier='breaking';input.addEventListener('input',compute);box.append(input);return box;
 }
 function setupCharges(){
  const charge=!!active.charges;$('chargeModifiers').hidden=!charge;$('normalModifiers').hidden=charge;$('chargeResults').hidden=!charge;$('normalResults').hidden=charge;$('chargeEditorField').hidden=!charge;

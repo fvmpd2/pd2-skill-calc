@@ -265,3 +265,19 @@ elements.skill.value=skill('Poison Nova').id;elements.skill.listeners.change();a
 c.editedHash='#build='+encodeURIComponent(editedState);assert(vm.runInContext('restoreBuild(editedHash)',c));assert.equal(vm.runInContext('skillFormula().min[0]',c),1);
 elements.skill.value=skill('Meteor').id;elements.skill.listeners.change();assert.equal(vm.runInContext('Object.keys(overrides).length',c),0);
 console.log('Passed: skill switches restore S13 scaling; explicitly loaded build links retain saved scaling.');
+
+// Reduction input signs never reverse or discard the intended reduction.
+for(const formula of [flat,poison])for(const res of [-20,0,50,110,150])for(const breaking of [0,21,75,102])for(const pierce of [0,30,75]){
+ const opts={skillLevel:1,enemyResistancePct:res,breakingPiercePct:breaking,enemyResistanceReductionPct:pierce,enemyPlrPct:25};
+ const expected=c.calc(formula,opts);
+ for(const [b,p] of [[-breaking,pierce],[breaking,-pierce],[-breaking,-pierce]])assert.deepEqual(c.calc(formula,{...opts,breakingPiercePct:b,enemyResistanceReductionPct:p}),expected);
+}
+assert.deepEqual(c.calc(flat,{skillLevel:1,enemyResistancePct:110,breakingPiercePct:[-21,31,-12]}),c.calc(flat,{skillLevel:1,enemyResistancePct:110,breakingPiercePct:[21,31,12]}));
+for(const name of ['Poison Nova','Meteor']){
+ elements.skill.value=skill(name).id;elements.skill.listeners.change();
+ const fields=skill(name).charges?elements.chargeModifiers.querySelectorAll('input').filter(e=>['breaking','pierce'].includes(e.dataset.modifier)):[elements.pierce,...elements.normalBreaking.querySelectorAll('input')];
+ fields.forEach(e=>e.value='75');vm.runInContext('compute()',c);
+ const capture=e=>[e.textContent,...e.children.map(capture)];const positive=JSON.stringify(capture(skill(name).charges?elements.chargeResults:elements.damageRows));
+ fields.forEach(e=>e.value='-75');vm.runInContext('compute()',c);assert.equal(JSON.stringify(capture(skill(name).charges?elements.chargeResults:elements.damageRows)),positive);
+}
+console.log('Passed: either sign for resistance reductions across immunity, poison duration and single/multi-component UI.');

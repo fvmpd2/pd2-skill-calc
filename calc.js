@@ -17,12 +17,13 @@ function calculate(formula, {skillLevel, synergyPoints={}, skillDamagePct=0, ene
   if(formula.model==='skeleton-warrior'||formula.model==='skeleton-archer'){const mastery=Math.max(0,Number(extraInputs.masteryLevel||0));baseMin+=2*mastery;baseMax+=2*mastery;synergyPct+=Number(extraInputs.summonEd||0)+(formula.model==='skeleton-warrior'?Math.max(0,level-3)*10:0);}
   if(formula.model==='druid-summon'){const grizzly=formula.ownGrizzly?level:Number(extraInputs.grizzlyLevel||0);modifierMultiplier*=1+((grizzly>0?25+10*(grizzly-1):0)+Number(extraInputs.summonEd||0)+100*Math.min(1,Math.floor(extraInputs.corpseFed||0)))/100;}
   const isPoison=(damageType||formula.damageType)==='poison';
-  const pierce=Math.max(0,Number(enemyResistanceReductionPct));
+  // Reduction fields accept either sign; magnitude is the intended reduction.
+  const pierce=Math.abs(Number(enemyResistanceReductionPct)||0);
   // Breaking sources are applied simultaneously. Each source is halved and
   // rounded separately against the target's original immunity, before item pierce.
   const resistance=Number(enemyResistancePct), initiallyImmune=resistance>=100;
   const breakingSources=Array.isArray(breakingPiercePct)?breakingPiercePct:[breakingPiercePct];
-  const appliedBreakingPct=breakingSources.reduce((sum,value)=>sum+Math.floor(Math.max(0,Number(value)||0)/(initiallyImmune?2:1)),0);
+  const appliedBreakingPct=breakingSources.reduce((sum,value)=>sum+Math.floor(Math.abs(Number(value)||0)/(initiallyImmune?2:1)),0);
   const resistanceAfterBreakingPct=resistance-appliedBreakingPct;
   const immune=resistanceAfterBreakingPct>=100;
   const totalReduction=appliedBreakingPct+(immune?0:pierce);

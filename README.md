@@ -28,6 +28,8 @@ Use **Copy build link** or bookmark the updated address to save your setup. Comp
 
 Results describe the listed damage applications, not complete character or army DPS. Hit chance, projectile overlap, attack/cast speed and persistent-effect timing are not simulated. Corpse Explosion and Death Sentry show a note for corpse-life damage but do not calculate that contribution.
 
+Breaking pierce and −enemy resistance inputs accept either sign: `75` and `−75` both mean a 75-point reduction. Enemy starting resistance retains its actual sign.
+
 Breaking pierce is halved against initial immunity; ordinary −enemy resistance applies only once immunity is broken. The below-zero resistance portion is halved. The combined Breaking pierce input can differ from in-game rounding when several sources are rounded separately. [PD2 resistance reference](https://wiki.projectdiablo2.cn/wiki/Game_Mechanics#Reducing_Resistances).
 
 The poison-length effect uses the requested half-pierce model: target PLR minus half of ordinary pierce, clamped to −100–75%. This rule is **not independently confirmed for PD2**; integer-frame and fixed-point rounding are not reproduced.
