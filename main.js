@@ -30,7 +30,7 @@ function compute(){renderMastery();normalizeReductionInputs();syncBuildLink();$(
  if(poison){$('poisonResults').hidden=false;const holder=$('poisonResults');holder.replaceChildren();
  const cards=[['Duration before pierce',`${base.beforeDurationSec.toFixed(2)} s`],['Duration after pierce',`${base.durationSec.toFixed(2)} s`],['Damage / frame (25 fps)',range(base.frameMin,base.frameMax)],['Damage / second',range(base.dpsMin,base.dpsMax)]];
  for(const [title,value,hint] of cards){const card=document.createElement('div');card.className='poison-card';const label=document.createElement('span');label.textContent=title;const strong=document.createElement('strong');strong.textContent=value;card.append(label);card.append(strong);holder.append(card);}
-}if(base.immune)$('status').textContent+=' Immune after Breaking pierce; damage is zero.';const inc=x=>base.avg?`${((x.avg/base.avg-1)*100).toFixed(2)}%`:'n/a';$('comparison').textContent=`+1 skill level: ${inc(higher)} · +5% skill damage: ${inc(boost)} · +6% skill damage: ${inc(boost6)}`;
+}if(base.immune)$('status').textContent+=' Immune after Breaking pierce; damage is zero.';const inc=x=>base.avg?`${((x.avg/base.avg-1)*100).toFixed(2)}%`:'n/a';$('comparison').textContent=hasCriticalDamage()?`+1 skill level: ${inc(higher)} · ${deadlyStrikeComparison(base.avg)}`:`+1 skill level: ${inc(higher)} · +5% skill damage: ${inc(boost)} · +6% skill damage: ${inc(boost6)}`;
  }catch(e){$('status').textContent=`Formula error: ${e.message}`;$('damageRows').replaceChildren();$('poisonResults').textContent='';$('comparison').textContent='';}}
 $('class').addEventListener('change',refreshSkillList);$('skill').addEventListener('change',changeSkill);for(const id of ['level','pct','pierce','enemyRes','enemyPlr','damageType','teleportLevel','masteryLevel','truncateNumbers','criticalChance','deadlyChance','criticalBonus','deadlyBonus'])$(id).addEventListener('input',compute);
 function renderScaling(){
@@ -102,7 +102,7 @@ function computeCharges(){
    if(c.formula.kind==='weapon'){const note=document.createElement('p');note.className='muted';note.textContent=`Skill enhanced damage: +${result.enhancedPct.toFixed(0)}%.${n('weaponMax')===0?' Enter your weapon Min/Max above to see physical damage.':''}`;section.append(note);}
   });for(const row of stageTeleportRows)table.append(row);scroll.append(table);section.append(scroll);section.append(damageBreakdown(breakdown));
   for(const component of criticalComponents){const target=document.createElement('div');target.className='component-critical';renderCriticalDamage(component,target);section.append(target);
-   const note=document.createElement('p');note.className='compare';const avg=component.result.avg;const inc=opts=>{const v=calculateChargeComponent(component.formula,{...component.options,...opts});return avg?`${((v.avg/avg-1)*100).toFixed(2)}%`:'n/a';};note.textContent=`+1 skill level: ${inc({skillLevel:level+1})} · +5% skill damage: ${inc({skillDamagePct:component.options.skillDamagePct+5})} · +6% skill damage: ${inc({skillDamagePct:component.options.skillDamagePct+6})}`;section.append(note);
+   const note=document.createElement('p');note.className='compare';const avg=component.result.avg;const inc=opts=>{const v=calculateChargeComponent(component.formula,{...component.options,...opts});return avg?`${((v.avg/avg-1)*100).toFixed(2)}%`:'n/a';};note.textContent=`+1 skill level: ${inc({skillLevel:level+1})} · ${deadlyStrikeComparison(avg)}`;section.append(note);
   }
   if(hitCount>1&&stage.total!==false){const total=document.createElement('p');total.className='charge-total';total.textContent=missingBase?'Enter summon base physical damage to calculate the combined hit.':`Combined impact damage: ${range(sumMin,sumMax)} (one hit from each listed impact component)`;section.append(total);}
   if(stage.note){const note=document.createElement('p');note.className='muted';note.textContent=stage.note;section.append(note);}holder.append(section);
@@ -214,4 +214,12 @@ function renderSeasonComparison(options,current){
   for(const text of [season,`${range(beforeMin,beforeMax)} (${change(beforeMin,beforeMax,current.beforeMin,current.beforeMax)})`,`${range(result.min,result.max)} (${change(result.min,result.max,current.afterMin,current.afterMax)})`]){const cell=document.createElement('td');cell.textContent=text;row.append(cell);}table.append(row);
  }
  scroll.append(table);holder.append(scroll);
+}
+
+function deadlyStrikeComparison(baseAverage){
+ const chance=clamp(n('deadlyChance'),0,100),next=Math.min(100,chance+10);
+ const options={criticalChancePct:n('criticalChance'),deadlyChancePct:chance,criticalBonusPct:n('criticalBonus'),deadlyBonusPct:n('deadlyBonus')};
+ const current=criticalDamage(options).averageMultiplier,boosted=criticalDamage({...options,deadlyChancePct:next}).averageMultiplier;
+ const gain=baseAverage&&current?`${((boosted/current-1)*100).toFixed(2)}%`:'n/a';
+ return `+10% Deadly Strike (${pctText(chance)}% → ${pctText(next)}%): ${gain}`;
 }

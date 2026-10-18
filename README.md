@@ -11,7 +11,7 @@ A compact calculator for supported Project Diablo 2 skill damage, built with AI.
 - S14 beta Poison Nova comparison below the main S13 damage, with before/after-resistance values and percentage changes in average damage.
 - Automatic Fire/Lightning/Cold Mastery from your effective level (including +skills); equipment bonuses stay separate. Defaults/reset use level 0.
 - Sorceress damage with and without the Teleport debuff.
-- An optional **hypothetical** Critical/Deadly Strike comparison for Shock Wave, Twister and Tornado, including outcome chances and average damage. Their in-game eligibility is not verified.
+- An optional **hypothetical** Critical/Deadly Strike comparison for Shock Wave, Twister and Tornado, including outcome chances and average damage. Their in-game eligibility is not verified. These three skills compare +1 skill level against +10 percentage points of Deadly Strike chance (capped at 100%), using the expected average damage with your current Critical/Deadly Strike multipliers.
 
 Weapon-dependent player skills are excluded; Barbarian offers War Cry only. Summons use Hell data. Iron Golem and Revive are omitted.
 

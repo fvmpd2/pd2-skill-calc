@@ -291,9 +291,9 @@ for(const name of ['Poison Nova','Holy Fire']){
 console.log('Passed: negative reduction entries display as positive; enemy resistance keeps its sign.');
 
 elements.skill.value=skill('War Cry').id;elements.skill.listeners.change();assert(elements.criticalPanel.hidden);assert(elements.criticalResults.hidden);
-for(const name of ['Shock Wave','Twister','Fire Bolt']){elements.skill.value=skill(name).id;elements.skill.listeners.change();assert(elements.comparison.textContent.includes('+6% skill damage:'));}
+for(const name of ['Fire Bolt']){elements.skill.value=skill(name).id;elements.skill.listeners.change();assert(elements.comparison.textContent.includes('+6% skill damage:'));}
 elements.skill.value=skill('Tornado').id;elements.skill.listeners.change();elements.criticalChance.value='75';elements.deadlyChance.value='30';elements.deadlyChance.listeners.input();assert(!elements.criticalPanel.hidden);
-for(const section of elements.chargeResults.children){const crit=section.children.find(x=>x.className==='component-critical');assert(crit);assert.equal(crit.children[0].children[0].children[1].textContent,'82.5%');assert(section.children.some(x=>x.className==='compare'&&x.textContent.includes('+6% skill damage:')));}
+for(const section of elements.chargeResults.children){const crit=section.children.find(x=>x.className==='component-critical');assert(crit);assert.equal(crit.children[0].children[0].children[1].textContent,'82.5%');assert(section.children.some(x=>x.className==='compare'&&x.textContent.includes('+10% Deadly Strike')));}
 console.log('Passed: Druid strike comparisons, Tornado per-component outcomes, War Cry removal and +6% comparison.');
 
 for(const [type,damage,pierce] of [['fire',96,20],['lightning',240,0],['cold',48,24]]){const v=vm.runInContext(`sorceressMastery('${type}',20)`,c);assert.equal(v.damagePct,damage);assert.equal(v.piercePct,pierce);assert.equal(vm.runInContext(`sorceressMastery('${type}',0).damagePct`,c),0);}
@@ -312,3 +312,13 @@ for(const item of c.catalog.filter(s=>s.formula&&!s.excluded&&s.className==='Sor
 elements.skill.value=skill('Fire Bolt').id;elements.skill.listeners.change();elements.masteryLevel.value='20';elements.pct.value='70';elements.pierce.value='35';elements.pct.listeners.input();
 const points=Object.fromEntries(elements.synergies.querySelectorAll('input').map(e=>[e.dataset.synergy,Number(e.value)]));c.masteryTotal=c.calc(skill('Fire Bolt').formula,{skillLevel:Number(elements.level.value),synergyPoints:points,skillDamagePct:166,enemyResistanceReductionPct:55});assert.equal(elements.damageRows.children[0].children[2].textContent,vm.runInContext('range(masteryTotal.min,masteryTotal.max)',c));
 console.log('Passed: all Sorceress skills with mastery and additive equipment bonuses.');
+
+for(const name of ['Shock Wave','Twister','Tornado']){
+ elements.skill.value=skill(name).id;elements.skill.listeners.change();elements.criticalChance.value='75';elements.deadlyChance.value='30';elements.deadlyChance.listeners.input();
+ const labels=()=>name==='Tornado'?elements.chargeResults.children.map(s=>s.children.find(x=>x.className==='compare').textContent):[elements.comparison.textContent];
+ assert(labels().every(t=>t.includes('+10% Deadly Strike (30% → 40%): 0.70%')&&t.includes('+1 skill level:')));
+ elements.deadlyChance.value='95';elements.deadlyChance.listeners.input();assert(labels().every(t=>t.includes('(95% → 100%)')));
+ elements.deadlyChance.value='100';elements.deadlyChance.listeners.input();assert(labels().every(t=>t.includes('(100% → 100%): 0.00%')));
+ elements.criticalChance.value='100';elements.deadlyChance.value='0';elements.criticalChance.listeners.input();assert(labels().every(t=>t.includes(': 0.00%')));
+}
+console.log('Passed: +1 level versus +10 Deadly Strike expected damage, conditional rolls and 100% cap.');
