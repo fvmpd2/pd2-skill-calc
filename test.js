@@ -180,7 +180,7 @@ console.log('Passed: Reset restores synergies to 20 and synergy levels remain ed
 for(const [cc,dc,cb,db,either,avg] of [[75,30,0,0,.825,1.7875],[50,40,25,25,.7,1.775],[0,0,0,0,0,1],[100,100,0,0,1,2],[0,100,0,0,1,1.5],[100,100,50,50,1,2.5],[-10,120,0,0,1,1.5]]){
  const v=vm.runInContext(`criticalDamage({criticalChancePct:${cc},deadlyChancePct:${dc},criticalBonusPct:${cb},deadlyBonusPct:${db}})`,c);assert(Math.abs(v.eitherChance-either)<1e-12);assert(Math.abs(v.averageMultiplier-avg)<1e-12);assert(Math.abs(v.criticalChance+v.deadlyChance+v.normalChance-1)<1e-12);
 }
-for(const name of ['Shock Wave','War Cry']){
+for(const name of ['Shock Wave','Twister']){
  elements.skill.value=skill(name).id;elements.skill.listeners.change();elements.truncateNumbers.checked=false;elements.level.value='20';elements.enemyRes.value='25';elements.pierce.value='0';elements.normalBreaking.querySelectorAll('input')[0].value='0';elements.criticalChance.value='75';elements.deadlyChance.value='30';elements.criticalBonus.value='0';elements.deadlyBonus.value='0';elements.deadlyChance.listeners.input();
  assert(!elements.criticalPanel.hidden);assert(!elements.criticalResults.hidden);const stats=elements.criticalResults.children[0];assert.equal(stats.children[0].children[1].textContent,'82.5%');assert.equal(stats.children[2].children[1].textContent,'178.75% (+78.75%)');
  const table=elements.criticalResults.children[1].children[0];assert.equal(table.children.length,5);assert.equal(table.children[2].children[1].textContent,'75%');assert.equal(table.children[3].children[1].textContent,'7.5%');assert.equal(table.children[4].className,'critical-average');
@@ -289,3 +289,9 @@ for(const name of ['Poison Nova','Holy Fire']){
  const resist=skill(name).charges?elements.chargeModifiers.querySelectorAll('input').find(e=>e.dataset.modifier==='res'):elements.enemyRes;resist.value='-25';resist.listeners.input();assert.equal(resist.value,'-25');
 }
 console.log('Passed: negative reduction entries display as positive; enemy resistance keeps its sign.');
+
+elements.skill.value=skill('War Cry').id;elements.skill.listeners.change();assert(elements.criticalPanel.hidden);assert(elements.criticalResults.hidden);
+for(const name of ['Shock Wave','Twister','Fire Bolt']){elements.skill.value=skill(name).id;elements.skill.listeners.change();assert(elements.comparison.textContent.includes('+6% skill damage:'));}
+elements.skill.value=skill('Tornado').id;elements.skill.listeners.change();elements.criticalChance.value='75';elements.deadlyChance.value='30';elements.deadlyChance.listeners.input();assert(!elements.criticalPanel.hidden);
+for(const section of elements.chargeResults.children){const crit=section.children.find(x=>x.className==='component-critical');assert(crit);assert.equal(crit.children[0].children[0].children[1].textContent,'82.5%');assert(section.children.some(x=>x.className==='compare'&&x.textContent.includes('+6% skill damage:')));}
+console.log('Passed: Druid strike comparisons, Tornado per-component outcomes, War Cry removal and +6% comparison.');

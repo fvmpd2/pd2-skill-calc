@@ -10,7 +10,7 @@ A compact calculator for supported Project Diablo 2 skill damage, built with AI.
 - Poison duration before/after pierce, damage per frame (25 fps), per second and total damage.
 - S14 beta Poison Nova comparison below the main S13 damage, with before/after-resistance values and percentage changes in average damage.
 - Sorceress damage with and without the Teleport debuff.
-- An optional **hypothetical** Critical/Deadly Strike comparison for Shock Wave and War Cry, including outcome chances and average damage. Their in-game eligibility is not verified.
+- An optional **hypothetical** Critical/Deadly Strike comparison for Shock Wave, Twister and Tornado, including outcome chances and average damage. Their in-game eligibility is not verified.
 
 Weapon-dependent player skills are excluded; Barbarian offers War Cry only. Summons use Hell data. Iron Golem and Revive are omitted.
 
