@@ -89,3 +89,12 @@ function criticalDamage({criticalChancePct=0,deadlyChancePct=0,criticalBonusPct=
  const averageMultiplier=criticalChance*criticalMultiplier+deadlyChance*deadlyMultiplier+normalChance;
  return {criticalChance,deadlyChance,normalChance,eitherChance,criticalMultiplier,deadlyMultiplier,averageMultiplier};
 }
+
+/** Supplied S13 mastery passive formulas; level includes equipment bonuses. */
+function sorceressMastery(type,level){
+ const lvl=clamp(Math.floor(Number(level)||0),0,100);if(!lvl)return {damagePct:0,piercePct:0};
+ if(type==='fire')return {damagePct:20+4*(lvl-1),piercePct:Math.min(lvl,30)};
+ if(type==='lightning')return {damagePct:50+10*(lvl-1),piercePct:0};
+ if(type==='cold')return {damagePct:10+2*(lvl-1),piercePct:Math.min(5+lvl-1,45)};
+ return {damagePct:0,piercePct:0};
+}
