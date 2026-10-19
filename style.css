@@ -72,4 +72,4 @@ th,td,.charge-stage th,.charge-stage td,.damage-breakdown th,.damage-breakdown t
 
 /* Main damage leads; beta figures are a quieter comparison below. */
 .normal-row{background:#3b2112;border-left:3px solid #db782e}.normal-row td:nth-child(n+2){color:#ffe2b3;font-weight:700;font-size:var(--font-subheading);padding-top:12px;padding-bottom:12px}.normal-row td:last-child{color:#ffca7d}
-.season-comparison{margin:9px 0 12px;padding:0 0 8px;border-bottom:1px solid var(--border)}.season-comparison>p{margin:0 0 5px}.season-comparison td{font-size:var(--font-body);color:#c9ae94;background:#1d120d}.season-comparison td:first-child{color:#e9b37a}.season-comparison td{border-top:0}
+

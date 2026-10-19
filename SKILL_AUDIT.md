@@ -1,4 +1,4 @@
-# PD2 calculator skill audit — v14
+# PD2 calculator skill audit — S14 Open Beta
 
 All 231 class-tagged Skills rows have a classification; 96 are selectable. This is a source/model audit, not in-game verification of every component.
 
@@ -26,7 +26,7 @@ All 231 class-tagged Skills rows have a classification; 96 are selectable. This 
 
 Fire Golem separates Hell physical punch, added melee fire and Holy Fire pulse. Clay/Blood physical bases also use Hell MonStats A1 values. All three have noRatio=1; MonLvl multipliers do not apply. Iron Golem and Revive are excluded by request.
 
-Dark Pact adds 10% per curse after the first; zero curses gives zero damage. Corpse Explosion includes flat physical/fire and mentions the excluded corpse-life contribution. Skeletal warriors/archers/mages and Druid summons include their applicable mastery/passive modifiers.
+Dark Pact consumes up to four curses and adds 10% per curse after the first; zero curses gives zero damage. Corpse Explosion includes flat physical/fire and mentions the excluded corpse-life contribution. Skeletal warriors/archers/mages and Druid summons include their applicable mastery/passive modifiers. Skeleton Archer synergies come from passivecalc4 even though S14 DmgSymPerCalc is blank. Wolf Grizzly bonuses use hard points; Dire Wolf includes its level-based physical pierce.
 
 Resist Fire/Cold/Lightning and Salvation are bonuses, not damaging attacks. Aura attacks have separate pulse/on-hit values. Other additions include physical/fire impacts, ground fire, secondary novas and Tornado collision/pulse damage.
 
@@ -49,11 +49,11 @@ Uploaded scaling is authoritative. Descriptions were cross-checked with the foll
 
 Input SHA-256 fingerprints:
 
-- Skills.txt: `19f8efbafbe5e2e58f0f010028efc580a4a1ec8899e857094f2cd94b6dd806f4`
-- Missiles.txt: `056eb678514d8e1f6162ef915260c05a12b53639564d8a0a320da0bc0dee196e`
-- Skilldesc.txt: `3ff24b80883864ea2531875d4efb22c8500c937d2426c60a8301144f7c778676`
+- Skills.txt: `aaaf85fd4e1fe7698dd7b49eb2a43589ad70d4dfa0c575d0cbfe556a75cab26b`
+- Missiles.txt: `38e395a8f50d1e0b5fb77fde971d2fe1ff95fd87263ca6de36051964c51eab61`
+- SkillDesc.txt: `f11f70872d61936090e77c33382ed0c2cb1f984d9e6509bce081fe2a9f4178a3`
 - MissCalc.txt: `3aaaea44299543cc09ca5b23835fbb46182ce6365757d8ff838513e28f1422b0`
-- MonStats.txt: `1b3c08d28b4093d4c154798a5ae9e794f0ed08b1702ee2cb938b1bc5c2e4c5b2`
+- MonStats.txt: `e9fea097888a5c353d67a029ba64d44f91579ebe4e90aaac6c2ca9b8fc2c48c8`
 - MonLvl.txt: `bda243efe1d1e9591f75b8cf97ac73f78ff691362381f35cc000233eb46c092a`
 
 ## Amazon
@@ -197,7 +197,7 @@ Input SHA-256 fingerprints:
 | Shock Wave | yes | calculated | physical per application — Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled. |
 | Solar Creeper | no | non-damaging | Buff, resistance, defensive or utility stat fields are not direct attack damage. |
 | Spirit of Barbs | yes | conditional | Returned damage: Flat physical return (physical, per attacker hit) — Conditional returned damage when the protected target is hit; not an active attack or DPS. |
-| Summon Dire Wolf | yes | calculated | Summon attack: Physical (physical, per hit) — Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled. |
+| Summon Dire Wolf | yes | calculated | Summon attack: Physical (physical, per hit) — Includes the wolf’s level-based physical pierce (8% at level 1, +0.5% per level, capped at 20%; integer rounding). Grizzly bonus uses hard points. |
 | Summon Grizzly | yes | calculated | Summon attack: Physical (physical, per hit) — Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled. |
 | Summon Spirit Wolf | yes | calculated | Summon attack: Physical (physical, per hit) — Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled. |
 | Tornado | yes | calculated | Collision hit: Physical (physical, per hit); Area pulse: Physical (physical, per pulse) — Area damage checks every 15 frames (0.6 s). Collision and pulse are separate sources; hit count depends on path and target overlap. |

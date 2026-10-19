@@ -1,0 +1,54 @@
+{
+  "season": "S14 Open Beta",
+  "extracted": "2026-10-20",
+  "archives": {
+    "pd2data.mpq": "f6722aa6544d2d15c0eff78a38c6783de334d83ee723ca23416024f23bed441b",
+    "patch_d2.mpq": "b976e7847dda696f54198a9477819f96579c4894f54381c72afb4937e919e0a9"
+  },
+  "tables": {
+    "Skills": {
+      "archive": "pd2data.mpq",
+      "sha256": "aaaf85fd4e1fe7698dd7b49eb2a43589ad70d4dfa0c575d0cbfe556a75cab26b"
+    },
+    "Missiles": {
+      "archive": "pd2data.mpq",
+      "sha256": "38e395a8f50d1e0b5fb77fde971d2fe1ff95fd87263ca6de36051964c51eab61"
+    },
+    "SkillDesc": {
+      "archive": "pd2data.mpq",
+      "sha256": "f11f70872d61936090e77c33382ed0c2cb1f984d9e6509bce081fe2a9f4178a3"
+    },
+    "MissCalc": {
+      "archive": "pd2data.mpq",
+      "sha256": "3aaaea44299543cc09ca5b23835fbb46182ce6365757d8ff838513e28f1422b0"
+    },
+    "MonStats": {
+      "archive": "pd2data.mpq",
+      "sha256": "e9fea097888a5c353d67a029ba64d44f91579ebe4e90aaac6c2ca9b8fc2c48c8"
+    },
+    "MonLvl": {
+      "archive": "pd2data.mpq",
+      "sha256": "bda243efe1d1e9591f75b8cf97ac73f78ff691362381f35cc000233eb46c092a"
+    }
+  },
+  "selectableSkills": 96,
+  "changedDamageModels": [
+    "Fire Arrow",
+    "Frost Nova",
+    "Shiver Armor",
+    "Meteor",
+    "Chilling Armor",
+    "Raise Skeleton Archer",
+    "Poison Nova",
+    "Summon Spirit Wolf",
+    "Fissure",
+    "Summon Dire Wolf",
+    "Twister",
+    "Tornado",
+    "Summon Grizzly",
+    "Hurricane",
+    "Fists of Fire",
+    "Phoenix Strike",
+    "Dark Pact"
+  ]
+}

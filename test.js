@@ -6,7 +6,7 @@ const flat={kind:'flat',min:[10,1,2,3,4,5],max:[20,1,2,3,4,5]};
 for(const [res,pierce,want] of [[25,40,-7],[0,40,-20],[-20,40,-40],[100,200,100],[200,300,200],[20,10,10],[0,500,-100]])assert.equal(c.calc(flat,{skillLevel:1,enemyResistancePct:res,enemyResistanceReductionPct:pierce}).effectiveResistancePct,want);
 assert.equal(c.calc(flat,{skillLevel:1,enemyResistancePct:100,enemyResistanceReductionPct:500}).min,0);
 for(const [lvl,want] of [[1,10],[8,17],[9,19],[16,33],[17,36],[22,51],[23,55],[28,75],[29,80]])assert.equal(c.scale(flat.min,lvl),want);
-for(const [name,min,max] of [['Fire Bolt',3,6],['Teeth',3,5],['Poison Nova',50,90.625],['War Cry',3,5],['Tornado',32,35]]){const v=c.calc(c.catalog.find(s=>s.name===name).formula,{skillLevel:1});assert.equal(v.min,min,name);assert.equal(v.max,max,name);}
+for(const [name,min,max] of [['Fire Bolt',3,6],['Teeth',3,5],['Poison Nova',50,90.625],['War Cry',3,5],['Tornado',35,39]]){const v=c.calc(c.catalog.find(s=>s.name===name).formula,{skillLevel:1});assert.equal(v.min,min,name);assert.equal(v.max,max,name);}
 const poison={...flat,damageType:'poison',poisonDurationSec:2};
 const p=c.calc(poison,{skillLevel:1,enemyResistanceReductionPct:40});
 assert.equal(p.beforeDurationSec,2);assert.equal(p.durationSec,2.4);assert.equal(p.frameMin,.24);assert(Math.abs(p.min-p.frameMin*p.durationSec*25)<1e-9);
@@ -16,10 +16,10 @@ assert.equal(c.calc(null,{skillLevel:1}),null);
 for(const s of c.catalog)if(s.formula?.kind==='flat')for(const skillLevel of [1,8,9,16,17,22,23,28,29,50,100]){const v=c.calc(s.formula,{skillLevel});assert(Number.isFinite(v.min)&&Number.isFinite(v.max),s.name);}
 // Exercise UI event handling without a browser, including unsupported and editable formulas.
 class Element{constructor(){this.value='';this.children=[];this.listeners={};this.firstChild={textContent:''};this.dataset={};this.textContent='';}replaceChildren(...xs){this.children=xs;if(xs[0]?.value!==undefined)this.value=xs[0].value;}append(x){this.children.push(x);}addEventListener(name,fn){this.listeners[name]=fn;}querySelectorAll(selector){const all=this.children.flatMap(x=>[x,...x.querySelectorAll(selector)]);return all.filter(x=>selector==='input'&&x.type==='number');}get selectedOptions(){return [{text:this.value}];}}
-const ids=['masteryField','masteryLabel','masteryLevel','masterySummary','skillDamageLabel','enemyReductionLabel','synergyNote','seasonComparison','class','skill','levelLabel','damageType','normalModifierType','scalingGrid','scalingNote','synergies','synergyDetails','criticalTitle','level','pct','pierce','enemyRes','enemyPlr','plrField','poisonResults','status','damageRows','criticalPanel','criticalResults','criticalChance','deadlyChance','criticalBonus','deadlyBonus','criticalMultiplierHint','deadlyMultiplierHint','normalResistance','normalBreakdown','truncateNumbers','comparison','apply','feedback','reset','chargeModifiers','normalModifiers','chargeResults','normalResults','chargeEditorField','chargeEditor','weaponFields','weaponMin','weaponMax','otherEd','copyBuild','resetBuild','linkFeedback','linkFallback','normalBreaking','teleportField','teleportLevel','teleportPenalty','teleportResults','extraFields','skillInfo','difficulty','difficultyField'];
+const ids=['masteryField','masteryLabel','masteryLevel','masterySummary','skillDamageLabel','enemyReductionLabel','synergyNote','class','skill','levelLabel','damageType','normalModifierType','scalingGrid','scalingNote','synergies','synergyDetails','criticalTitle','level','pct','pierce','enemyRes','enemyPlr','plrField','poisonResults','status','damageRows','criticalPanel','criticalResults','criticalChance','deadlyChance','criticalBonus','deadlyBonus','criticalMultiplierHint','deadlyMultiplierHint','normalResistance','normalBreakdown','truncateNumbers','comparison','apply','feedback','reset','chargeModifiers','normalModifiers','chargeResults','normalResults','chargeEditorField','chargeEditor','weaponFields','weaponMin','weaponMax','otherEd','copyBuild','resetBuild','linkFeedback','linkFallback','normalBreaking','teleportField','teleportLevel','teleportPenalty','teleportResults','extraFields','skillInfo','difficulty','difficultyField'];
 const elements=Object.fromEntries(ids.map(id=>[id,new Element()]));elements.level.value='1';elements.truncateNumbers.checked=true;
 c.document={getElementById:id=>elements[id],createElement:()=>new Element()};c.Option=function(text,value){return {text,value};};
-vm.runInContext(fs.readFileSync(__dirname+'/seasons.js','utf8')+fs.readFileSync(__dirname+'/main.js','utf8'),c);
+vm.runInContext(fs.readFileSync(__dirname+'/main.js','utf8'),c);
 assert.equal(elements.skill.children.some(x=>x.text.includes('unsupported')),false);
 for(const s of c.catalog.filter(s=>s.formula&&!s.excluded)){elements.skill.value=s.id;vm.runInContext('changeSkill()',c);assert(!/error/i.test(elements.status.textContent),s.name);if(s.charges){assert.equal(elements.chargeResults.children.length,s.charges.length,s.name);}else{assert.equal(elements.damageRows.children.length,s.className==='Sorceress'?2:1,s.name);}assert.equal(elements.scalingGrid.querySelectorAll('input').length,(s.charges?s.charges[0].components[0].formula:s.formula).kind!=='flat'?0:12,s.name);}
 for(const className of new Set(c.catalog.map(s=>s.className))){elements.class.value=className;elements.class.listeners.change();assert(elements.skill.children.every(option=>c.catalog.find(s=>s.id===option.value).formula));}
@@ -67,7 +67,7 @@ assert.equal(evalComp('Dark Pact',0,0,{extraInputs:{curseCount:1}}).min,3);
 assert(Math.abs(evalComp('Dark Pact',0,0,{extraInputs:{curseCount:3}}).min-3.6)<1e-10);
 assert.equal(evalComp('Dark Pact',0,0,{extraInputs:{curseCount:3},skillDamagePct:50}).modifierMultiplier,1.2);
 assert(Math.abs(evalComp('Raise Skeleton Warrior',0,0,{skillLevel:4,extraInputs:{masteryLevel:10},synergyPoints:{'Skeleton Mastery':5,'Raise Skeleton Archer':10}}).min-38.4)<1e-10); // (1+3+20) × (1+.1+.3+.2)
-assert.equal(evalComp('Raise Skeleton Archer',0,0,{extraInputs:{masteryLevel:10},synergyPoints:{'Skeleton Mastery':5}}).min,45.5);
+assert.equal(evalComp('Raise Skeleton Archer',0,0,{extraInputs:{masteryLevel:10},synergyPoints:{'Skeleton Mastery':5}}).min,52);
 assert.equal(skill('Raise Skeleton Mage').charges.length,4);
 assert.equal(evalComp('Raise Skeleton Mage',2,0,{skillLevel:4,extraInputs:{masteryLevel:1}}).min,8.8); // bolt level 2, 8 fire, +10% mastery
 assert.equal(evalComp('Holy Fire',0,0).min,1.25);
@@ -76,7 +76,7 @@ assert.equal(evalComp('Holy Light',1,0).min,3.5);
 assert.equal(evalComp('Bone Wall',0,0).min,15);
 assert.equal(evalComp('Bone Prison',0,0).min,30);
 assert.equal(evalComp('Meteor',0,0,{skillDamagePct:100}).min,50); // physical inherits fire mastery
-assert.equal(evalComp('Jab',0,0,{weaponMin:100,weaponMax:200,synergyPoints:{Fend:2},otherEnhancedDamagePct:40}).min,200);
+assert.equal(evalComp('Jab',0,0,{weaponMin:100,weaponMax:200,synergyPoints:{Fend:2},otherEnhancedDamagePct:40}).min,194);
 assert(Math.abs(evalComp('Clay Golem',0,0,{skillLevel:2,difficulty:'Hell',synergyPoints:{'Golem Mastery':1}}).min-201.6)<1e-10);
 assert(Math.abs(evalComp('Blood Golem',0,0,{skillLevel:2,difficulty:'Hell',synergyPoints:{'Golem Mastery':1}}).min-112.2)<1e-10);
 assert.equal(skill('Revive').formula,null);assert.equal(skill('Iron Golem').formula,null);
@@ -206,30 +206,8 @@ const meteorSection=elements.chargeResults.children[0];
 const meteorTable=meteorSection.children.find(x=>x.className==='table-scroll').children[0];
 assert.deepEqual(meteorTable.children.slice(1).map(x=>x.className),['normal-row','normal-row','teleport-row','teleport-row']);
 assert.deepEqual(meteorTable.children.slice(1).map(x=>x.children[0].textContent),['Physical (per hit)','Fire (per hit)','Physical (per hit) · After Teleport (−50%)','Fire (per hit) · After Teleport (−50%)']);
-const firewallLabel=elements.synergies.children.find(x=>x.textContent==='Fire Wall (hlvl)');
-assert(firewallLabel.children.some(x=>x.textContent.includes('Ground fire only')));
-assert(!elements.synergies.children.find(x=>x.textContent==='Inferno (hlvl)').children.some(x=>x.textContent.includes('Ground fire only')));
-console.log('Passed: Meteor ground-fire note and normal/Teleport component grouping.');
-
-// Season comparisons use identical entered synergies, bonuses and resistance.
-elements.skill.value=skill('Poison Nova').id;elements.skill.listeners.change();elements.resetBuild.listeners.click();elements.level.value='40';elements.truncateNumbers.checked=false;elements.pct.value='50';elements.enemyRes.value='50';elements.pierce.value='30';elements.enemyPlr.value='25';elements.pct.listeners.input();
-assert(!elements.seasonComparison.hidden);assert.equal(elements.seasonComparison.children.length,2);
-const seasonOpts={skillLevel:40,synergyPoints:{'Poison Strike':20,Desecrate:20},skillDamagePct:50,enemyResistancePct:50,enemyResistanceReductionPct:30,enemyPlrPct:25};
-c.seasonOpts=seasonOpts;
-const betaRow=elements.seasonComparison.children[1].children[0].children[0];
-const betaResult=vm.runInContext("calculate(seasonComparisons[active.id]['S14 beta'],seasonOpts)",c);c.seasonExpected=betaResult;
-assert(betaRow.children[2].textContent.startsWith(vm.runInContext('range(seasonExpected.min,seasonExpected.max)',c)));
-const mainResult=c.calc(skill('Poison Nova').formula,seasonOpts);
-assert(betaRow.children[2].textContent.includes((((betaResult.avg/mainResult.avg)-1)*100).toFixed(2)+'%'));
-assert.equal(betaRow.children[0].textContent,'S14 beta');
-// Applied S13 scaling is the comparison baseline; the beta remains its supplied data.
-elements.scalingGrid.querySelectorAll('input')[0].value='1';elements.apply.listeners.click();
-const alteredRow=elements.seasonComparison.children[1].children[0].children[0];
-const current=vm.runInContext('calculate(skillFormula(),seasonOpts)',c);
-assert(alteredRow.children[2].textContent.includes((((betaResult.avg/current.avg)-1)*100).toFixed(2)+'%'));
-const s14=vm.runInContext("seasonComparisons[active.id]['S14 beta']",c);assert.equal(s14.min[5],28.125);assert.equal(s14.synergy[0].pctPerHardPoint,.11);
-elements.skill.value=skill('Meteor').id;elements.skill.listeners.change();assert(elements.seasonComparison.hidden);assert.equal(elements.seasonComparison.children.length,0);
-console.log('Passed: S13/S14 Poison Nova final damage comparison and visibility.');
+assert(!elements.synergies.children.some(x=>x.textContent==='Fire Wall (hlvl)'));
+console.log('Passed: Meteor corrected synergy list and normal/Teleport component grouping.');
 
 // The first result column has no heading or redundant Normal label.
 elements.skill.value=skill('Fire Bolt').id;elements.skill.listeners.change();
@@ -264,7 +242,7 @@ elements.skill.value=skill('Meteor').id;elements.skill.listeners.change();
 elements.skill.value=skill('Poison Nova').id;elements.skill.listeners.change();assert.equal(vm.runInContext('skillFormula().min[0]',c),originalNovaMin);
 c.editedHash='#build='+encodeURIComponent(editedState);assert(vm.runInContext('restoreBuild(editedHash)',c));assert.equal(vm.runInContext('skillFormula().min[0]',c),1);
 elements.skill.value=skill('Meteor').id;elements.skill.listeners.change();assert.equal(vm.runInContext('Object.keys(overrides).length',c),0);
-console.log('Passed: skill switches restore S13 scaling; explicitly loaded build links retain saved scaling.');
+console.log('Passed: skill switches restore S14 scaling; explicitly loaded build links retain saved scaling.');
 
 // Reduction input signs never reverse or discard the intended reduction.
 for(const formula of [flat,poison])for(const res of [-20,0,50,110,150])for(const breaking of [0,21,75,102])for(const pierce of [0,30,75]){
@@ -322,3 +300,24 @@ for(const name of ['Shock Wave','Twister','Tornado']){
  elements.criticalChance.value='100';elements.deadlyChance.value='0';elements.criticalChance.listeners.input();assert(labels().every(t=>t.includes(': 0.00%')));
 }
 console.log('Passed: +1 level versus +10 Deadly Strike expected damage, conditional rolls and 100% cap.');
+
+// S14 source-derived checks catch changed scaling and passive effects.
+assert.equal(c.calc(skill('Poison Nova').formula,{skillLevel:40,synergyPoints:{'Poison Strike':20,Desecrate:20}}).min,5467.5);
+assert.equal(c.calc(skill('Poison Nova').formula,{skillLevel:40,synergyPoints:{'Poison Strike':20,Desecrate:20}}).max,5686.875);
+assert.equal(c.calc(skill('Twister').formula,{skillLevel:1}).min,6.5);assert.equal(c.calc(skill('Twister').formula,{skillLevel:1}).max,9);
+assert.deepEqual(Array.from(component('Meteor',1,0).formula.synergy.map(x=>x.name)).sort(),['Blaze','Fire Ball','Inferno']);
+assert.equal(skill('Frost Nova').formula.synergy[0].pctPerHardPoint,.08);
+assert.equal(skill('Shiver Armor').formula.synergy[0].name,'Frost Nova');assert.equal(skill('Chilling Armor').formula.synergy[0].name,'Blizzard');
+assert.equal(component('Raise Skeleton Archer',0,0).formula.synergy.length,2);
+assert.equal(evalComp('Raise Skeleton Archer',0,0,{extraInputs:{masteryLevel:10},synergyPoints:{'Skeleton Mastery':5}}).min,52);
+assert.deepEqual(Array.from(component('Fists of Fire',0,1).formula.synergy.map(x=>x.name)),['Tiger Strike','Dragon Flight']);
+assert.equal(component('Phoenix Strike',0,0).formula.min[0],24);assert.equal(component('Phoenix Strike',0,0).formula.synergy[0].pctPerHardPoint,.1);assert.equal(component('Phoenix Strike',2,0).formula.min[0],32);
+assert.equal(component('Hurricane',0,0).formula.synergy[0].pctPerHardPoint,.13);
+assert.equal(evalComp('Dark Pact',0,0,{extraInputs:{curseCount:4}}).modifierMultiplier,1.3);assert.equal(evalComp('Dark Pact',0,0,{extraInputs:{curseCount:10}}).modifierMultiplier,1.3);
+for(const [level,want] of [[1,-4],[2,-4],[3,-4],[4,-4],[5,-5],[25,-10],[60,-10]])assert.equal(evalComp('Summon Dire Wolf',0,0,{skillLevel:level}).effectiveResistancePct,want);
+assert.equal(component('Summon Spirit Wolf',0,0).formula.grizzlyHardPoints,true);
+const wolf20=evalComp('Summon Spirit Wolf',0,0,{extraInputs:{grizzlyLevel:20}});const wolf40=evalComp('Summon Spirit Wolf',0,0,{extraInputs:{grizzlyLevel:40}});assert.equal(wolf20.min,wolf40.min);
+console.log('Passed: S14 changed damage, corrected synergies, summon hard points/pierce, and four-curse cap.');
+
+assert(fs.readFileSync(__dirname+'/index.html','utf8').includes('Updated for S14 Open Beta'));assert(!fs.readFileSync(__dirname+'/index.html','utf8').includes('seasons.js'));assert(!fs.readFileSync(__dirname+'/main.js','utf8').includes('seasonComparison'));
+console.log('Passed: S14 tagline and removal of seasonal comparison output.');

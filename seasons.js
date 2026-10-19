@@ -1,2 +1,0 @@
-// S14 beta Poison Nova: extracted Beta Patch Skills.txt and Missiles.txt, 2026-10-12.
-const seasonComparisons = {"necromancer-poison-nova":{"S14 beta":{"kind":"flat","damageType":"poison","min":[50.0,18.75,21.875,25.0,28.125,28.125],"max":[90.625,18.75,21.875,25.0,28.125,28.125],"synergy":[{"name":"Poison Strike","pctPerHardPoint":0.11},{"name":"Desecrate","pctPerHardPoint":0.11}],"source":"skill:Poison Nova","poisonDurationSec":2.0,"poisonLengthSteps":[50.0,0,0,0]}}};

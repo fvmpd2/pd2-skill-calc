@@ -121,7 +121,7 @@ Druid,Raven,Raven,221,yes,calculated,cold per application,"Cold damage per peck.
 Druid,Shock Wave,Shock Wave,243,yes,calculated,physical per application,"Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
 Druid,Solar Creeper,Vines,241,no,non-damaging,,"Buff, resistance, defensive or utility stat fields are not direct attack damage."
 Druid,Spirit of Barbs,Spirit of Barbs,246,yes,conditional,"Returned damage: Flat physical return (physical, per attacker hit)",Conditional returned damage when the protected target is hit; not an active attack or DPS.
-Druid,Summon Dire Wolf,Summon Fenris,237,yes,calculated,"Summon attack: Physical (physical, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
+Druid,Summon Dire Wolf,Summon Fenris,237,yes,calculated,"Summon attack: Physical (physical, per hit)","Includes the wolf’s level-based physical pierce (8% at level 1, +0.5% per level, capped at 20%; integer rounding). Grizzly bonus uses hard points."
 Druid,Summon Grizzly,Summon Grizzly,247,yes,calculated,"Summon attack: Physical (physical, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
 Druid,Summon Spirit Wolf,Summon Spirit Wolf,227,yes,calculated,"Summon attack: Physical (physical, per hit)","Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled."
 Druid,Tornado,Tornado,245,yes,calculated,"Collision hit: Physical (physical, per hit); Area pulse: Physical (physical, per pulse)",Area damage checks every 15 frames (0.6 s). Collision and pulse are separate sources; hit count depends on path and target overlap.

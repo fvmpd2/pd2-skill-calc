@@ -100,7 +100,7 @@ def audit(data,rows,missiles,descs,api):
    half=copy.deepcopy(f);half['min']=[v/2 for v in f['min']];half['max']=[v/2 for v in f['max']]
    e['charges']=[stage('Cast on enemy',[comp('Magic area damage',f)]),stage('Cast on ally',[comp('Magic area damage',half)],'Casting on an ally halves damage. Healing is not included.')]
   if name=='Dark Pact':
-   f['model']='dark-pact';extra(e,'curseCount','Curses on target',1,10);e['charges']=[stage('Dark Pact',[comp('Magic',f)],'+10% damage for each curse after the first. An uncursed target takes no Dark Pact damage.')]
+   f['model']='dark-pact';f['maxCurses']=int(numeric(r.get('calc1')) or 10);extra(e,'curseCount','Curses on target',1,f['maxCurses']);e['charges']=[stage('Dark Pact',[comp('Magic',f)],'+10% damage for each curse after the first. An uncursed target takes no Dark Pact damage.')]
   if name in ['Holy Fire','Holy Freeze','Holy Shock','Sanctuary']:
    hit=copy.deepcopy(f);factor=float(r['Param7' if name=='Sanctuary' else 'Param5']);hit['min']=[v*factor for v in hit['min']];hit['max']=[v*factor for v in hit['max']]
    e['charges']=[stage('Aura pulse',[comp('Pulse',f,'per pulse')]),stage('Added attack damage',[comp('Added '+f['damageType'],hit)],'Added to your weapon attack; weapon damage is not included.')]
@@ -132,7 +132,7 @@ def audit(data,rows,missiles,descs,api):
   if name in ['Raise Skeleton','Raise Skeleton Archer']:
    if name=='Raise Skeleton':
     steps=[numeric(r.get('EMin')) or 0]+[numeric(r.get('EMinLev'+str(i))) or 0 for i in range(1,6)];sf={'kind':'flat','damageType':'physical','min':[steps[0]+1]+steps[1:],'max':[steps[0]+2]+steps[1:],'synergy':syn(r['passivecalc4'],r),'source':'summon base 1–2 + skill EMin','model':'skeleton-warrior'}
-   else:sf=physical;sf['model']='skeleton-archer'
+   else:sf=physical;sf['model']='skeleton-archer';sf['synergy']=syn(r['passivecalc4'],r)
    e['formula']=sf;e['charges']=[stage('Summon attack',[comp('Physical',sf)],'Per skeleton hit; no army-total DPS or critical-hit averaging.')];extra(e,'masteryLevel','Skeleton Mastery (effective level)',20);extra(e,'summonEd','Other summon enhanced damage (%)');e['auditDetail']='Includes mastery flat damage, hard-point synergies and skill enhanced damage. Does not include summon attack speed, crits, external elemental damage or army DPS.'
   if name=='Raise Skeletal Mage':
    e['charges']=[]
@@ -142,9 +142,13 @@ def audit(data,rows,missiles,descs,api):
   if name=='Revive':
    wp=weapon(r,30,30,"skill('Desecrate'.blvl)*par8",'summon-base');e['formula']=wp;e['charges']=[stage('Revived monster attack',[comp('Physical',wp)],'Physical attack only; monster spells, elemental attacks and equipment-dependent effects vary by monster.')];extra(e,'summonMin','Monster base physical Min');extra(e,'summonMax','Monster base physical Max');extra(e,'summonEd','Other summon enhanced damage (%)');e['info']='Physical bonus: +30% per Revive level, +20% per Desecrate hard point. Elemental bonus: +20% per Revive level, +10% per Desecrate hard point; monster elemental/spell damage is not calculated.';e['auditStatus']='partial';e['auditDetail']=e['info']
   if name in ['Summon Spirit Wolf','Summon Fenris','Summon Grizzly']:
-   sf=e['formula'];sf['model']='druid-summon';sf['ownGrizzly']=name=='Summon Grizzly';e['charges']=[stage('Summon attack',[comp('Physical',sf)],'Per summon hit; Grizzly’s passive enhanced damage is included. Enter aura/gear enhanced damage separately.')];extra(e,'summonEd','Other summon enhanced damage (%)')
-   if name!='Summon Grizzly':extra(e,'grizzlyLevel','Summon Grizzly (effective level)',0)
-   if name=='Summon Fenris':extra(e,'corpseFed','Corpse-fed buff (0 = off, 1 = on)',0,1)
+   sf=e['formula'];sf['model']='druid-summon';sf['ownGrizzly']=name=='Summon Grizzly';sf['grizzlyHardPoints']=".blvl) > 0" in r.get('passivecalc3','');sf['corpseFedEd']=numeric(r.get('Param5')) or 100;
+   if r.get('passivestat4')=='passive_phys_pierce':sf['levelPhysicalPierce']={'base':8,'perLevel':0.5,'cap':20}
+   e['charges']=[stage('Summon attack',[comp('Physical',sf)],'Per summon hit; Grizzly’s passive enhanced damage is included. Enter aura/gear enhanced damage separately.')];extra(e,'summonEd','Other summon enhanced damage (%)')
+   if name!='Summon Grizzly':extra(e,'grizzlyLevel','Summon Grizzly (hard points)' if sf['grizzlyHardPoints'] else 'Summon Grizzly (effective level)',0,20 if sf['grizzlyHardPoints'] else 100)
+   if name=='Summon Fenris':
+    extra(e,'corpseFed','Corpse-fed buff (0 = off, 1 = on)',0,1)
+    if sf.get('levelPhysicalPierce'):e['info']='Includes the wolf’s level-based physical pierce (8% at level 1, +0.5% per level, capped at 20%; integer rounding). Grizzly bonus uses hard points.';e['auditDetail']=e['info']
   if name=='Raven':
    e['info']='Cold damage per peck shown. Native physical attack damage depends on the summoned monster’s level and is not in the uploaded files.';e['auditStatus']='partial';e['auditDetail']=e['info']
   if (numeric(r.get('SrcDam')) or 0)>0 and name not in ['Raise Skeleton Archer'] and e.get('formula') and not e.get('charges'):

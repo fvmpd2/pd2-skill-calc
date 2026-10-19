@@ -1,6 +1,6 @@
-# PD2 Damage Calculator
+# PD2 Damage Calculator — S14 Open Beta
 
-A compact calculator for supported Project Diablo 2 skill damage, built with AI. Choose a class and skill, enter your levels and modifiers, and compare damage before and after enemy resistance.
+A compact calculator for supported Project Diablo 2 skill damage, built with AI, using the uploaded S14 Open Beta data (20 October 2026). Choose a class and skill, enter your levels and modifiers, and compare damage before and after enemy resistance.
 
 ## What it calculates
 
@@ -8,7 +8,6 @@ A compact calculator for supported Project Diablo 2 skill damage, built with AI.
 - Hard-point synergies, mastery and skill-specific modifiers such as Dark Pact curse count.
 - Enemy resistance, ordinary −enemy resistance and immunity-breaking reductions.
 - Poison duration before/after pierce, damage per frame (25 fps), per second and total damage.
-- S14 beta Poison Nova comparison below the main S13 damage, with before/after-resistance values and percentage changes in average damage.
 - Automatic Fire/Lightning/Cold Mastery from your effective level (including +skills); equipment bonuses stay separate. Defaults/reset use level 0.
 - Sorceress damage with and without the Teleport debuff.
 - An optional **hypothetical** Critical/Deadly Strike comparison for Shock Wave, Twister and Tornado, including outcome chances and average damage. Their in-game eligibility is not verified. These three skills compare +1 skill level against +10 percentage points of Deadly Strike chance (capped at 100%), using the expected average damage with your current Critical/Deadly Strike multipliers.
@@ -19,7 +18,7 @@ Weapon-dependent player skills are excluded; Barbarian offers War Cry only. Summ
 
 Open [the calculator](https://fvmpd2.github.io/pd2-skill-calc/) or download the files and open `index.html` locally. No installation or account is needed.
 
-Skill levels include gear; synergy levels are hard points. Synergies default to 20 hard points. With four or more, only three default to 20, prioritizing the largest bonuses; all are editable. Changing skills clears damage and resistance modifiers and discards custom scaling, restoring the original S13 values. **Reset** keeps your selected class/skill and restores default inputs and synergies.
+Skill levels include gear; synergy levels are hard points. Synergies default to 20 hard points. With four or more, only three default to 20, prioritizing the largest bonuses; all are editable. Changing skills clears damage and resistance modifiers and discards custom scaling, restoring the original S14 Open Beta values. **Reset** keeps your selected class/skill and restores default inputs and synergies.
 
 Use **Copy build link** or bookmark the updated address to save your setup. Compact links include applied scaling edits and display preferences. Older saved links remain supported. Future game-data updates can change their results.
 
@@ -35,7 +34,7 @@ Breaking pierce is halved against initial immunity; ordinary −enemy resistance
 
 The poison-length effect uses the requested half-pierce model: target PLR minus half of ordinary pierce, clamped to −100–75%. This rule is **not independently confirmed for PD2**; integer-frame and fixed-point rounding are not reproduced.
 
-Meteor’s supplied impact formula uses Fire Ball, Blaze and Inferno; its ground-fire formula uses Fire Ball, Blaze and Fire Wall instead (6% per hard point). The Fire Wall input is marked as ground-fire only. Normal component rows are grouped before their Teleport comparison rows.
+S14 Meteor impact and ground fire both use Fire Ball, Blaze and Inferno at 6% per hard point. See [S14_CHANGES.md](S14_CHANGES.md) for source changes and scope, and [SOURCE_MANIFEST.json](SOURCE_MANIFEST.json) for the exact input fingerprints.
 
 Thunder Storm shows one shared strike/nova damage range. Those effects roll independently; whether its nova rolls separately for each monster remains unverified. Other source/tooltip discrepancies and component limitations are documented in [SKILL_AUDIT.md](SKILL_AUDIT.md), with a [CSV audit](SKILL_AUDIT.csv) covering all 231 source entries.
 
@@ -43,7 +42,7 @@ Found an issue? Tag **fvm** on the PD2 Discord. For more detailed planning, use 
 
 ## Development
 
-The website needs `index.html`, `style.css`, `skills.js`, `seasons.js`, `calc.js` and `main.js`. Deploy these together to GitHub Pages; the original game files are not needed to run it.
+The website needs `index.html`, `style.css`, `skills.js`, `calc.js` and `main.js`. Deploy these together to GitHub Pages; the original game files are not needed to run it.
 
 Run the automated formula and UI-logic checks with:
 
