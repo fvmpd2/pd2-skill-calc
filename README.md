@@ -14,6 +14,12 @@ A compact calculator for supported Project Diablo 2 skill damage, built with AI,
 
 Weapon-dependent player skills are excluded; Barbarian offers War Cry only. Summons use Hell data. Iron Golem and Revive are omitted.
 
+## Layout and repeated casts
+
+Controls sit beside average damage on desktop and stack on phones. Deadly Strike chance stays visible beside −enemy res for the Druid strike comparisons. Breaking pierce stays visible; skill notes, Critical Strike and calculation details are expandable. Detailed Min/Max ranges and strike outcomes remain in Calculation breakdown.
+
+Poison Nova includes FCR, human Necromancer cast frames and average double/triple-cast totals after resistance. These totals count damage between casts plus the final full poison duration, assuming every cast hits the same target and each application refreshes poison without stacking. They are an estimate, not a simulation of missile travel, misses, changing damage or target life. FCR is saved in build links. [FCR breakpoints](https://wiki.projectdiablo2.cn/wiki/Breakpoints#快速施法速度_Faster_Cast_Rate).
+
 ## Mobile use
 
 Phone layouts keep Skill damage and −Enemy res together, with target resistance below. Inputs use larger touch targets and text, and wide breakdown/strike tables scroll within their panel. Tap the Breaking pierce “?” for help. Copy build link offers a selectable fallback when clipboard access is unavailable.
@@ -26,11 +32,11 @@ Skill levels include gear; synergy levels are hard points. Synergies default to 
 
 Use **Copy build link** or bookmark the updated address to save your setup. Compact links include applied scaling edits and display preferences. Older saved links remain supported. Future game-data updates can change their results.
 
-**Truncate numbers** displays whole damage values; unchecking it shows up to three decimal places. The collapsed scaling editor lets you adjust starting Min/Max and five level tiers for the current browser session.
+**Whole numbers** displays whole damage values; unchecking it shows up to three decimal places. The collapsed scaling editor lets you adjust starting Min/Max and five level tiers for the current browser session.
 
 ## Important limits
 
-Results describe the listed damage applications, not complete character or army DPS. Hit chance, projectile overlap, attack/cast speed and persistent-effect timing are not simulated. Corpse Explosion and Death Sentry show a note for corpse-life damage but do not calculate that contribution.
+Results describe the listed damage applications, not complete character or army DPS. Hit chance, projectile overlap, attack speed and persistent-effect timing are not simulated, except the explicit Poison Nova repeated-cast estimate. Corpse Explosion and Death Sentry show a note for corpse-life damage but do not calculate that contribution.
 
 Breaking pierce and −enemy resistance inputs accept either sign: `75` and `−75` both mean a 75-point reduction. Enemy starting resistance retains its actual sign.
 

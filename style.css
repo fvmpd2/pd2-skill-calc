@@ -122,3 +122,63 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
  .scaling-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(max-width:420px){.selectors{grid-template-columns:minmax(0,1fr)}h1{font-size:21px}.critical-inputs{grid-template-columns:1fr}#synergies{gap:12px}}
+
+/* Balanced controls/results layout. */
+.wrap{max-width:1120px;font-size:14px;line-height:1.5}
+header{text-align:left;margin-bottom:22px}.ai-credit{margin-left:0;font-size:12px}
+.selectors{grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);justify-content:start;gap:14px;margin:0 0 12px;max-width:650px}
+.selectors label{min-width:0}.selectors select{width:100%;height:42px;margin-top:5px}
+.build-actions{margin-bottom:22px}.build-actions button{font-size:12px;min-height:40px}
+.workspace{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1.2fr);gap:28px;align-items:start}
+.control-column,.workspace>*{min-width:0}.columns{display:block}
+.control-column>.columns>.panel,.control-column>#criticalPanel{background:none;border:0;box-shadow:none;border-radius:0;border-bottom:1px solid var(--border);margin:0 0 18px}
+.control-column .panel h2{background:none;border:0;text-shadow:none;padding:0;color:var(--orange);font:500 15px/1.5 system-ui}
+.control-column .content{padding:10px 0 18px}.content>label{max-width:none}
+.control-column label,.breaking-box,.charge-modifier .fields label,.modifier-type{font-size:12px;font-weight:400}
+.control-column input,.control-column select{min-height:40px;max-width:100%;font-size:14px}
+.control-column .fields,#normalModifiers .fields,.charge-modifier .fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:stretch;min-height:0;grid-template-rows:none}
+#normalModifiers .fields>label[data-modifier],.charge-modifier .fields>label[data-modifier],#normalBreaking,.charge-modifier .fields>.breaking-box{grid-column:auto;grid-row:auto}
+.fields>label,.breaking-box{display:flex;flex-direction:column;justify-content:space-between;gap:5px;min-width:0}
+.fields>label>input,.breaking-box>input{margin-top:0}.breaking-help-text{order:3}
+#normalModifiers .fields>label[data-modifier="bonus"],.charge-modifier .fields>label[data-modifier="bonus"]{grid-column:1;grid-row:1}
+#normalModifiers .fields>label[data-modifier="pierce"],.charge-modifier .fields>label[data-modifier="pierce"]{grid-column:2;grid-row:1}
+#normalModifiers .fields>label[data-modifier="res"],.charge-modifier .fields>label[data-modifier="res"]{grid-column:1;grid-row:2}
+#normalBreaking,.charge-modifier .fields>.breaking-box{grid-column:2;grid-row:2;margin:0}
+#normalModifiers .fields>label[data-modifier="plr"],.charge-modifier .fields>label[data-modifier="plr"]{grid-column:1;grid-row:3}
+#normalBreaking>.breaking-box{height:100%}.breaking-box input{width:100%;max-width:100%}
+#normalModifiers:has(input:disabled) label[data-modifier="bonus"],.charge-modifier label[data-modifier="bonus"]:has(input:disabled){visibility:hidden}
+#synergies{border:0;margin:0;padding:0}#synergies:before{display:none}
+.synergy-details summary,.about-skill summary,#criticalDetails summary{font:500 13px/1.5 system-ui;padding:8px 0;color:var(--muted)}
+#synergyNote{font-size:12px;margin:12px 0}.skill-info{background:none;margin-top:10px}
+#criticalPanel .critical-inputs{grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+#criticalPanel small{font-size:11px}.critical-inputs input{margin-top:5px}
+.results{position:static;align-self:start;background:#1c120e;border:0;border-top:2px solid #a44e24;box-shadow:none}
+.results h2{background:none;border:0;font:500 15px/1.5 system-ui;padding:18px 18px 0}.results>.content{padding:12px 18px 18px}
+.results table{table-layout:fixed;width:100%}.results th,.results td{white-space:normal;overflow-wrap:anywhere;padding:12px 5px;font-size:13px}
+.results th{font-size:12px;font-weight:400;color:var(--muted)}
+.results th:first-child,.results td:first-child,.charge-stage th:first-child,.charge-stage td:first-child{width:36%}
+.normal-row td:nth-child(n+2){font-weight:500;color:#d3bba0;font-size:16px;background:none}
+.normal-row td:last-child{color:#ffda9e;font-size:18px}.normal-row{background:none}
+.teleport-row td{font-size:13px}.charge-stage h3{font-size:13px;font-weight:500}
+.damage-breakdown table{table-layout:auto;min-width:620px}.damage-breakdown th,.damage-breakdown td{white-space:nowrap;font-size:11px}
+.damage-breakdown summary{font-size:13px;color:var(--muted)}
+.critical-stats{grid-template-columns:1fr}.critical-stats>div{background:none;border:0;padding:4px 0}
+#poisonResults{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.poison-card{background:none;border:0;padding:3px 0}.poison-card strong{font-size:13px}
+.poison-recast{margin:14px 0;padding:14px;border:1px solid var(--border);border-radius:5px;background:var(--input)}
+.poison-recast h3{color:var(--orange);font-size:14px;font-weight:500;margin:0 0 10px}
+.cast-speed{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:end}
+.cast-speed input{max-width:100%;min-height:40px}.cast-speed p{font-size:12px;color:var(--muted)}
+.cast-total{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px}.cast-total strong{font-weight:500;color:#ffda9e;font-variant-numeric:tabular-nums}
+.poison-recast small{display:block;font-size:11px;color:var(--muted);margin-top:10px}
+@media(max-width:750px){
+ .workspace{grid-template-columns:minmax(0,1fr);gap:16px}
+ .selectors{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)}
+ .control-column input,.control-column select,.cast-speed input{font-size:16px;min-height:44px}
+ .results>.content{padding:12px}.results h2{padding:14px 12px 0}
+ .results th,.results td{padding:10px 4px}.normal-row td:nth-child(n+2){font-size:15px}
+ .results .damage-breakdown th,.results .damage-breakdown td{white-space:nowrap}
+}
+/* Put the always-visible Deadly Strike chance beside ordinary reduction. */
+#deadlyChanceField{visibility:visible!important;grid-column:1!important;grid-row:1!important}
+#deadlyFields{margin-bottom:10px}
+#normalModifierFields:has(#deadlyChanceField)>label[data-modifier="bonus"]:not(#deadlyChanceField),.charge-modifier .fields:has(#deadlyChanceField)>label[data-modifier="bonus"]:not(#deadlyChanceField){display:none}

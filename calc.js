@@ -99,3 +99,17 @@ function sorceressMastery(type,level){
  if(type==='cold')return {damagePct:10+2*(lvl-1),piercePct:Math.min(5+lvl-1,45)};
  return {damagePct:0,piercePct:0};
 }
+
+/** Human Necromancer FCR; repeated poison applications refresh rather than stack.
+ * Assumes unchanged damage/defences and every cast hits the same target.
+ */
+function poisonNovaCasts(result,fcr=0){
+ const rate=Number.isFinite(Number(fcr))?Math.max(0,Number(fcr)):0;
+ const thresholds=[0,9,18,30,48,75,125];
+ const frames=16-thresholds.filter(t=>rate>=t).length;
+ const duration=Math.max(0,result.durationSec||0);
+ const dps=Math.max(0,((result.dpsMin||0)+(result.dpsMax||0))/2);
+ const earlyDamage=dps*Math.min(frames/25,duration);
+ const singleDamage=dps*duration;
+ return {frames,singleDamage,doubleDamage:singleDamage+earlyDamage,tripleDamage:singleDamage+2*earlyDamage};
+}
