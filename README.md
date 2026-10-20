@@ -14,6 +14,10 @@ A compact calculator for supported Project Diablo 2 skill damage, built with AI,
 
 Weapon-dependent player skills are excluded; Barbarian offers War Cry only. Summons use Hell data. Iron Golem and Revive are omitted.
 
+## Mobile use
+
+Phone layouts keep Skill damage and −Enemy res together, with target resistance below. Inputs use larger touch targets and text, and wide breakdown/strike tables scroll within their panel. Tap the Breaking pierce “?” for help. Copy build link offers a selectable fallback when clipboard access is unavailable.
+
 ## Using it
 
 Open [the calculator](https://fvmpd2.github.io/pd2-skill-calc/) or download the files and open `index.html` locally. No installation or account is needed.

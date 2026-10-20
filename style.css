@@ -79,3 +79,46 @@ th,td,.charge-stage th,.charge-stage td,.damage-breakdown th,.damage-breakdown t
 #normalModifiers .fields>label[data-modifier="pierce"],.charge-modifier .fields>label[data-modifier="pierce"]{grid-column:2;grid-row:1}
 #normalModifiers .fields>label[data-modifier="res"],.charge-modifier .fields>label[data-modifier="res"]{grid-column:3;grid-row:1}
 #normalModifiers .fields>label[data-modifier="plr"],.charge-modifier .fields>label[data-modifier="plr"]{grid-column:3;grid-row:2}
+
+/* Mobile Safari: contain wide results, readable controls, and touch targets. */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+.columns>*,.panel,.content,.table-scroll,.selectors>*,.fields>*,.charge-stage{min-width:0}
+.table-scroll{max-width:100%;-webkit-overflow-scrolling:touch}
+.breaking-help-text{display:block;font-size:var(--font-helper);font-weight:400;line-height:1.5;color:var(--muted);margin:5px 0}
+@media(max-width:750px){
+ :root{--font-body:14px;--font-helper:12px;--font-subheading:15px;--font-section:17px}
+ body{background-attachment:scroll}
+ .wrap{padding:12px max(12px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left))}
+ .selectors{grid-template-columns:repeat(2,minmax(0,1fr))}
+ label{line-height:1.4}
+ input:not([type=checkbox]),select,textarea,.build-actions input{font-size:16px;min-width:0;min-height:44px}
+ input[type=number],.content>label,#teleportField select{max-width:100%}
+ button,.build-actions button{min-height:44px;padding:10px 14px;touch-action:manipulation}
+ summary,.damage-breakdown summary,.synergy-details summary{min-height:44px;line-height:1.5;padding-top:11px;padding-bottom:11px;touch-action:manipulation}
+ .build-actions{gap:10px}.build-actions span{flex-basis:100%}
+ .results h2{gap:10px;flex-wrap:wrap}.truncate-control{min-height:36px;gap:8px}
+ .truncate-control input{width:22px;height:22px;flex-shrink:0}
+ .ai-credit{line-height:1.6}.ai-credit a{display:inline-block;padding:3px 0}
+ .fields label{min-height:0}.fields label input{margin-top:6px}
+ .charge-stage table,#normalResults>.table-scroll>table{table-layout:fixed;width:100%}
+ .charge-stage th,.charge-stage td,#normalResults>.table-scroll th,#normalResults>.table-scroll td{white-space:normal;overflow-wrap:anywhere;padding:9px 6px}
+ .charge-stage th:first-child,.charge-stage td:first-child,#normalResults>.table-scroll th:first-child,#normalResults>.table-scroll td:first-child{width:28%}
+ .normal-row td:nth-child(n+2){font-size:15px;line-height:1.45}
+ .damage-breakdown table{min-width:620px;table-layout:auto}.damage-breakdown th,.damage-breakdown td{white-space:nowrap;overflow-wrap:normal}
+ #criticalResults table,.component-critical table{min-width:560px}
+ .compare,.critical-expected,.charge-total,.skill-info{line-height:1.6;overflow-wrap:anywhere}
+ .critical-stats{grid-template-columns:1fr}.critical-inputs{gap:14px 10px}
+ .breaking-help{width:28px;height:28px;font-size:14px;vertical-align:middle;touch-action:manipulation}
+ .poison-card{padding:9px}.poison-card strong{font-size:14px;overflow-wrap:anywhere}
+}
+@media(max-width:600px){
+ #normalModifiers .fields,.charge-modifier .fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 10px;min-height:0}
+ #normalModifiers .fields>label[data-modifier="bonus"],.charge-modifier .fields>label[data-modifier="bonus"]{grid-column:1;grid-row:1}
+ #normalModifiers .fields>label[data-modifier="pierce"],.charge-modifier .fields>label[data-modifier="pierce"]{grid-column:2;grid-row:1}
+ #normalModifiers .fields>label[data-modifier="res"],.charge-modifier .fields>label[data-modifier="res"]{grid-column:1;grid-row:2}
+ #normalModifiers .fields>label[data-modifier="plr"],.charge-modifier .fields>label[data-modifier="plr"]{grid-column:2;grid-row:2}
+ #normalBreaking,.charge-modifier .fields>.breaking-box{grid-column:1 / -1;grid-row:3}
+ #normalBreaking input,.charge-modifier .fields>.breaking-box input{max-width:100%}
+ .scaling-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:420px){.selectors{grid-template-columns:minmax(0,1fr)}h1{font-size:21px}.critical-inputs{grid-template-columns:1fr}#synergies{gap:12px}}

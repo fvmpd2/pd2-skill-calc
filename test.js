@@ -321,3 +321,8 @@ console.log('Passed: S14 changed damage, corrected synergies, summon hard points
 
 assert(fs.readFileSync(__dirname+'/index.html','utf8').includes('Updated for S14 Open Beta'));assert(!fs.readFileSync(__dirname+'/index.html','utf8').includes('seasons.js'));assert(!fs.readFileSync(__dirname+'/main.js','utf8').includes('seasonComparison'));
 console.log('Passed: S14 tagline and removal of seasonal comparison output.');
+
+// Breaking-pierce help works by tap and keyboard, without relying on hover.
+const tapHelp=vm.runInContext("breakingLabel('poison')",c);const helpButton=tapHelp.children[0].children[0],explanation=tapHelp.children.at(-1);
+assert(explanation.hidden);assert.equal(helpButton.role,'button');helpButton.listeners.click({preventDefault(){}});assert(!explanation.hidden);assert.equal(helpButton.ariaExpanded,'true');helpButton.listeners.keydown({key:'Enter',preventDefault(){}});assert(explanation.hidden);
+console.log('Passed: touch/keyboard resistance help.');

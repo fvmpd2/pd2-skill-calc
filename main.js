@@ -64,8 +64,11 @@ function breakingLabel(type){
  const title=document.createElement('span');title.textContent='Breaking pierce (%) ';
  const help=document.createElement('span');help.className='breaking-help';help.textContent='?';help.tabIndex=0;
  help.title=`${type[0].toUpperCase()+type.slice(1)} immunity-breaking skills: ${(breakingSources[type]||[]).join(', ')}. Enter their combined reduction with either sign (75 and −75 are equivalent). Against immunity, the total is halved; combining odd-valued sources can differ slightly from individual in-game rounding.`;
- help.ariaLabel=help.title;title.append(help);box.append(title);
- const input=document.createElement('input');input.type='number';input.step=1;input.value='0';input.ariaLabel=`${type} Breaking pierce (%)`;input.dataset.type=type;input.dataset.modifier='breaking';input.addEventListener('input',compute);box.append(input);return box;
+ help.ariaLabel=help.title;help.role='button';help.ariaExpanded='false';title.append(help);box.append(title);
+ const explanation=document.createElement('small');explanation.className='breaking-help-text';explanation.textContent=help.title;explanation.hidden=true;
+ const toggleHelp=event=>{event.preventDefault();explanation.hidden=!explanation.hidden;help.ariaExpanded=String(!explanation.hidden);};
+ help.addEventListener('click',toggleHelp);help.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' ')toggleHelp(event);});
+ const input=document.createElement('input');input.type='number';input.step=1;input.value='0';input.ariaLabel=`${type} Breaking pierce (%)`;input.dataset.type=type;input.dataset.modifier='breaking';input.addEventListener('input',compute);box.append(input);box.append(explanation);return box;
 }
 function setupCharges(){
  const charge=!!active.charges;$('chargeModifiers').hidden=!charge;$('normalModifiers').hidden=charge;$('chargeResults').hidden=!charge;$('normalResults').hidden=charge;$('chargeEditorField').hidden=!charge;
@@ -142,7 +145,7 @@ function renderCriticalDamage(component,target=null){
 }
 
 // Store a self-contained build in the URL fragment: GitHub Pages needs no backend.
-var linkReady=false,restoringBuild=false;
+var linkReady=false,restoringBuild=false,buildLinkTimer=null,lastBuildLinkUpdate=0;
 const buildFields=['level','pct','pierce','enemyRes','enemyPlr','weaponMin','weaponMax','otherEd','teleportLevel','criticalChance','deadlyChance','criticalBonus','deadlyBonus','masteryLevel'];
 function collectBuild(){
  const values=Object.fromEntries(buildFields.map(id=>[id,String(n(id))]));
@@ -162,7 +165,14 @@ function expandBuild(compact){
  return {v:1,skill:skill.id,values:Object.fromEntries(buildFields.map((id,i)=>[id,String(compact[1][i]??(['level','teleportLevel'].includes(id)?1:0))])),synergies:entries(compact[2]),extras:entries(compact[3]),modifiers:compact[4].map(([key,type,value])=>({key,type,value:String(value)})),editor:compact[5],truncated:!!compact[6],scaling:Object.fromEntries(compact[7].map(([key,min,max])=>[key,{min,max}]))};
 }
 function buildUrl(){const url=new URL(window.location.href);url.hash='b='+encodeURIComponent(JSON.stringify(compactBuild(collectBuild())));return url.href;}
-function syncBuildLink(){if(!linkReady||restoringBuild||typeof window==='undefined')return;try{window.history.replaceState(null,'',buildUrl());}catch(e){/* Local-file browsers can disallow history updates; copying still works. */}}
+function syncBuildLink(){
+ if(!linkReady||restoringBuild||typeof window==='undefined')return;
+ const update=()=>{lastBuildLinkUpdate=Date.now();try{window.history.replaceState(null,'',buildUrl());}catch(e){/* Copy still uses the current inputs when history is unavailable. */}};
+ // Safari rate-limits history changes. Keep rapid typing below that limit.
+ if(typeof setTimeout==='undefined'){update();return;}
+ clearTimeout(buildLinkTimer);const delay=Math.max(0,500-(Date.now()-lastBuildLinkUpdate));
+ if(delay)buildLinkTimer=setTimeout(update,delay);else update();
+}
 function restoreBuild(hash){
  if(!hash.startsWith('#build=')&&!hash.startsWith('#b='))return false;
  try{
@@ -196,7 +206,7 @@ $('resetBuild').addEventListener('click',()=>{
 });
 $('copyBuild').addEventListener('click',async()=>{
  try{const url=buildUrl();await navigator.clipboard.writeText(url);$('linkFeedback').textContent='Build link copied. Save it as a bookmark or share it.';}
- catch(e){$('linkFallback').value=buildUrl();$('linkFallback').hidden=false;$('linkFallback').select();$('linkFeedback').textContent='Copy the link from the box below.';}
+ catch(e){$('linkFallback').value=buildUrl();$('linkFallback').hidden=false;$('linkFallback').focus();$('linkFallback').select();$('linkFallback').setSelectionRange(0,$('linkFallback').value.length);$('linkFeedback').textContent='Copy the link from the box below.';}
 });
 refreshSkillList();
 if(typeof window!=='undefined'){restoreBuild(window.location.hash);linkReady=true;window.addEventListener('hashchange',()=>restoreBuild(window.location.hash));}
