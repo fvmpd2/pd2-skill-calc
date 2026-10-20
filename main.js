@@ -75,7 +75,7 @@ function setupCharges(){
  const holder=$('chargeModifiers');holder.replaceChildren();
  for(const type of new Set(active.charges.flatMap(stage=>stage.components.flatMap(c=>[c.formula.damageType,...(c.formula.bonusType?[c.formula.bonusType]:[])])))){
   const box=document.createElement('div');box.className='charge-modifier';const h=document.createElement('h3');h.textContent=type[0].toUpperCase()+type.slice(1);box.append(h);const fields=document.createElement('div');fields.className='fields';
-  const specs=[['bonus','+ Skill damage',0],['res','Enemy res',0],['pierce','−Enemy res %',0]];if(type==='poison')specs.push(['plr','Poison length reduction (%)',0]);
+  const specs=[['bonus','+ Skill damage',0],['pierce','−Enemy res %',0],['res','Enemy res',0]];if(type==='poison')specs.push(['plr','Poison length reduction (%)',0]);
   for(const [key,title,initial] of specs){const label=document.createElement('label');label.textContent=title+(active.className==='Sorceress'&&['bonus','pierce'].includes(key)?' (equipment only)':'');label.dataset.modifier=key;const input=document.createElement('input');input.type='number';input.value=String(initial);input.dataset.type=type;input.dataset.modifier=key;if(key==='bonus'&&type==='physical'){input.disabled=true;input.title='Skill damage bonus does not apply to physical damage.';}input.addEventListener('input',compute);label.append(input);fields.append(label);}fields.append(breakingLabel(type));box.append(fields);holder.append(box);
  }
 }

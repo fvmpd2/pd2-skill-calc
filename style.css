@@ -21,7 +21,7 @@ header{margin-bottom:12px}h1{color:#ffc36c;text-shadow:0 0 15px #fc4a1c66,0 2px 
 summary{color:#ffa24c}select,input,textarea{background:#0b0807;border-color:#793d26;color:#ebd3ba}input:focus,select:focus,textarea:focus{outline-color:#ff8b39;box-shadow:0 0 8px #ff4f1b33}
 button{background:linear-gradient(#ad3d18,#6c1c0d);border-color:#e17636;color:#ffe4bc}.secondary{background:linear-gradient(#34201a,#1b100d);border-color:#8e442c}
 .fields{align-items:stretch}.fields label{display:flex;flex-direction:column;justify-content:flex-end}.fields input{flex-shrink:0}
-.charge-modifier{border-color:#6b2b1a}.charge-modifier h3,.charge-stage h3{color:#ffa24c}.charge-modifier .fields label[data-modifier="res"]{grid-column:2}.charge-modifier .fields label[data-modifier="pierce"]{grid-column:3}.charge-modifier .fields label[data-modifier="bonus"]{grid-column:1}.charge-modifier .fields label[data-modifier="plr"]{grid-column:1}
+.charge-modifier{border-color:#6b2b1a}.charge-modifier h3,.charge-stage h3{color:#ffa24c}
 #status:empty{display:none}#poisonResults{gap:6px;margin:7px 0 0;padding-top:7px}.poison-card{padding:6px 8px;border-color:#5e2c1d;background:#100a08}.poison-card span{color:#cda178;font-size:11px;line-height:1.2}.poison-card strong{font-size:13px;margin:3px 0 0;line-height:1.2}.charge-stage td[colspan="5"]{font-size:11px;color:var(--muted);padding:5px 8px}
 .scaling-tier{background:#100b09;border-color:#5d2b1b}.scaling-tier:first-child{border-color:#b2572c}.scaling-tier h3,.charge-total{color:#ffac59}.site-notice{background:#130c09;border-color:#5e2c1d;font-size:11px;padding:7px 10px}.site-notice a{color:#ffb464}
 @media(max-width:750px){.charge-modifier .fields label[data-modifier]{grid-column:auto}}
@@ -38,11 +38,11 @@ button{background:linear-gradient(#ad3d18,#6c1c0d);border-color:#e17636;color:#f
 
 /* Consistent modifier slots for every component type. */
 #normalModifiers .fields,.charge-modifier .fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;align-items:end}
-#normalModifiers .fields>[data-modifier="bonus"],.charge-modifier .fields>[data-modifier="bonus"]{grid-column:1;grid-row:1}
-#normalModifiers .fields>[data-modifier="res"],.charge-modifier .fields>[data-modifier="res"]{grid-column:2;grid-row:1}
-#normalModifiers .fields>[data-modifier="pierce"],.charge-modifier .fields>[data-modifier="pierce"]{grid-column:3;grid-row:1}
+
+
+
 #normalBreaking,.charge-modifier .fields>.breaking-box{grid-column:1;grid-row:2;margin:0}
-#normalModifiers .fields>[data-modifier="plr"],.charge-modifier .fields>[data-modifier="plr"]{grid-column:2;grid-row:2}
+
 .charge-modifier .fields,#normalModifiers .fields{grid-template-rows:auto auto;min-height:110px}.fields label{font-size:11px}.fields input:disabled{opacity:.4}.breaking-box{font-size:11px}.damage-type-label{font-size:11px}
 .results h2{display:flex;justify-content:space-between;align-items:center}.truncate-control{display:flex;align-items:center;gap:5px;font:11px system-ui;color:var(--muted)}.truncate-control input{width:13px;height:13px;padding:0;margin:0;accent-color:#e68b40}
 .normal-row td:last-child,.teleport-row td:last-child{color:#ffd08c;font-weight:700}.teleport-row{background:#2c1a1055}.teleport-row td{color:#c8ab90}.damage-breakdown{border-top:1px solid var(--border);margin:8px 0 0!important}.damage-breakdown summary{font:12px system-ui;padding:8px 0}.damage-breakdown table{table-layout:auto}.damage-breakdown th,.damage-breakdown td{font-size:11px;white-space:nowrap}.damage-breakdown th:first-child,.damage-breakdown td:first-child{width:auto}#normalResistance{font-size:11px;margin:6px 0}.charge-stage td[colspan="3"]{font-size:11px;color:var(--muted)}
@@ -60,9 +60,9 @@ th,td,.charge-stage th,.charge-stage td,.damage-breakdown th,.damage-breakdown t
 @media(max-width:420px){.fields label,.breaking-box{font-size:var(--font-body)}}
 
 /* Player damage modifiers together; target resistance values on the right. */
-#normalModifiers .fields>[data-modifier="pierce"],.charge-modifier .fields>[data-modifier="pierce"]{grid-column:2;grid-row:1}
-#normalModifiers .fields>[data-modifier="res"],.charge-modifier .fields>[data-modifier="res"]{grid-column:3;grid-row:1}
-#normalModifiers .fields>[data-modifier="plr"],.charge-modifier .fields>[data-modifier="plr"]{grid-column:3;grid-row:2}
+
+
+
 
 .critical-inputs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 16px}.critical-inputs input{max-width:100%}.critical-inputs small{display:block;color:var(--muted);font-size:var(--font-helper);margin-top:4px}.critical-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:10px 0}.critical-stats>div{background:#29190f;border:1px solid #59331f;border-radius:5px;padding:9px}.critical-stats span{display:block;font-size:var(--font-helper);color:var(--muted)}.critical-stats strong{display:block;font-size:var(--font-subheading);color:#ffd08c;margin-top:4px}.critical-average{background:#38200f;color:#ffce87;font-weight:650}.critical-expected{font-size:var(--font-body);color:#e5bd90;margin:8px 0}#criticalPanel .muted{margin:10px 0 0}#criticalResults{border-top:1px solid var(--border);margin-top:10px;padding-top:2px}@media(max-width:600px){.critical-stats{grid-template-columns:1fr}.critical-inputs{gap:9px}}
 
@@ -73,3 +73,9 @@ th,td,.charge-stage th,.charge-stage td,.damage-breakdown th,.damage-breakdown t
 /* Main damage leads; beta figures are a quieter comparison below. */
 .normal-row{background:#3b2112;border-left:3px solid #db782e}.normal-row td:nth-child(n+2){color:#ffe2b3;font-weight:700;font-size:var(--font-subheading);padding-top:12px;padding-bottom:12px}.normal-row td:last-child{color:#ffca7d}
 
+
+/* Shared modifier slots and reading order for every skill. */
+#normalModifiers .fields>label[data-modifier="bonus"],.charge-modifier .fields>label[data-modifier="bonus"]{grid-column:1;grid-row:1}
+#normalModifiers .fields>label[data-modifier="pierce"],.charge-modifier .fields>label[data-modifier="pierce"]{grid-column:2;grid-row:1}
+#normalModifiers .fields>label[data-modifier="res"],.charge-modifier .fields>label[data-modifier="res"]{grid-column:3;grid-row:1}
+#normalModifiers .fields>label[data-modifier="plr"],.charge-modifier .fields>label[data-modifier="plr"]{grid-column:3;grid-row:2}
