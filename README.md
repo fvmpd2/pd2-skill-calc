@@ -60,7 +60,7 @@ Run the automated formula and UI-logic checks with:
 node test.js
 ```
 
-These checks are not a live in-game comparison or visual browser test.
+These checks are not a live in-game comparison. For the real-DOM recalculation regression, with Playwright and Chromium installed, run `node browser-test.cjs`. Set `PD2_BROWSER_PATH` if using an existing Chrome or Brave executable. This checks repeated Twister/Shock Wave edits, strike averages, saved links, reset and skill switching.
 
 To rebuild the data and audit with Python 3, keep the helper scripts together and supply the season's game files:
 
