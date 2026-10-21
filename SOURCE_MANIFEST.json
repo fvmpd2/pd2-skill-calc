@@ -1,18 +1,18 @@
 {
-  "season": "S14 Open Beta",
-  "extracted": "2026-10-20",
+  "season": "S14 Open Beta Patch 1",
+  "extracted": "2026-10-22",
   "archives": {
-    "pd2data.mpq": "f6722aa6544d2d15c0eff78a38c6783de334d83ee723ca23416024f23bed441b",
+    "pd2data.mpq": "666c4e90930b7f234777c69a2daa1294f7646b98a530327ccf58a3a9019ec39e",
     "patch_d2.mpq": "b976e7847dda696f54198a9477819f96579c4894f54381c72afb4937e919e0a9"
   },
   "tables": {
     "Skills": {
       "archive": "pd2data.mpq",
-      "sha256": "aaaf85fd4e1fe7698dd7b49eb2a43589ad70d4dfa0c575d0cbfe556a75cab26b"
+      "sha256": "0bf4da2418f1c5df5acf47e410f927bc1a036f69e0edbbf1ea4c74d4b21b0f8b"
     },
     "Missiles": {
       "archive": "pd2data.mpq",
-      "sha256": "38e395a8f50d1e0b5fb77fde971d2fe1ff95fd87263ca6de36051964c51eab61"
+      "sha256": "81a7b2b01dcada71dba61ed91d393015f2b6a855e3a295c1170da43866d0f880"
     },
     "SkillDesc": {
       "archive": "pd2data.mpq",
@@ -24,7 +24,7 @@
     },
     "MonStats": {
       "archive": "pd2data.mpq",
-      "sha256": "e9fea097888a5c353d67a029ba64d44f91579ebe4e90aaac6c2ca9b8fc2c48c8"
+      "sha256": "b743cc0040ee1646c05ee9e7c83be647f29e2e4c0a6ad43c465e36e6f4bdb8e4"
     },
     "MonLvl": {
       "archive": "pd2data.mpq",
@@ -33,22 +33,14 @@
   },
   "selectableSkills": 96,
   "changedDamageModels": [
-    "Fire Arrow",
-    "Frost Nova",
-    "Shiver Armor",
-    "Meteor",
-    "Chilling Armor",
-    "Raise Skeleton Archer",
-    "Poison Nova",
-    "Summon Spirit Wolf",
-    "Fissure",
-    "Summon Dire Wolf",
-    "Twister",
-    "Tornado",
-    "Summon Grizzly",
-    "Hurricane",
-    "Fists of Fire",
-    "Phoenix Strike",
-    "Dark Pact"
-  ]
+    "Poison Creeper",
+    "Fissure"
+  ],
+  "changedTimingModels": [
+    "Twister: next-hit delay 4 frames",
+    "Tornado: next-hit delay 4 frames"
+  ],
+  "binaries": {
+    "ProjectDiablo.dll": "17d5fb1b049d8076226d27295487b49c8b5f2629553c193a01aa1e3d8afaba57"
+  }
 }

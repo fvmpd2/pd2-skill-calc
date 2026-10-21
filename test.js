@@ -343,3 +343,11 @@ const beforeText=elements.damageRows.children[0].children[1].textContent;assert(
 const strikeBase=c.calc(skill('Twister').formula,{skillLevel:20,synergyPoints:Object.fromEntries(elements.synergies.querySelectorAll('input').map(e=>[e.dataset.synergy,Number(e.value)])),enemyResistancePct:25});c.strikeAverage=(strikeBase.min+strikeBase.max)/2*1.5;assert.equal(elements.damageRows.children[0].children[2].textContent,vm.runInContext('fmt(strikeAverage)',c));
 const detail=elements.normalBreakdown.children[0];assert(detail.children[0].textContent.includes('without Crit / DS'));assert(!detail.open);assert(!elements.criticalDetails.open);
 console.log('Passed: FCR boundaries, poison refresh/non-overlap/immunity, FCR build-link/reset, average-only preview and collapsed strike detail.');
+
+// Open Beta Patch 1: independent level-40 totals with all hard-point synergies.
+const creeperPatch=c.calc(skill('Poison Creeper').formula,{skillLevel:40,synergyPoints:{Rabies:20,'Carrion Vine':20,'Solar Creeper':20}});
+assert.equal(creeperPatch.min,9900);assert.equal(creeperPatch.max,9925);assert.equal(creeperPatch.durationSec,4);
+const fissurePatch=c.calc(skill('Fissure').formula,{skillLevel:40,synergyPoints:{Firestorm:20,'Molten Boulder':20}});
+assert(Math.abs(fissurePatch.min-4349.4)<1e-8);assert(Math.abs(fissurePatch.max-4930.2)<1e-8);
+for(const name of ['Twister','Tornado'])assert(skill(name).info.includes('4-frame next-hit delay (0.16 seconds)'));
+console.log('Passed: Open Beta Patch 1 Creeper/Fissure damage and next-hit timing notes.');

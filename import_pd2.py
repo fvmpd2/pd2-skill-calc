@@ -157,6 +157,13 @@ def make_data(skill_path,missile_path,desc_path=None,calc_path=None,monstats_pat
   if e['name']=='Thunder Storm':
    e.pop('charges',None);e['auditDetail']='One shared strike/nova lightning damage range is displayed. Wiki describes independent rolls; no doubled or combined hit is assumed.'
    e['info']='One shared lightning damage range for strike/nova; independent rolls are not added together.'
+  if e['name'] in ('Twister','Tornado'):
+   missile=missile_by_name[e['name'].lower()]
+   delay=numeric(missile.get('NextDelay',''))
+   if missile.get('NextHit')=='1' and delay:
+    note=f"The source missile has a {int(delay)}-frame next-hit delay ({delay/25:g} seconds). Damage shown is per application; repeated-hit timing and overlap are not simulated."
+    e['info']=(e.get('info','')+' '+note).strip()
+    e['auditDetail']+=' '+note
  stats['chargeSkills']=sum(bool(s.get('charges')) for s in out)
  stats['supported']=sum(s['formula'] is not None and not s.get('excluded') for s in out)
  stats['review']=len(out)-stats['supported']

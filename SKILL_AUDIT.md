@@ -49,11 +49,11 @@ Uploaded scaling is authoritative. Descriptions were cross-checked with the foll
 
 Input SHA-256 fingerprints:
 
-- Skills.txt: `aaaf85fd4e1fe7698dd7b49eb2a43589ad70d4dfa0c575d0cbfe556a75cab26b`
-- Missiles.txt: `38e395a8f50d1e0b5fb77fde971d2fe1ff95fd87263ca6de36051964c51eab61`
-- SkillDesc.txt: `f11f70872d61936090e77c33382ed0c2cb1f984d9e6509bce081fe2a9f4178a3`
+- Skills.txt: `0bf4da2418f1c5df5acf47e410f927bc1a036f69e0edbbf1ea4c74d4b21b0f8b`
+- Missiles.txt: `81a7b2b01dcada71dba61ed91d393015f2b6a855e3a295c1170da43866d0f880`
+- Skilldesc.txt: `f11f70872d61936090e77c33382ed0c2cb1f984d9e6509bce081fe2a9f4178a3`
 - MissCalc.txt: `3aaaea44299543cc09ca5b23835fbb46182ce6365757d8ff838513e28f1422b0`
-- MonStats.txt: `e9fea097888a5c353d67a029ba64d44f91579ebe4e90aaac6c2ca9b8fc2c48c8`
+- MonStats.txt: `b743cc0040ee1646c05ee9e7c83be647f29e2e4c0a6ad43c465e36e6f4bdb8e4`
 - MonLvl.txt: `bda243efe1d1e9591f75b8cf97ac73f78ff691362381f35cc000233eb46c092a`
 
 ## Amazon
@@ -200,8 +200,8 @@ Input SHA-256 fingerprints:
 | Summon Dire Wolf | yes | calculated | Summon attack: Physical (physical, per hit) — Includes the wolf’s level-based physical pierce (8% at level 1, +0.5% per level, capped at 20%; integer rounding). Grizzly bonus uses hard points. |
 | Summon Grizzly | yes | calculated | Summon attack: Physical (physical, per hit) — Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled. |
 | Summon Spirit Wolf | yes | calculated | Summon attack: Physical (physical, per hit) — Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled. |
-| Tornado | yes | calculated | Collision hit: Physical (physical, per hit); Area pulse: Physical (physical, per pulse) — Area damage checks every 15 frames (0.6 s). Collision and pulse are separate sources; hit count depends on path and target overlap. |
-| Twister | yes | calculated | physical per application — Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled. |
+| Tornado | yes | calculated | Collision hit: Physical (physical, per hit); Area pulse: Physical (physical, per pulse) — Area damage checks every 15 frames (0.6 s). Collision and pulse are separate sources; hit count depends on path and target overlap. The source missile has a 4-frame next-hit delay (0.16 seconds). Damage shown is per application; repeated-hit timing and overlap are not simulated. |
+| Twister | yes | calculated | physical per application — Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled. The source missile has a 4-frame next-hit delay (0.16 seconds). Damage shown is per application; repeated-hit timing and overlap are not simulated. |
 | Volcano | yes | calculated | Impact: Physical (physical, per hit); Impact: Fire (fire, per hit) — Single damage application; attack/cast timing, critical hits and repeated projectiles are not totaled. |
 | Werebear | no | non-damaging | Buff, resistance, defensive or utility stat fields are not direct attack damage. |
 | Werewolf | no | non-damaging | Buff, resistance, defensive or utility stat fields are not direct attack damage. |

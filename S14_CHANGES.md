@@ -1,3 +1,17 @@
+# S14 Open Beta Patch 1 — 22 October 2026
+
+Updated from the supplied Patch 1 archive snapshot. Exact input fingerprints are in `SOURCE_MANIFEST.json`.
+
+- **Poison Creeper:** each damage synergy rises from 14% to 25% per hard point. Raw level 17–22 increments change from 4 to 8, level 23–28 from 15 to 14, and level 29+ from 30 to 20. Poison duration remains 100 frames (4 seconds); Param3's change is life scaling, not poison duration.
+- **Fissure:** each synergy rises from 12% to 14%. Raw level 29+ minimum/maximum increments fall from 34/36 to 28/30. The source eruption frequency formula also changes from `6 - floor(hard points / 10)` to `5 - floor(hard points / 5)`; the calculator still shows damage per application and does not estimate total vent DPS.
+- **Twister and Tornado:** missile next-hit delays change from 10 and 25 frames respectively to 4 frames (0.16 seconds). Per-application damage is unchanged. Their skill notes now identify the delay without converting it into a guaranteed hit rate or DPS multiplier.
+- **Blood Golem:** summon cast delay falls from 50 to 25 frames. Summon attack DPS is not simulated.
+- **Mercenary Static Field:** radius cap changes from 26 to 22 and Param4 from 25 to 0. This mercenary skill is not a selectable player damage model.
+
+The regenerated catalogue changes only Poison Creeper/Fissure damage models and the Twister/Tornado timing notes; the existing layout, saved links and calculation engine are retained. Other archive/DLL changes are outside this numerical damage-data refresh unless represented by these models. This is a source-data update, not a complete runtime audit of the patch DLL.
+
+---
+
 # S14 Open Beta calculator update
 
 Source: uploaded Live installation, extracted 20 October 2026. Archive and table SHA-256 fingerprints are in `SOURCE_MANIFEST.json`. The main catalogue and Reset now use S14 Open Beta. Previous season-comparison output has been removed.

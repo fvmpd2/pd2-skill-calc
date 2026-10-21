@@ -1,6 +1,6 @@
-# PD2 Damage Calculator — S14 Open Beta
+# PD2 Damage Calculator — S14 Open Beta Patch 1
 
-A compact calculator for supported Project Diablo 2 skill damage, built with AI, using the uploaded S14 Open Beta data (20 October 2026). Choose a class and skill, enter your levels and modifiers, and compare damage before and after enemy resistance.
+A compact calculator for supported Project Diablo 2 skill damage, built with AI, using the uploaded S14 Open Beta Patch 1 data (22 October 2026). Choose a class and skill, enter your levels and modifiers, and compare damage before and after enemy resistance.
 
 ## What it calculates
 
