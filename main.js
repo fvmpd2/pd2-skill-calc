@@ -258,6 +258,6 @@ async function importCharacter(read){
  try{const data=await read();if(!classes.includes(data.className))throw Error('No supported damage skills for this character class.');importedCharacter=data;$('class').value=data.className;refreshSkillList();const learned=supportedSkills.find(s=>s.className===data.className&&data.C.levels(Number(s.gameId)).blvl>0);if(learned){$('skill').value=learned.id;changeSkill();}$('clearCharacter').hidden=false;}
  catch(e){status.textContent=e.message;}finally{$('importArmory').disabled=false;$('characterFile').disabled=false;}
 }
-$('importArmory').addEventListener('click',()=>importCharacter(()=>SkillCharacterImport.armory($('armoryLink').value)));
+$('importArmory').addEventListener('click',()=>{try{const name=SkillCharacterImport.armoryName($('armoryLink').value);$('armoryDownload').href='https://api.projectdiablo2.com/game/character/'+encodeURIComponent(name);$('armoryDownload').hidden=false;importCharacter(()=>SkillCharacterImport.armory($('armoryLink').value));}catch(e){$('importStatus').textContent=e.message;}});
 $('characterFile').addEventListener('change',e=>{const file=e.target.files[0];if(file)importCharacter(()=>SkillCharacterImport.file(file));e.target.value='';});
 $('clearCharacter').addEventListener('click',()=>{importedCharacter=null;$('clearCharacter').hidden=true;$('importStatus').textContent='Character detached. Current inputs remain editable.';});
