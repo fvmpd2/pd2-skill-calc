@@ -249,6 +249,7 @@ function applyImportedCharacter(){
  const type=$('damageType').value;$('pct').value=String(damage(type));$('pierce').value=String(pierce(type));
  if(active.className==='Sorceress'){const mt=masteryType(),id={fire:61,lightning:63,cold:65}[mt];$('masteryLevel').value=String(id?skillLevel(id).lvl:0);$('teleportLevel').value=String(Math.max(1,skillLevel(54).lvl));}
  for(const e of $('chargeModifiers').querySelectorAll('input')){if(e.dataset.modifier==='bonus')e.value=String(damage(e.dataset.type));if(e.dataset.modifier==='pierce')e.value=String(pierce(e.dataset.type));}
+ for(const e of $('extraFields').querySelectorAll('input')){if(e.dataset.extra==='masteryLevel'&&active.className==='Necromancer')e.value=String(skillLevel(69).lvl);if(e.dataset.extra==='grizzlyLevel')e.value=String(skillLevel(247).blvl);}
  $('poisonFcr').value=String(itemStat(105));
  $('importStatus').textContent=`Using ${importedCharacter.name} · ${importedCharacter.className}. Skill and synergy levels follow this character when selecting skills. Unlearned skills display level 1 for preview. Check target resistance, temporary buffs and summon/weapon inputs manually.`+(importedCharacter.notes.length?' Reader notes: '+importedCharacter.notes.join(' '):'');
 }
