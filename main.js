@@ -1,6 +1,6 @@
 const $=id=>document.getElementById(id);
 const supportedSkills=skills.filter(s=>s.formula&&!s.excluded);
-const classes=[...new Set(supportedSkills.map(s=>s.className))].sort((a,b)=>a.localeCompare(b));let active=null;const overrides={};const savedSynergies={};
+const classes=[...new Set(supportedSkills.map(s=>s.className))].sort((a,b)=>a.localeCompare(b));let active=null;let importedCharacter=null;const overrides={};const savedSynergies={};
 const types={poison:/poison|plague|rabies|venom|desecrate/i,fire:/fire|flame|meteor|hydra|molten|fissure|volcano|armageddon|inferno|immolation|blaze|combustion|explod/i,cold:/cold|ice|frost|blizzard|frozen|glacial|hurricane|arctic/i,lightning:/lightning|charged|shock|thunder|nova|static/i,magic:/teeth|bone spear|bone spirit|blessed hammer|holy bolt|psychic hammer|mind blast/i};
 const editorKey=()=>active?.charges?`${active.id}:${$('chargeEditor').value}`:active?.id;
 const selectedComponent=()=>{if(!active?.charges)return null;const [stage,index]=$('chargeEditor').value.split(':').map(Number);return active.charges[stage]?.components[index];};
@@ -10,7 +10,7 @@ const n=id=>Number($(id).value)||0;
 $('teleportLevel').replaceChildren(...Array.from({length:100},(_,i)=>new Option(String(i+1),String(i+1))));const fmt=v=>$('truncateNumbers').checked?Math.trunc(v).toLocaleString():v.toLocaleString(undefined,{maximumFractionDigits:3});const range=(a,b)=>`${fmt(a)} – ${fmt(b)}`;
 $('class').replaceChildren(...classes.map(c=>new Option(c,c)));
 function refreshSkillList(){const matching=supportedSkills.filter(s=>s.className===$('class').value);$('skill').replaceChildren(...matching.map(s=>new Option(s.name,s.id)));active=matching[0]||null;changeSkill();}
-function changeSkill(){if(!restoringBuild)for(const key of Object.keys(overrides))delete overrides[key];active=supportedSkills.find(s=>s.id===$('skill').value)||active;if(!active)return;for(const id of ['masteryLevel','pct','pierce','enemyRes','enemyPlr','criticalChance','deadlyChance','criticalBonus','deadlyBonus'])$(id).value='0';$('deadlyFields').append($('deadlyChanceField'));$('feedback').textContent='';$('levelLabel').firstChild.textContent=`${active.name} (slvl)`;setupExtras();setupCharges();placeStrikeChance();$('skillInfo').textContent=active.info||'';$('skillInfo').hidden=!active.info;$('aboutSkill').hidden=!active.info;$('aboutSkill').open=false;$('criticalDetails').open=false;$('poisonCastPanel').hidden=active.name!=='Poison Nova';$('damageType').value=skillFormula()?.damageType||guessedType(active);$('damageType').disabled=true;$('normalModifierType').textContent=$('damageType').value[0].toUpperCase()+$('damageType').value.slice(1);$('pct').disabled=$('damageType').value==='physical';$('skillDamageLabel').textContent='+ Skill damage'+(active.className==='Sorceress'?' (equipment only)':'');$('enemyReductionLabel').textContent='−Enemy res %'+(active.className==='Sorceress'?' (equipment only)':'');renderScaling();renderSynergies();compute();}
+function changeSkill(){if(!restoringBuild)for(const key of Object.keys(overrides))delete overrides[key];active=supportedSkills.find(s=>s.id===$('skill').value)||active;if(!active)return;for(const id of ['masteryLevel','pct','pierce','enemyRes','enemyPlr','criticalChance','deadlyChance','criticalBonus','deadlyBonus'])$(id).value='0';$('deadlyFields').append($('deadlyChanceField'));$('feedback').textContent='';$('levelLabel').firstChild.textContent=`${active.name} (slvl)`;setupExtras();setupCharges();placeStrikeChance();$('skillInfo').textContent=active.info||'';$('skillInfo').hidden=!active.info;$('aboutSkill').hidden=!active.info;$('aboutSkill').open=false;$('criticalDetails').open=false;$('poisonCastPanel').hidden=active.name!=='Poison Nova';$('damageType').value=skillFormula()?.damageType||guessedType(active);$('damageType').disabled=true;$('normalModifierType').textContent=$('damageType').value[0].toUpperCase()+$('damageType').value.slice(1);$('pct').disabled=$('damageType').value==='physical';$('skillDamageLabel').textContent='+ Skill damage'+(active.className==='Sorceress'?' (equipment only)':'');$('enemyReductionLabel').textContent='−Enemy res %'+(active.className==='Sorceress'?' (equipment only)':'');renderScaling();renderSynergies();if(importedCharacter)applyImportedCharacter();compute();}
 function renderSynergies(){const f=skillFormula(),holder=$('synergies'),defaults=defaultSynergies();$('synergyDetails').open=synergyList().length>3;$('synergyDetails').hidden=!synergyList().length;$('synergyNote').hidden=!synergyList().length;holder.replaceChildren();for(const sy of synergyList()){const label=document.createElement('label');label.textContent=`${sy.name} (hlvl)`;const input=document.createElement('input');input.type='number';input.min=0;input.max=20;input.value=savedSynergies[active.id]?.[sy.name]??defaults[sy.name];input.addEventListener('input',()=>{(savedSynergies[active.id]??={})[sy.name]=Number(input.value)||0;compute();});input.dataset.synergy=sy.name;label.append(input);holder.append(label);}}
 function normalizeReductionInputs(){
  const fields=[$('pierce'),...$('normalBreaking').querySelectorAll('input'),...Array.from($('chargeModifiers').querySelectorAll('input')).filter(e=>['pierce','breaking'].includes(e.dataset.modifier))];
@@ -197,6 +197,7 @@ function restoreBuild(hash){
  }catch(e){$('linkFeedback').textContent='This build link could not be loaded. Choose a skill to start again.';return false;}finally{restoringBuild=false;}
 }
 $('resetBuild').addEventListener('click',()=>{
+ importedCharacter=null;$('clearCharacter').hidden=true;$('importStatus').textContent='';
  const id=active.id;
  for(const key of Object.keys(overrides))if(key===id||key.startsWith(id+':'))delete overrides[key];
  savedSynergies[id]={};
@@ -234,3 +235,28 @@ function placeStrikeChance(){
  const fields=active.charges?Array.from($('chargeModifiers').children).find(box=>box.children[0].textContent==='Physical')?.children[1]:$('normalModifierFields');
  if(fields)fields.append($('deadlyChanceField'));
 }
+
+function applyImportedCharacter(){
+ if(!importedCharacter||!active||active.className!==importedCharacter.className)return;
+ const {C}=importedCharacter;
+ const findSkill=name=>skills.find(s=>s.name===name||s.internalName===name);
+ const skillLevel=id=>C.levels(Number(id));
+ $('level').value=String(Math.max(1,skillLevel(active.gameId).lvl));
+ for(const input of $('synergies').querySelectorAll('input')){const sk=findSkill(input.dataset.synergy);input.value=String(sk?skillLevel(sk.gameId).blvl:0);(savedSynergies[active.id]??={})[input.dataset.synergy]=Number(input.value);}
+ const itemStat=id=>C.itemLists.reduce((sum,x)=>sum+x.T.sum(id),0);
+ const damageStats={fire:329,lightning:330,cold:331,poison:332,magic:357},pierceStats={fire:333,lightning:334,cold:335,poison:336,magic:358};
+ const damage=type=>damageStats[type]===undefined?0:itemStat(damageStats[type]),pierce=type=>pierceStats[type]===undefined?0:Math.abs(itemStat(pierceStats[type]));
+ const type=$('damageType').value;$('pct').value=String(damage(type));$('pierce').value=String(pierce(type));
+ if(active.className==='Sorceress'){const mt=masteryType(),id={fire:61,lightning:63,cold:65}[mt];$('masteryLevel').value=String(id?skillLevel(id).lvl:0);$('teleportLevel').value=String(Math.max(1,skillLevel(54).lvl));}
+ for(const e of $('chargeModifiers').querySelectorAll('input')){if(e.dataset.modifier==='bonus')e.value=String(damage(e.dataset.type));if(e.dataset.modifier==='pierce')e.value=String(pierce(e.dataset.type));}
+ $('poisonFcr').value=String(itemStat(105));
+ $('importStatus').textContent=`Using ${importedCharacter.name} · ${importedCharacter.className}. Skill and synergy levels follow this character when selecting skills. Unlearned skills display level 1 for preview. Check target resistance, temporary buffs and summon/weapon inputs manually.`+(importedCharacter.notes.length?' Reader notes: '+importedCharacter.notes.join(' '):'');
+}
+async function importCharacter(read){
+ const status=$('importStatus');$('importArmory').disabled=true;$('characterFile').disabled=true;status.textContent='Reading character…';
+ try{const data=await read();if(!classes.includes(data.className))throw Error('No supported damage skills for this character class.');importedCharacter=data;$('class').value=data.className;refreshSkillList();const learned=supportedSkills.find(s=>s.className===data.className&&data.C.levels(Number(s.gameId)).blvl>0);if(learned){$('skill').value=learned.id;changeSkill();}$('clearCharacter').hidden=false;}
+ catch(e){status.textContent=e.message;}finally{$('importArmory').disabled=false;$('characterFile').disabled=false;}
+}
+$('importArmory').addEventListener('click',()=>importCharacter(()=>SkillCharacterImport.armory($('armoryLink').value)));
+$('characterFile').addEventListener('change',e=>{const file=e.target.files[0];if(file)importCharacter(()=>SkillCharacterImport.file(file));e.target.value='';});
+$('clearCharacter').addEventListener('click',()=>{importedCharacter=null;$('clearCharacter').hidden=true;$('importStatus').textContent='Character detached. Current inputs remain editable.';});

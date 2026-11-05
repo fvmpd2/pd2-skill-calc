@@ -70,3 +70,9 @@ python3 build_audit.py Skills.txt Missiles.txt Skilldesc.txt MissCalc.txt MonSta
 ```
 
 Monster files enable Hell summon bases. Review the season-specific formulas and audit when updating game data.
+
+## Import a character
+
+Open **Import character** and paste a PD2 character armory link/name, or upload a `.d2s` save or armory JSON export. Save parsing runs locally. Imports select the class, fill effective skill/mastery levels, actual hard-point synergies, equipment damage/pierce and FCR. Selecting another skill in that class reuses the character. Reset detaches it.
+
+Enemy stats, curses, temporary/party buffs and summon/weapon-specific inputs require manual review. Unlearned skills preview at level 1. The bundled reader has its own data version, which may lag future patches. If the public armory API is unavailable, use a save or JSON export. Keep `character-import.js` and `vendor/` beside the site files.
