@@ -1,0 +1,10 @@
+const A=require('node:assert/strict'),E=require('./engine.js');
+A.equal(E.scale([1,2,3,4,5,6],8),15);A.equal(E.scale([1,2,3,4,5,6],9),18);A.equal(E.scale([1,2,3,4,5,6],29),99);
+const empty={creeperHard:0,feralHard:0,shapeHard:0,rabiesHard:0,carrionHard:0,solarHard:0,creeperActive:false,enemyRes:0,enemyPlr:0,rabiesLevel:1,creeperLevel:1};const v=E.calculate(empty);A.equal(v.rabies.rawFrame[0],.125);A.equal(v.rabies.rawTotal[0],15.625);A.equal(v.creeper.rawFrame[1],2/64);A.equal(v.rabies.baseDuration,5);A.equal(v.creeper.baseDuration,4);
+const syn=E.calculate({...empty,creeperHard:20,feralHard:20,shapeHard:20,rabiesHard:20,carrionHard:20,solarHard:20});A.equal(syn.rabies.rawTotal[0],15.625*7);A.equal(syn.creeper.rawFrame[0],16/64);A.equal(syn.creepers,3);A.equal(E.calculate({...empty,creeperHard:9}).creepers,1);A.equal(E.calculate({...empty,creeperHard:10}).creepers,2);A.equal(E.calculate({...empty,creeperHard:0,creeperLevel:99}).creepers,1);
+A.equal(E.calculate({...empty,creeperLevel:36,creeperActive:true}).debuff,40);A.equal(E.calculate({...empty,creeperLevel:99,creeperActive:true}).debuff,40);
+A.equal(E.resistance(110,[40],90).effective,0);A.equal(E.resistance(120,[40],90).immune,true);A.equal(E.resistance(100,[5,5],0).breaking,4);A.equal(E.resistance(50,[],60).effective,-5);
+const positive=E.calculate({...empty,pierce:60,breaking:10}),negative=E.calculate({...empty,pierce:-60,breaking:-10});A.deepEqual(positive.rabies,negative.rabies);A.equal(positive.rabies.duration,6.48);A.equal(positive.creeper.duration,4);A.equal(E.calculate({...empty,pierce:200}).rabies.duration,10);
+const immune=E.calculate({...empty,enemyRes:150,pierce:100});A.equal(immune.rabies.avgDps,0);A.equal(E.marginal({...empty,enemyRes:150}).pierce.rate,null);
+for(let l=1;l<=100;l++){const x=E.calculate({...empty,rabiesLevel:l,creeperLevel:l});A(Number.isFinite(x.rabies.avgDps));A(x.rabies.rawFrame[1]>=x.rabies.rawFrame[0]);}
+console.log('Rabies/Creeper rate, synergy, tiers, count, resistance, immunity, signed inputs and duration checks passed.');
