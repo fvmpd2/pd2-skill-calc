@@ -252,7 +252,7 @@ function fromArmory(J, D) {
     const r = {
       name: it.name, code: it.base_code || it.base.id, type: it.base.type_code, quality: it.quality && it.quality.id, eth: !!it.is_ethereal,
       stats: armoryStats(D, it.modifiers), rw: it.runeword ? it.runeword.name : null, runewordStats: [],
-      sockets: it.socket_count || 0, children: (it.socketed || []).map(conv), setName: it.quality && it.quality.id === 5 ? it.name : null,
+      sockets: it.socket_count || 0, children: (it.socketed || []).map(conv), setId: it.set_id ?? it.set_item_id, setName: it.quality && it.quality.id === 5 ? it.name : null,
       defense: it.defense ? it.defense.base : null, defenseTotal: it.defense ? it.defense.total : null,
       armoryDamage: it.damage || null, unique: it.quality && it.quality.id === 7 ? it.name : null, ilvl: it.item_level,
       corrupted: !!it.corrupted, loc: 'other', slot: null, x: it.position ? it.position.column : 0, y: it.position ? it.position.row : 0,
@@ -402,19 +402,29 @@ function activeItems(D, model, opts) {
   }
   return out;
 }
+// API display names can differ from SetItems.txt's internal keys (notably Tal Rasha/Aldur).
+function resolveSetItem(D, it) {
+  if (Number.isInteger(it.setId) && D.setitems[it.setId]) return it.setId;
+  const normalize = n => String(n || '').normalize('NFKD').replace(/[’‘]/g, "'").toLowerCase().replace(/[^a-z0-9]/g, '');
+  const aliases = { talrashasguardianship: 'talrashashowlingwind', aldursrhythm: 'aldursgauntlet' };
+  const name = normalize(it.setName || it.name), wanted = aliases[name] || name;
+  const byName = D.setitems.findIndex(s => normalize(s.n) === wanted);
+  if (byName >= 0) return byName;
+  const byBase = D.setitems.map((s, id) => ({ s, id })).filter(({s}) => s.code === it.code);
+  return byBase.length === 1 ? byBase[0].id : -1;
+}
 function setBonuses(D, items) {              // SetItems aprop by count + Sets partial/full bonuses
   const bySet = new Map(); const out = [];
   for (const it of items) {
     if (it.quality !== 5) continue;
-    let sid = it.setId;
-    if ((sid === undefined || sid === null) && it.setName) sid = D.setitems.findIndex(s => s.n === it.setName);
+    const sid = resolveSetItem(D, it);
     if (sid === undefined || sid < 0 || !D.setitems[sid]) continue;
     const si = D.setitems[sid]; const set = si.set;
     if (!bySet.has(set)) bySet.set(set, []);
-    if (!bySet.get(set).some(x => x.si === si)) bySet.get(set).push({ it, si });   // the same set item twice counts once
+    bySet.get(set).push({ it, si }); // Each equipped copy gets its own bonuses; distinct pieces determine set count.
   }
   for (const [set, list] of bySet) {
-    const n = list.length;
+    const n = new Set(list.map(x => x.si)).size;
     for (const { it, si } of list) {
       if (it.setBonusLists && it.setBonusLists.length) {      // .d2s stores the item's own bonus lists
         for (const l of it.setBonusLists) if (n >= l.bit + 2) for (const s of l.stats) out.push({ ...s, src: it.name + ' (set bonus)' });
@@ -471,7 +481,10 @@ function compute(model, D, opts) {
     itemLists.push({ it, T });
     T.each((id, p, v) => { R.add(id, p, v); note(id, it.name + (it.loc === 'inv' ? ' (charm)' : ''), v); });
   }
-  for (const s of setBonuses(D, items)) { const v = vshift(D, s.id, s.val); R.add(s.id, s.param, v); note(s.id, s.src, v); }
+  const setStats = new List();
+  for (const s of setBonuses(D, items)) { const v = vshift(D, s.id, s.val); R.add(s.id, s.param, v); setStats.add(s.id, s.param, v); note(s.id, s.src, v); }
+  // Equipment-only totals include active set bonuses, but exclude skill passives/auras (e.g. Sorceress mastery).
+  const equipmentStat = id => itemLists.reduce((sum, x) => sum + x.T.sum(id), 0) + setStats.sum(id);
   // PD2: items grant auras and "when equipped" self-auras
   const auraSkills = [];
   R.each((id, p, v) => { if ((id === 151 || id === 191) && v > 0) auraSkills.push({ id: p, lvl: v, from: id === 191 ? 'equip' : 'aura' }); });
@@ -564,7 +577,7 @@ function compute(model, D, opts) {
   // TP(id): PD 0x102D30B0, the layered passive entries whose item type the wielded weapon matches.
   const T0 = id => T(id) - (layered.get(id) || 0);
   const TP = id => layeredMatch.get(id) || 0;
-  return { model, D, cls, items, itemLists, R, T: stat, T0, TP, src, levels, skillRows, auraRows, weapons: W, opts };
+  return { model, D, cls, items, itemLists, equipmentStat, R, T: stat, T0, TP, src, levels, skillRows, auraRows, weapons: W, opts };
 }
 
 // ---------------------------------------------------------------- BH.dll Advanced Stats panel (0x1007C040)

@@ -243,7 +243,7 @@ function applyImportedCharacter(){
  const skillLevel=id=>C.levels(Number(id));
  $('level').value=String(Math.max(1,skillLevel(active.gameId).lvl));
  for(const input of $('synergies').querySelectorAll('input')){const sk=findSkill(input.dataset.synergy);input.value=String(sk?skillLevel(sk.gameId).blvl:0);(savedSynergies[active.id]??={})[input.dataset.synergy]=Number(input.value);}
- const itemStat=id=>C.itemLists.reduce((sum,x)=>sum+x.T.sum(id),0);
+ const itemStat=id=>C.equipmentStat(id);
  const damageStats={fire:329,lightning:330,cold:331,poison:332,magic:357},pierceStats={fire:333,lightning:334,cold:335,poison:336,magic:358};
  const damage=type=>damageStats[type]===undefined?0:itemStat(damageStats[type]),pierce=type=>pierceStats[type]===undefined?0:Math.abs(itemStat(pierceStats[type]));
  const type=$('damageType').value;$('pct').value=String(damage(type));$('pierce').value=String(pierce(type));
