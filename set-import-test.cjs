@@ -31,3 +31,16 @@ if(saveFile){
  assert.equal(C.equipmentStat(331),5,'Mav gloves cold set damage');
  console.log('Actual MavsFireArrow save passed: level 46 Fire Arrow, 68% fire damage, 70% fire pierce and 5% cold set damage.');
 }
+// CTA's buff survives swapping; its own item +skills do not transfer.
+const ctaModel=A.fromArmory(character(tal),D);
+const cta={name:'Call to Arms',code:'fla',type:'mace',loc:'equip',slot:'rarm2',quality:2,stats:[{id:97,param:155,val:6},{id:127,param:0,val:1}],children:[],runewordStats:[],childrenIncluded:true};
+ctaModel.items.push(cta);
+const unbuffed=A.compute(ctaModel,D,{}),buffed=A.compute(ctaModel,D,{assumeBattleCommand:true});
+assert.equal(buffed.battleCommandAssumed,true);
+assert.equal(buffed.levels(36).lvl,unbuffed.levels(36).lvl+1,'CTA adds exactly one skill after swapping back');
+assert.equal(buffed.levels(36).blvl,20,'CTA must not change hard-point synergies');
+assert.equal(buffed.equipmentStat(127),unbuffed.equipmentStat(127),'inactive CTA equipment skills stay excluded');
+assert.equal(buffed.levels(37).lvl,0,'CTA does not teach unlearned skills');
+cta.loc='stash';assert.equal(A.compute(ctaModel,D,{assumeBattleCommand:true}).battleCommandAssumed,false,'stash CTA cannot be used');
+cta.loc='equip';cta.slot='rarm';assert.equal(A.compute(ctaModel,D,{swap:true,assumeBattleCommand:true}).battleCommandAssumed,true,'detect CTA on either equipped weapon set');
+console.log('CTA tests passed: +1 skill, unchanged hard points, no inactive equipment leakage, stash excluded and either swap supported.');

@@ -485,6 +485,12 @@ function compute(model, D, opts) {
   for (const s of setBonuses(D, items)) { const v = vshift(D, s.id, s.val); R.add(s.id, s.param, v); setStats.add(s.id, s.param, v); note(s.id, s.src, v); }
   // Equipment-only totals include active set bonuses, but exclude skill passives/auras (e.g. Sorceress mastery).
   const equipmentStat = id => itemLists.reduce((sum, x) => sum + x.T.sum(id), 0) + setStats.sum(id);
+  // Assume an available CTA Battle Command has been cast before returning to the active weapons.
+  // Only its persistent buff transfers: inactive weapon/shield +skills never do.
+  const battleCommandAssumed = !!opts.assumeBattleCommand && model.items.some(it =>
+    it.loc === 'equip' && ['rarm', 'larm', 'rarm2', 'larm2'].includes(it.slot) &&
+    itemTotals(D, it, model).get(97, 155) > 0);
+  if (battleCommandAssumed) { R.add(127, 0, 1); note(127, 'Battle Command (CTA prebuff assumed)', 1); }
   // PD2: items grant auras and "when equipped" self-auras
   const auraSkills = [];
   R.each((id, p, v) => { if ((id === 151 || id === 191) && v > 0) auraSkills.push({ id: p, lvl: v, from: id === 191 ? 'equip' : 'aura' }); });
@@ -577,7 +583,7 @@ function compute(model, D, opts) {
   // TP(id): PD 0x102D30B0, the layered passive entries whose item type the wielded weapon matches.
   const T0 = id => T(id) - (layered.get(id) || 0);
   const TP = id => layeredMatch.get(id) || 0;
-  return { model, D, cls, items, itemLists, equipmentStat, R, T: stat, T0, TP, src, levels, skillRows, auraRows, weapons: W, opts };
+  return { model, D, cls, items, itemLists, equipmentStat, battleCommandAssumed, R, T: stat, T0, TP, src, levels, skillRows, auraRows, weapons: W, opts };
 }
 
 // ---------------------------------------------------------------- BH.dll Advanced Stats panel (0x1007C040)
