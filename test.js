@@ -351,3 +351,11 @@ const fissurePatch=c.calc(skill('Fissure').formula,{skillLevel:40,synergyPoints:
 assert(Math.abs(fissurePatch.min-4349.4)<1e-8);assert(Math.abs(fissurePatch.max-4930.2)<1e-8);
 for(const name of ['Twister','Tornado'])assert(skill(name).info.includes('4-frame next-hit delay (0.16 seconds)'));
 console.log('Passed: Open Beta Patch 1 Creeper/Fissure damage and next-hit timing notes.');
+// Fire Arrow's burning-patch tooltip is three times actual DPS.
+const firePatch=c.catalog.find(s=>s.name==='Fire Arrow').charges[1].components[0];
+for(const level of [1,28,48]){
+ const opts={skillLevel:level,synergyPoints:{'Magic Arrow':20,'Immolation Arrow':20},skillDamagePct:66,enemyResistancePct:75,enemyResistanceReductionPct:69};
+ const corrected=c.charge(firePatch,opts),tooltip=c.charge({...firePatch,formula:{...firePatch.formula,outputMultiplier:1}},opts);
+ for(const field of ['min','max','avg'])assert.ok(Math.abs(corrected[field]*3-tooltip[field])<1e-8,'burning patch /3 '+field);
+}
+console.log('Passed: Fire Arrow burning patch is one-third tooltip DPS across skill levels, mastery and resistance.');

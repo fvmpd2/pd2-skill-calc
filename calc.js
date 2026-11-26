@@ -12,7 +12,7 @@ function calculate(formula, {skillLevel, synergyPoints={}, skillDamagePct=0, ene
   const level = Math.max(1, Math.floor(Number(skillLevel)));
   let baseMin=scaledValue(formula.min,level), baseMax=scaledValue(formula.max,level);
   let synergyPct=(formula.synergy||[]).reduce((sum,s)=>sum+(Number(synergyPoints[s.name]||0)*s.pctPerHardPoint*100),0);
-  let modifierMultiplier=1;
+  let modifierMultiplier=Number(formula.outputMultiplier ?? 1);
   if(formula.model==='dark-pact'){const count=Math.min(formula.maxCurses??Infinity,Math.max(0,Math.floor(extraInputs.curseCount??1)));modifierMultiplier=count===0?0:1+.1*(count-1);}
   if(formula.model==='skeleton-warrior'||formula.model==='skeleton-archer'){const mastery=Math.max(0,Number(extraInputs.masteryLevel||0));baseMin+=2*mastery;baseMax+=2*mastery;synergyPct+=Number(extraInputs.summonEd||0)+(formula.model==='skeleton-warrior'?Math.max(0,level-3)*10:0);}
   if(formula.model==='druid-summon'){const grizzly=formula.ownGrizzly?level:Math.min(formula.grizzlyHardPoints?20:100,Number(extraInputs.grizzlyLevel||0));modifierMultiplier*=1+((grizzly>0?25+10*(grizzly-1):0)+Number(extraInputs.summonEd||0)+(formula.corpseFedEd??100)*Math.min(1,Math.floor(extraInputs.corpseFed||0)))/100;}
